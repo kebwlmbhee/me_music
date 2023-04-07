@@ -1,0 +1,71 @@
+[33mcommit d062a3854a9c3794c8bf6d146692b185b291836e[m[33m ([m[1;36mHEAD -> [m[1;32mfirebase-env-webpack[m[33m)[m
+Author: kebwlmbhee <yhqchiu@gmail.com>
+Date:   Fri Apr 7 12:46:31 2023 +0800
+
+    create firebase environment with webpack
+
+[33mcommit e3ccc2b12d42c720f3afc273e9a5fddfea0c5b2f[m[33m ([m[1;32mdev[m[33m)[m
+Merge: 67d1895 e7742ea
+Author: kebwlmbhee <yhqchiu@gmail.com>
+Date:   Fri Apr 7 10:34:46 2023 +0800
+
+    Merge branch 'dev' of nccu_se/ac/me_music into dev
+
+[33mcommit e7742ea22ba26d128b04944c335e99acb0b2299e[m[33m ([m[1;31msrc_me_music/dev[m[33m)[m
+Merge: b3176a5 fa59aa0
+Author: Jay Hung <gamania0258@gmail.com>
+Date:   Fri Apr 7 01:59:12 2023 +0000
+
+    Merge branch 'ZhiRong' into 'dev'
+    
+    Create project environment
+    
+    See merge request nccu_se/ac/me_music!3
+
+[33mcommit 67d1895fdcba008ed5221e096529b8e39c245e35[m[33m ([m[1;31morigin/dev[m[33m)[m
+Author: kebwlmbhee <yhqchiu@gmail.com>
+Date:   Thu Apr 6 02:17:41 2023 +0800
+
+    feat: create firebase environment by using webpack
+
+[33mcommit 3f7403baf78afada614fdec8269cb6b2c49fa379[m
+Author: kebwlmbhee <yhqchiu@gmail.com>
+Date:   Thu Apr 6 01:53:41 2023 +0800
+
+    feat: build temporary vue environment, add webpack bundle.js
+
+[33mcommit fa59aa092ba48fc279accc240469c6e3c982f4ae[m
+Merge: 6a6a371 b3176a5
+Author: jordan990301 <jordan990301@gmail.com>
+Date:   Wed Apr 5 19:14:57 2023 +0800
+
+    first commit
+
+[33mcommit 6a6a37129fc87885ac11b96973e78dfa34a71960[m
+Author: jordan990301 <jordan990301@gmail.com>
+Date:   Wed Apr 5 19:10:39 2023 +0800
+
+    first commit
+
+[33mcommit b3176a5b1d6aac7379053c4b12d3d6dddd81d42f[m
+Merge: ce5974e b189a0b
+Author: kebwlmbhee <yhqchiu@gmail.com>
+Date:   Thu Mar 30 10:59:57 2023 +0000
+
+    Merge branch 'dev' into 'dev'
+    
+    docs: remove README additional information
+    
+    See merge request nccu_se/ac/me_music!1
+
+[33mcommit b189a0bd7e8cf4fde47ddf1333057d17fec067d7[m
+Author: kebwlmbhee <yhqchiu@gmail.com>
+Date:   Thu Mar 30 18:51:42 2023 +0800
+
+    docs: remove README additional information
+
+[33mcommit ce5974e906b61939bbb05fb05d00c0b2347d8cd2[m[33m ([m[1;31msrc_me_music/main[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m, [m[1;32mmain[m[33m)[m
+Author: kebwlmbhee <yhqchiu@gmail.com>
+Date:   Mon Mar 27 06:24:45 2023 +0000
+
+    Initial commit

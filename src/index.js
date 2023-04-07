@@ -1,3 +1,6 @@
+import { createApp } from 'vue'
+
+
 import { initializeApp } from 'firebase/app';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
@@ -15,6 +18,56 @@ const firebaseApp = initializeApp({
 });
 
 const db = getDatabase();
+const chatroomRef = ref(db, 'chatroom');
 
 const auth = getAuth(firebaseApp);
 
+
+/*
+async function writeData(msg){
+    
+    push(chatroomRef, {
+        message: msg
+    })
+}
+
+writeData("123");
+*/
+
+function readData(){
+
+    onValue(chatroomRef, (snapshot) => {
+        const data = snapshot.val();
+        console.log(data)
+    });
+}
+
+readData();
+
+/*
+const app = createApp({
+    data() {
+        return {
+            chatroom: [],
+            tempUserName: '',
+            username: '',
+            message: ''
+        }
+    },
+    methods: {
+
+    },
+    setup() {
+        onValue(chatroomRef, (snapshot) => {
+            const data = snapshot.val();
+            console.log(data)
+            this.chatroom = data;
+        });
+    }
+});
+
+app.mount('#app')
+
+window.Vue = app;
+
+*/
