@@ -19,27 +19,23 @@ npm install
 ### Compile and Hot-Reload for Development
 
 ```sh
-node_modules/.bin/webpack
 npm run dev
 ```
 
 ### Compile and Minify for Production
 
 ```sh
-node_modules/.bin/webpack
 npm run build
 ```
 
 ### Run Unit Tests with [Vitest](https://vitest.dev/)
 
 ```sh
-node_modules/.bin/webpack
 npm run test:unit
 ```
 
 ### Lint with [ESLint](https://eslint.org/)
 
 ```sh
-node_modules/.bin/webpack
 npm run lint
 ```
