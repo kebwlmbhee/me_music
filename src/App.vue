@@ -121,6 +121,11 @@ export default defineComponent({
   cursor: pointer;
 }
 
+.message-input button:hover{
+  background-color: rgb(92, 153, 243);
+  color: white;
+}
+
 input::placeholder{
   font-size: 20px;
 }
