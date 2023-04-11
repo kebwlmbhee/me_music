@@ -1,85 +1,161 @@
-<script setup>
-import { RouterLink, RouterView } from 'vue-router'
-import HelloWorld from './components/HelloWorld.vue'
-</script>
-
 <template>
-  <header>
-    <img alt="Vue logo" class="logo" src="@/assets/logo.svg" width="125" height="125" />
+    <v-app id="inspire">
+        <!-- 左邊 -->
+        <v-navigation-drawer
+            
+            color="grey-lighten-3"
+            rail
+        >
+            <v-avatar
+            class="d-block text-center mx-auto mt-4"
+            color="grey-darken-1"
+            size="36"
+            ></v-avatar>
 
-    <div class="wrapper">
-      <HelloWorld msg="You did it!" />
+            <v-divider class="mx-3 my-5"></v-divider>
 
-      <nav>
-        <RouterLink to="/">Home</RouterLink>
-        <RouterLink to="/about">About</RouterLink>
-      </nav>
-    </div>
-  </header>
+            <v-btn v-for="(chatroom, index) in FakeData['Chatrooms']" :key="index"
+             class="d-block text-center mx-auto mb-9 rounded-circle"  
+              size="28" color="grey-lighten-1" :title="chatroom.alt">
+              <v-menu activator="parent">
+                  <v-list>
+                  <v-list-item value="Enter" title="Enter" to="/Chat" @click="chatdataTransfer(index)"></v-list-item>
+                  <v-list-item value="Delete" title="Delete"></v-list-item>
+                  </v-list>
+              </v-menu>
+            </v-btn>
+        </v-navigation-drawer>
+        <!-- 左-2 -->
+        <v-navigation-drawer width="244" permanent>
+            <!-- 左-2 放商標的? -->
+            <!--  -->
+            <v-sheet color="grey-lighten-5" height="128" width="100%">
+            <v-img src="src/assets/logo.png" alt="Fake"></v-img>
+            </v-sheet>
+            <!-- 底下的Item -->
+            <v-list mandatory v-model:selected="SelectedPage">
+                <v-list-item v-for="(explore, index) in Explores"
+                :key="index" :value="explore.title"
+                link :to="explore.to">
+                <v-list-item-title class="text-left font-weight-black">{{ explore.title }}</v-list-item-title>
+                </v-list-item>
+            </v-list>
+        </v-navigation-drawer>
 
-  <RouterView />
+        <!-- 右中-上 -->
+        <v-app-bar class="px-2" color="grey-lighten-4"
+            flat height="72">
+            <v-app-bar-title class="font-weight-bold" >#{{ SelectedPage[0] }}</v-app-bar-title> 
+            
+            <v-spacer></v-spacer>
+
+            <v-responsive max-width="156">
+            <v-text-field
+                bg-color="grey-lighten-2"
+                class="rounded-pill overflow-hidden"
+                density="compact"
+                hide-details
+                variant="solo"
+            ></v-text-field>
+            </v-responsive>
+        </v-app-bar>
+
+        <!-- 要放Page的地方  應該用Router Route  或是Component -->
+        <v-main>
+            <router-view></router-view>
+        </v-main>
+
+        <!-- 右邊的東東 -->
+        <v-navigation-drawer location="right">
+            <v-list>
+            
+            <v-list-item v-for="(member , index) in FakeData['ChatroomMembers']"
+                :key="index" :title="member.Name" 
+                link>
+                <!-- :prepend-avatar="'https://cdn.vuetifyjs.com/images/lists/1.jpg'" -->
+                <template v-slot:prepend>
+                <v-avatar color="brown">{{ member.alt }}</v-avatar>
+                </template>
+
+            </v-list-item>
+            </v-list>
+        </v-navigation-drawer>
+
+        <!-- 底下輸入框 -->
+        <v-footer
+            app
+            height="72"
+        >
+            <v-text-field v-model="message"
+            bg-color="grey-lighten-1"
+            class="rounded-pill overflow-hidden"
+            density="compact"
+            hide-details
+            variant="solo"
+            clearable
+            @keydown.enter="addchatData"
+            ></v-text-field>
+        </v-footer>
+    </v-app>
 </template>
 
-<style scoped>
-header {
-  line-height: 1.5;
-  max-height: 100vh;
+<script setup> 
+import { ref, reactive } from 'vue';
+import { useChatDataStore } from './stores/chatdata';
+
+const store = useChatDataStore()
+const Explores = reactive([
+                { title:"大廳", to:"/"},
+                { title:"我的音樂記錄", to:"/MusicRecord"},
+                { title:"建立播放清單", to:"/Where"}
+            ])
+const SelectedPage = ref(["大廳"])
+const FakeData = reactive({
+    ChatroomMembers:[
+      { ava:"", Name:"member1", alt:"M1"},
+      { ava:"", Name:"member2", alt:"M2"},
+      { ava:"", Name:"member3", alt:"M3"},
+      { ava:"", Name:"member4", alt:"M4"},
+      { ava:"", Name:"member5", alt:"M5"},
+    ],
+    Chatrooms:[ // 代表你有多少已進入的聊天室
+      { ava:"", Name:"ChatRoom1", alt:"C1"},
+      { ava:"", Name:"ChatRoom2", alt:"C2"},
+      { ava:"", Name:"ChatRoom3", alt:"C3"},
+      { ava:"", Name:"ChatRoom4", alt:"C4"},
+    ],
+    ChatData:[
+        { sender:"John", content:"這是我的內容喔"},
+        { sender:"Tess", content:"這是Tess的內容喔"},
+        { sender:"Tess", content:"這是Tess的內容喔"},
+        { sender:"John", content:"這是我的內容喔"},
+        { sender:"John", content:"這是我的內容喔"},
+        { sender:"Hso!", content:"這是Hso!的內容喔"},
+    ],
+})
+const message = ref("")
+
+// 以下皆為 function    
+function testClick(){
+  console.log("testClick");
 }
 
-.logo {
-  display: block;
-  margin: 0 auto 2rem;
+// TODO : 這裡要做獲取 串接API 聊天室資料
+// 好像有點問題  無法重新附值?
+function chatdataTransfer(index){
+  store.ClearChatData()
+  store.enterChatroom(FakeData['ChatData'])
+  store.addNewData({ sender :index , content:"test" })
 }
 
-nav {
-  width: 100%;
-  font-size: 12px;
-  text-align: center;
-  margin-top: 2rem;
+function addchatData(){
+  console.log(message.value)
+  store.addNewData({ sender : "A", content:message.value})
+  message.value = ""
 }
-
-nav a.router-link-exact-active {
-  color: var(--color-text);
-}
-
-nav a.router-link-exact-active:hover {
-  background-color: transparent;
-}
-
-nav a {
-  display: inline-block;
-  padding: 0 1rem;
-  border-left: 1px solid var(--color-border);
-}
-
-nav a:first-of-type {
-  border: 0;
-}
-
-@media (min-width: 1024px) {
-  header {
-    display: flex;
-    place-items: center;
-    padding-right: calc(var(--section-gap) / 2);
-  }
-
-  .logo {
-    margin: 0 2rem 0 0;
-  }
-
-  header .wrapper {
-    display: flex;
-    place-items: flex-start;
-    flex-wrap: wrap;
-  }
-
-  nav {
-    text-align: left;
-    margin-left: -1rem;
-    font-size: 1rem;
-
-    padding: 1rem 0;
-    margin-top: 1rem;
-  }
-}
-</style>
+   // watch:{
+   //   SelectedPage:function(newValue , oldValue){
+   //     console.log("there has a change new = " + newValue + " ,, old = " + oldValue);
+   //   }
+   // }
+</script>
