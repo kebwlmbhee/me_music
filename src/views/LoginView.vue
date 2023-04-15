@@ -1,8 +1,5 @@
 <template>
-    <router-link to="/">
-        <v-btn>Login</v-btn>
-    </router-link>
-    <v-btn v-on:click="getToken">test</v-btn>
+    <v-btn v-on:click="getToken">Login</v-btn>
 </template>
 
 <script>
@@ -29,8 +26,7 @@ export default {
     mounted() {
         const tokenValid = localStorage.getItem('authCode');
         if (tokenValid !== null) { this.$router.replace('/') }
-
-        //
+        
         const scope = "streaming user-top-read user-read-email user-read-private";
         const state = this.generateRandomString(16);
 
@@ -39,7 +35,8 @@ export default {
             client_id: import.meta.env.VITE_CLIENT_ID,
             scope: scope,
             redirect_uri: import.meta.env.VITE_REDIRECT_URI,
-            state: state
+            state: state,
+            // show_dialog: true
         })
         this.authUrl = 'https://accounts.spotify.com/authorize/?' + auth_query_parameters.toString();
     },

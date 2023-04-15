@@ -31,19 +31,6 @@ export default {
         this.getTokenURL();
         this.setTokenLocal();
         this.$router.replace('/');
-
-        // let url = new URL(window.location.href.toString());
-        // let params = url.searchParams;
-        // let code = '';
-        // let client_id = import.meta.env.VITE_CLIENT_ID;
-        // let client_secret = import.meta.env.VITE_CLIENT_SECRET;
-
-        // for (let pair of params.entries()) {
-        //     if (pair[0] === 'code') {
-        //         code = pair[1];
-        //     }
-        // }
-        // console.log(code);
     }
 }
 
