@@ -1,6 +1,6 @@
 <template>
   <div class="chat-container">
-    <div class="messages-container">
+    <div class="messages-container" v-if="messages.length > 0">
       <div class="message" v-for="(message, index) in messages" :key="index">
         <div class="message-info">
           <div class="message-author">{{ message.author }}</div>
@@ -20,8 +20,12 @@
 </template>
 
 <script>
-import { ref, push, onValue } from 'firebase/database';
+import { db } from './firebaseConf';
 import { defineComponent } from 'vue';
+
+import Chatroom from './chatroom.js';
+
+const chatroom = new Chatroom(db);
 
 export default defineComponent({
   data() {
@@ -32,27 +36,21 @@ export default defineComponent({
     }
   },
   created() {
-    const chatroomRef = ref(this.$db, 'chatroom');
-    onValue(chatroomRef, (snapshot) => {
-      const messages = [];
-      snapshot.forEach((childSnapshot) => {
-        messages.push(childSnapshot.val());
-      });
+    chatroom.onMessage((messages) => {
       this.messages = messages;
     });
   },
   methods: {
     sendMessage() {
       if (!this.author) {
-      alert('Please enter your name');
-      return;
-    }
-      const newMessage = {
-        author: this.author,
-        text: this.text,
-        time: new Date().toLocaleString()
+        alert('Please enter your name!');
+        return;
       }
-      push(ref(this.$db, 'chatroom'), newMessage);
+      if (!this.text){
+        alert('message is empty!');
+        return;
+      }
+      chatroom.sendMessage(this.author, this.text);
       this.text = '';
     }
   }
@@ -95,7 +93,6 @@ export default defineComponent({
 .message-input {
   display: flex;
   align-items: center;
-  /* margin: auto; */
   margin-top: 30%;
   padding: 10px;
   border-top: 1px solid #ccc;
@@ -120,21 +117,17 @@ export default defineComponent({
   font-weight: bold;
   cursor: pointer;
 }
-
 .message-input button:hover{
   background-color: rgb(92, 153, 243);
   color: white;
 }
-
 input::placeholder{
   font-size: 20px;
 }
-
 .form-container {
   position: fixed;
   bottom: 0;
   left: 50%;
   transform: translateX(-50%);
 }
-
 </style>
