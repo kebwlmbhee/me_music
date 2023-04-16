@@ -5,9 +5,27 @@ import LoginView from '../views/LoginView.vue'
 import CallbackView from '../views/CallbackView.vue'
 import NotFoundView from '../views/NotFoundView.vue'
 
+import Base from '../views/BaseView.vue'
+import Explore from '../views/ExploreView.vue'
+import ChatRoom from "../views/ChatView.vue"
+import MusicRecord from "../views/MusicRecord.vue"
+
+
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
-  routes: [
+  routes: [{
+    path:'/Home',
+    name:'大廳',
+    component: Base,
+    children:[{path:'', name:'大廳', component:Explore}
+      ,{path:'Chat', name:'聊天室', component:ChatRoom},
+      {path:'MusicRecord', name:'我的音樂記錄',  component:MusicRecord},
+      {path:'Explore', name:'探索',  component:Explore}]
+    },{
+      path:'/Where',
+      name:'Where',
+      redirect : '/Home/Explore'
+    },
     {
       path: '/',
       name: 'home',
