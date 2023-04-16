@@ -1,8 +1,10 @@
-import { createApp } from 'vue'
-import { createPinia } from 'pinia'
+import { createApp } from 'vue';
+import { db } from './firebaseConf.js';
+import App from './App.vue';
+import Chatroom from './chatroom.js';
 
-import App from './App.vue'
-import router from './router'
+// Create Vue app instance
+// const vueApp = createApp(App);
 
 // Vuetify
 import 'vuetify/styles'
