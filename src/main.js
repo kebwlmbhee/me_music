@@ -3,8 +3,8 @@ import { createPinia } from 'pinia'
 import axios from 'axios'
 import VueAxios from 'vue-axios'
 
-// Create Vue app instance
-// const vueApp = createApp(App);
+import App from './App.vue'
+import router from './router'
 
 // Vuetify
 import 'vuetify/styles'
