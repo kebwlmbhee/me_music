@@ -11,11 +11,6 @@ import 'vuetify/styles'
 // add Vuetify icon
 import iconFonts from '@/plugins/vuetify'
 
-const vuetify = createVuetify({
-    components,
-    directives,
-})
-
 // import './assets/main.css'
 
 const pinia = createPinia();
