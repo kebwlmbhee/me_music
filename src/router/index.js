@@ -28,6 +28,11 @@ const router = createRouter({
       name: "api_function",
       component: () => import('../views/ApiFunctionView.vue'),
     },
+    {
+      path: '/chatroom',
+      name: "chatroom",
+      component: () => import('../views/ChatroomView.vue'),
+    },
     // 404
     { 
       path: '/:pathMatch(.*)*', 
