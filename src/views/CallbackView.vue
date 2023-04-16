@@ -2,30 +2,32 @@
     <div></div>
 </template>
 <script>
+import { mapState, mapActions } from 'pinia';
+import UserStatus from '@/stores/UserStatus';
+
 export default {
     data() {
         return {
-            authorize: {
-                accessToken: '',
-                tokenType: '',
-                expiredIn: '',
-                state: ''
-            }
         }
     },
+    computed: {
+        ...mapState(UserStatus, ['authCode'])
+    },
     methods: {
+        ...mapActions(UserStatus, ['UpdateUser']),
+
         getTokenURL() {
             const fullUrl = window.location.href
             const queryString = fullUrl.replace(import.meta.env.VITE_REDIRECT_URI + '#', '?')
             const urlParams = new URLSearchParams(queryString)
-            this.authorize.accessToken = urlParams.get('access_token')
-            this.authorize.tokenType = urlParams.get('token_type')
-            this.authorize.expiredIn = urlParams.get('expires_in')
-            this.authorize.state = urlParams.get('state')
+            this.authCode.accessToken = urlParams.get('access_token')
+            this.authCode.tokenType = urlParams.get('token_type')
+            this.authCode.expiredIn = urlParams.get('expires_in')
+            this.authCode.state = urlParams.get('state')
         },
         setTokenLocal(){
-            localStorage.setItem("authCode", JSON.stringify(this.authorize));
-        }
+            localStorage.setItem("authCode", JSON.stringify(this.authCode));
+        },
     },
     mounted() {
         this.getTokenURL();
