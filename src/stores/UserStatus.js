@@ -34,7 +34,7 @@ export default defineStore('UserStatus', {
             this.authCode.state = authCode.state;
         },
         UpdateUser() {
-            let url = `${import.meta.env.VITE_API_PATH}/v1/me`;
+            let url = 'https://api.spotify.com/v1/me';
 
             let config = {
                 headers: {
@@ -44,8 +44,6 @@ export default defineStore('UserStatus', {
             }
             axios.get(url, config)
                 .then((res) => {
-                    console.log("success");
-                    console.log(res);
                     this.userProfile.name = res.data.display_name;
                     this.userProfile.avatar = res.data.images[0].url;
                 })
