@@ -1,8 +1,12 @@
-import { createRouter, createWebHashHistory } from 'vue-router'
+// Why not createWebHistory? Spotify auth callback will not provide /#/ in URL
+import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
+import LoginView from '../views/LoginView.vue'
+import CallbackView from '../views/CallbackView.vue'
+import NotFoundView from '../views/NotFoundView.vue'
 
 const router = createRouter({
-  history: createWebHashHistory(import.meta.env.BASE_URL),
+  history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
       path: '/',
@@ -10,14 +14,34 @@ const router = createRouter({
       component: HomeView
     },
     {
-      path: '/about',
-      name: 'about',
-      // route level code-splitting
-      // this generates a separate chunk (About.[hash].js) for this route
-      // which is lazy-loaded when the route is visited.
-      component: () => import('../views/AboutView.vue')
-    }
-  ]
+      path: '/login',
+      name: "login",
+      component: LoginView
+    },
+    {
+      path: '/callback',
+      name: "callback",
+      component: CallbackView
+    },
+    {
+      path: '/api_function',
+      name: "api_function",
+      component: () => import('../views/ApiFunctionView.vue'),
+    },
+    // 404
+    { 
+      path: '/:pathMatch(.*)*', 
+      name: 'NotFound', 
+      component: NotFoundView 
+    },
+    // Redirect
+    { 
+      path: '/login/:pathMatch(.*)*', 
+      redirect: {
+        name: 'login'
+      }
+    },
+  ],
 })
 
 export default router
