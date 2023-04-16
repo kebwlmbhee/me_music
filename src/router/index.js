@@ -1,13 +1,12 @@
 import { createRouter, createWebHashHistory } from 'vue-router'
 import Home from '../views/HomeView.vue'
 import ChatRoom from "../views/ChatView.vue"
-
-
+import MusicRecord from "../views/MusicRecord.vue"
 const router = createRouter({
   history: createWebHashHistory(import.meta.env.BASE_URL),
   routes:[{
       path:'/',
-      name:'Home',
+      name:'大廳',
       component: Home
     },{
       path:'/Chat',
@@ -20,10 +19,9 @@ const router = createRouter({
       redirect : '/'
     },{
       path:'/MusicRecord',
-      name:'MusicRecord',
-      redirect : '/'
+      name:'我的音樂記錄',
+      component: MusicRecord,
     }
   ]
 })
-
 export default router
