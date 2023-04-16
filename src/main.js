@@ -1,9 +1,11 @@
-import { createPinia } from 'pinia'
-import router from './router'
-import App from './App.vue';
 import { createApp, markRaw } from 'vue'
+import { createPinia } from 'pinia'
 import axios from 'axios'
 import VueAxios from 'vue-axios'
+
+import App from './App.vue'
+import router from './router'
+
 // Vuetify
 import 'vuetify/styles'
 import { createVuetify } from 'vuetify'
@@ -12,26 +14,18 @@ import * as directives from 'vuetify/directives'
 // add Vuetify icon
 import iconFonts from '@/plugins/vuetify'
 
-// 會影響 Vuetify
-import './assets/main.css'
-
 const vuetify = createVuetify({
     components,
     directives,
 })
 
-// Create Vue app instance
-const app = createApp(App)
-
-app.use(createPinia())
-app.use(router)
-app.use(vuetify)
-app.use(iconFonts)
+import './assets/main.css'
 
 const pinia = createPinia();
 // To allow using `this.router.xxx` in @/store/*.js
 pinia.use(({ store }) => { store.router = markRaw(router) });
 
+const app = createApp(App)
 
 app.use(pinia)
 app.use(router)
