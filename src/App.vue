@@ -26,27 +26,27 @@
             </v-btn>
         </v-navigation-drawer>
         <!-- 左-2 -->
-        <v-navigation-drawer width="244" permanent>
+        <v-navigation-drawer width="244" permanent >
             <!-- 左-2 放商標的? -->
             <!--  -->
             <v-sheet color="grey-lighten-5" height="128" width="100%">
-            <v-img src="src/assets/logo.png" alt="Fake"></v-img>
+                <v-img src="src/assets/logo.png" alt="Fake"></v-img>
             </v-sheet>
             <!-- 底下的Item -->
-            <v-list mandatory v-model:selected="SelectedPage">
+            <v-list mandatory >
                 <v-list-item v-for="(explore, index) in Explores"
-                :key="index" :value="explore.title"
-                link :to="explore.to">
-                <v-list-item-title class="text-left font-weight-black">{{ explore.title }}</v-list-item-title>
+                :key="index" :value="index"
+                link :to="explore.to" 
+                @click="()=>{SelectedPage = explore.title}">
+                    <v-list-item-title class="text-left font-weight-black">{{ explore.title }}</v-list-item-title>
                 </v-list-item>
             </v-list>
         </v-navigation-drawer>
 
         <!-- 右中-上 -->
         <v-app-bar class="px-2" color="grey-lighten-4"
-            flat height="72">
-            <v-app-bar-title class="font-weight-bold" >#{{ SelectedPage[0] }}</v-app-bar-title> 
-            
+            flat height="72" >
+            <v-app-bar-title class="font-weight-bold">#{{ SelectedPage }}</v-app-bar-title> 
             <v-spacer></v-spacer>
 
             <v-responsive max-width="156">
@@ -60,27 +60,25 @@
             </v-responsive>
         </v-app-bar>
 
-        <!-- 要放Page的地方  應該用Router Route  或是Component -->
-        <v-main>
-            <router-view></router-view>
-        </v-main>
-
         <!-- 右邊的東東 -->
-        <v-navigation-drawer location="right">
+        <v-navigation-drawer location="right" permanent>
             <v-list>
-            
-            <v-list-item v-for="(member , index) in FakeData['ChatroomMembers']"
-                :key="index" :title="member.Name" 
-                link>
-                <!-- :prepend-avatar="'https://cdn.vuetifyjs.com/images/lists/1.jpg'" -->
-                <template v-slot:prepend>
-                <v-avatar color="brown">{{ member.alt }}</v-avatar>
-                </template>
+                <v-list-item v-for="(member , index) in FakeData['ChatroomMembers']"
+                    :key="index" :title="member.Name" 
+                    link >
+                    <!-- :prepend-avatar="'https://cdn.vuetifyjs.com/images/lists/1.jpg'" -->
+                    <template v-slot:prepend>
+                    <v-avatar color="brown">{{ member.alt }}</v-avatar>
+                    </template>
 
-            </v-list-item>
+                </v-list-item>
             </v-list>
         </v-navigation-drawer>
 
+        <!-- 要放Page的地方  應該用Router Route  或是Component -->
+        <v-main>
+            <router-view v-if="isRouterAlive"></router-view>
+        </v-main>
         <!-- 底下輸入框 -->
         <v-footer
             app
@@ -100,16 +98,22 @@
 </template>
 
 <script setup> 
-import { ref, reactive } from 'vue';
+import { ref, reactive ,provide} from 'vue';
 import { useChatDataStore } from './stores/chatdata';
+import { useRoute } from "vue-router"
 
+const route = useRoute()
 const store = useChatDataStore()
 const Explores = reactive([
                 { title:"大廳", to:"/"},
                 { title:"我的音樂記錄", to:"/MusicRecord"},
                 { title:"建立播放清單", to:"/Where"}
             ])
-const SelectedPage = ref(["大廳"])
+const isRouterAlive = ref(true)
+const SelectedPage = ref("大廳")
+setTimeout(()=>{
+    SelectedPage.value = route.name
+},100)
 const FakeData = reactive({
     ChatroomMembers:[
       { ava:"", Name:"member1", alt:"M1"},
@@ -134,11 +138,18 @@ const FakeData = reactive({
     ],
 })
 const message = ref("")
+// 以下皆為 function
 
-// 以下皆為 function    
-function testClick(){
-  console.log("testClick");
+// 重新載入當前頁面?
+function reload(){
+    isRouterAlive.value = false
+    SelectedPage.value = route.name
+    setTimeout(()=>{
+        console.log("reload")
+        isRouterAlive.value = true 
+    },100)
 }
+provide("Reload",reload)
 
 // TODO : 這裡要做獲取 串接API 聊天室資料
 // 好像有點問題  無法重新附值?
@@ -147,15 +158,10 @@ function chatdataTransfer(index){
   store.enterChatroom(FakeData['ChatData'])
   store.addNewData({ sender :index , content:"test" })
 }
-
+// 新增聊天資料
 function addchatData(){
   console.log(message.value)
   store.addNewData({ sender : "A", content:message.value})
   message.value = ""
 }
-   // watch:{
-   //   SelectedPage:function(newValue , oldValue){
-   //     console.log("there has a change new = " + newValue + " ,, old = " + oldValue);
-   //   }
-   // }
 </script>
