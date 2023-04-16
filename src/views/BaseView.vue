@@ -6,7 +6,8 @@
             rail
         >
             <v-btn class="d-block text-center mx-auto mt-4 rounded-circle"
-            color="grey-darken-1" size="36" to="/Home">
+            color="grey-darken-1" size="36" to="/Home"
+            @click="()=>{SelectedPage = '大廳'}">
             </v-btn>
 
             <v-divider class="mx-3 my-5"></v-divider>
@@ -27,7 +28,7 @@
             <!-- 左-2 放商標的? -->
             <!--  -->
             <v-sheet color="grey-lighten-5" height="128" width="100%">
-                <v-img src="src/assets/logo.png" alt="Fake"></v-img>
+                <v-img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRXGQDqS3rBb7GyPj87cxlKGJM1VC3CFIaUBg&usqp=CAU" alt="Fake"></v-img>
             </v-sheet>
             <!-- 底下的Item -->
             <v-list mandatory >
