@@ -1,7 +1,7 @@
-import { createApp } from 'vue';
-import { db } from './firebaseConf.js';
-import App from './App.vue';
-import Chatroom from './chatroom.js';
+import { createApp, markRaw } from 'vue'
+import { createPinia } from 'pinia'
+import axios from 'axios'
+import VueAxios from 'vue-axios'
 
 // Create Vue app instance
 // const vueApp = createApp(App);
@@ -11,13 +11,22 @@ import 'vuetify/styles'
 // add Vuetify icon
 import iconFonts from '@/plugins/vuetify'
 
-// 會影響 Vuetify
+const vuetify = createVuetify({
+    components,
+    directives,
+})
+
 // import './assets/main.css'
+
+const pinia = createPinia();
+// To allow using `this.router.xxx` in @/store/*.js
+pinia.use(({ store }) => { store.router = markRaw(router) });
 
 const app = createApp(App)
 
-app.use(createPinia())
+app.use(pinia)
 app.use(router)
 app.use(iconFonts)
+app.use(VueAxios, axios)
 
 app.mount('#app')
