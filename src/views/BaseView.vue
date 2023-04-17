@@ -97,6 +97,8 @@
 
 <script setup> 
 import { ref, reactive ,provide} from 'vue';
+import { mapActions } from 'pinia';
+import UserStatus from '@/stores/UserStatus';
 import { useChatDataStore } from '../stores/chatdata';
 import { useRoute } from "vue-router"
 
@@ -161,5 +163,15 @@ function addchatData(){
   console.log(message.value)
   store.addNewData({ sender : "A", content:message.value})
   message.value = ""
+}
+</script>
+<script>
+export default {
+    methods:{
+        ...mapActions(UserStatus,['checkAuth'] )
+    },mounted(){
+        console.log("mounted")
+        this.checkAuth();
+    }
 }
 </script>
