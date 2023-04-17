@@ -1,3 +1,4 @@
+<!-- 這頁不要刪掉，用來 Demo Web Playback API 用的，弄很久，我會忘記怎麼串 -->
 <template>
     <main>
         <v-btn v-on:click="logout">Logout</v-btn>
@@ -29,6 +30,12 @@
             <v-btn id="togglePlay">Toggle Play</v-btn>
             <v-btn id="toggleNext">Next</v-btn>
         </div>
+
+        <div>
+            <h4 style="margin-bottom: 20px;">add Track Queue</h4>
+            <v-btn v-on:click="addQueue">Add Queue</v-btn>
+        </div>
+
     </main>
 </template>
 
@@ -57,7 +64,7 @@ export default {
             let config = {
                 headers: {
                     "Content-Type": "application/json",
-                    "Authorization": `Bearer ${this.authCode.accessToken}`
+                    "Authorization": `Bearer ${this.authCode.access_token}`
                 }
             }
             this.$http.get(url, config)
@@ -66,6 +73,22 @@ export default {
                     this.searchResponse = data.artists.items;
                 })
         },
+        
+        // 重要!!! Spotify 的 POST 必須照這個格式寫，改了就不能動，我也不知道為什麼 
+        addQueue() {
+            let config = {
+                method: 'POST',
+                url: "https://api.spotify.com/v1/me/player/queue/?uri=spotify:track:3KkXRkHbMCARz0aVfEt68P",
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    "Authorization": `Bearer ${this.authCode.access_token}`
+                }
+            }
+            this.$http(config)
+                .then((res) => {
+                    console.log(res);
+                })
+        }
     },
     mounted() {
         this.checkAuth();
@@ -79,7 +102,7 @@ export default {
         window.onSpotifyWebPlaybackSDKReady = () => {
             const player = new window.Spotify.Player({
                 name: 'Web Playback SDK',
-                getOAuthToken: cb => { cb(this.authCode.accessToken); },
+                getOAuthToken: cb => { cb(this.authCode.access_token); },
                 volume: 0.5
             });
 

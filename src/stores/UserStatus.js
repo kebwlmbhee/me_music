@@ -2,14 +2,15 @@ import axios from 'axios';
 import { defineStore } from 'pinia'
 
 export default defineStore('UserStatus', {
-    // data
+    // 等於 data
     state: () => {
         return {
             authCode: {
-                accessToken: '',
-                tokenType: '',
-                expiredIn: '',
-                state: '',
+                access_token: '',
+                expires_in: '',
+                refresh_token: '',
+                scope: '',
+                token_type: ''
             },
             userProfile: {
                 name: '',
@@ -17,10 +18,10 @@ export default defineStore('UserStatus', {
             }
         }
     },
-    // computed
+    // 等於 computed
     getters: {
     },
-    // methods
+    // 等於 methods
     actions: {
         logout() {
             localStorage.removeItem("authCode");
@@ -28,18 +29,18 @@ export default defineStore('UserStatus', {
         },
         load_authInfo() {
             const authCode = JSON.parse(localStorage.getItem('authCode'));
-            this.authCode.accessToken = authCode.accessToken;
-            this.authCode.tokenType = authCode.tokenType;
-            this.authCode.expiredIn = authCode.expiredIn;
-            this.authCode.state = authCode.state;
+            this.authCode.access_token = authCode.access_token;
+            this.authCode.expires_in = authCode.expires_in;
+            this.authCode.refresh_token = authCode.refresh_token;
+            this.authCode.scope = authCode.scope;
+            this.authCode.token_type = authCode.token_type;
         },
         UpdateUser() {
             let url = 'https://api.spotify.com/v1/me';
-
             let config = {
                 headers: {
                     "Content-Type": "application/json",
-                    "Authorization": `Bearer ${this.authCode.accessToken}`
+                    "Authorization": `Bearer ${this.authCode.access_token}`
                 }
             }
             axios.get(url, config)
@@ -49,7 +50,7 @@ export default defineStore('UserStatus', {
                 })
         },
         checkAuth() {
-            if (!localStorage.getItem('authCode') || localStorage.getItem('authCode').accessToken === null) {
+            if (!localStorage.getItem('authCode') || localStorage.getItem('authCode').access_token === null) {
                 this.logout();
             } else {
                 this.load_authInfo();

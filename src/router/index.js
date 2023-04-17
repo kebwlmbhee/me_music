@@ -14,6 +14,11 @@ const router = createRouter({
       component: HomeView
     },
     {
+      path: '/template',
+      name: 'template',
+      component: () => import('../views/TemplateView.vue'),
+    },
+    {
       path: '/login',
       name: "login",
       component: LoginView
@@ -27,11 +32,6 @@ const router = createRouter({
       path: '/api_function',
       name: "api_function",
       component: () => import('../views/ApiFunctionView.vue'),
-    },
-    {
-      path: '/chatroom',
-      name: "chatroom",
-      component: () => import('../views/ChatroomView.vue'),
     },
     // 404
     { 
