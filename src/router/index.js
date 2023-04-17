@@ -32,6 +32,11 @@ const router = createRouter({
       component: HomeView
     },
     {
+      path: '/template',
+      name: 'template',
+      component: () => import('../views/TemplateView.vue'),
+    },
+    {
       path: '/login',
       name: "login",
       component: LoginView
