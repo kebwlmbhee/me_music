@@ -1,7 +1,7 @@
-import { ref, push, onValue } from 'firebase/database';
+import { db, ref, push, onValue } from '/src/firebaseConf.js';
 
 class Chatroom {
-  constructor(db) {
+  constructor() {
     this.chatroomRef = ref(db, 'chatroom');
     this.announcementRef = ref(db, 'announcement');
   }
@@ -52,24 +52,6 @@ class Chatroom {
     const second = String(date.getSeconds()).padStart(2, '0');
     const timeString = `${adjustedHour}:${minute}:${second} ${period}`;
     return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')} ${timeString}`;
-  }
-
-  getMessages() {
-    return new Promise((resolve) => {
-      this.onMessage((messages) => {
-        this.messages = messages;
-        resolve(this.messages);
-      });
-    });
-  }
-
-  getAnnouncement() {
-    return new Promise((resolve) => {
-      this.onAnnouncement((messages) => {
-        this.announcements = messages;
-        resolve(this.announcements);
-      });
-    });
   }
 }
 

@@ -28,12 +28,11 @@
 </template>
 
 <script>
-import { db } from '/src/firebaseConf.js';
 import { defineComponent } from 'vue';
 
 import Chatroom from './chatroom.js';
 
-const chatroom = new Chatroom(db);
+const chatroom = new Chatroom();
 
 export default defineComponent({
   data() {
@@ -53,8 +52,8 @@ export default defineComponent({
     });
   },
   methods: {
-    redirectToUrl(){
-      window.open('/Homepage', '_blank');
+    redirectToUrl() {
+      window.open('/homepage', '_blank');
     },
     sendMessage() {
       if (!this.author) {
@@ -191,7 +190,6 @@ input::placeholder{
   position: fixed;
   right: -30%;
   top: 75%;
-
 }
 
 .url-redirection button {
