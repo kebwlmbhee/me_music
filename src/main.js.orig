@@ -6,14 +6,6 @@ import Chatroom from './chatroom.js';
 // Create Vue app instance
 // const vueApp = createApp(App);
 
-<<<<<<< HEAD
-// Inject Firebase Realtime Database instance as $db
-const chatroom = new Chatroom(db);
-console.log(chatroom);
-
-// Mount Vue app
-createApp(App).mount('#app')
-=======
 // Vuetify
 import 'vuetify/styles'
 import { createVuetify } from 'vuetify'
@@ -38,4 +30,3 @@ app.use(vuetify)
 app.use(iconFonts)
 
 app.mount('#app')
->>>>>>> dev
