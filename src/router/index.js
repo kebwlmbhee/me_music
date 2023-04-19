@@ -7,7 +7,7 @@ import NotFoundView from '../views/NotFoundView.vue'
 
 import Base from '../views/BaseView.vue'
 import Explore from '../views/ExploreView.vue'
-import ChatRoom from "../views/ChatView.vue"
+import ChatRoom from "../views/Chatroom/ChatView.vue"
 import MusicRecord from "../views/MusicRecord.vue"
 
 
@@ -54,7 +54,12 @@ const router = createRouter({
     {
       path: '/chatroom',
       name: "chatroom",
-      component: () => import('../views/ChatroomView.vue'),
+      component: () => import('/src/views/chatroom/ChatroomView.vue'),
+    },
+    {
+      path: '/homepage',
+      name: "homepage",
+      component: () => import('/src/views/announcement/HomepageView.vue'),
     },
     // 404
     { 

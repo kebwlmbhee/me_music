@@ -4,7 +4,7 @@
       <div class="message" v-for="(message, index) in messages" :key="index">
         <div class="message-info">
           <div class="message-author">{{ message.author }}</div>
-          <div class="message-time">{{ message.time }}</div>
+          <div class="message-time">{{ chatroom.getTimeString(message.time) }}</div>
         </div>
         <div class="message-text">{{ message.text }}</div>
       </div>
@@ -13,17 +13,25 @@
     <form class="message-input" @submit.prevent="sendMessage">
       <input type="text" v-model="author" placeholder="Your name">
       <input type="text" v-model="text" placeholder="Type your message here...">
+      <div class="announce-container">
+        <div class="announce-label">
+          <input type="checkbox" v-model="isAnnounce" id="announcement">
+        </div>
+      </div>
       <button type="submit">Send</button>
     </form>
+    <div class="url-redirection">
+      <button @click="redirectToUrl">Go to Announcement</button>
+    </div>
     </div>
   </div>
 </template>
 
 <script>
-import { db } from '../firebaseConf.js';
+import { db } from '/src/firebaseConf.js';
 import { defineComponent } from 'vue';
 
-import Chatroom from '../chatroom.js';
+import Chatroom from './chatroom.js';
 
 const chatroom = new Chatroom(db);
 
@@ -32,15 +40,22 @@ export default defineComponent({
     return {
       author: '',
       text: '',
+      isAnnounce: false,
       messages: []
     }
   },
   created() {
-    chatroom.onMessage((messages) => {
-      this.messages = messages;
+    new Promise((resolve) => {
+      chatroom.onMessage((messages) => {
+        this.messages = messages;
+        resolve(this.messages);
+      });
     });
   },
   methods: {
+    redirectToUrl(){
+      window.open('/Homepage', '_blank');
+    },
     sendMessage() {
       if (!this.author) {
         alert('Please enter your name!');
@@ -50,21 +65,61 @@ export default defineComponent({
         alert('message is empty!');
         return;
       }
-      chatroom.sendMessage(this.author, this.text);
+      chatroom.sendMessage(this.author, this.text, this.isAnnounce);
       this.text = '';
     }
+  },
+  mounted() {
+    this.chatroom = chatroom;
   }
 });
 </script>
 
-<style>
-.chat-container {
-  display: flex;
-  flex-direction: column;
+<style scope>
+
+.announce-container{
+  margin-right: 60px;
+  height: 80px;
+  width: 80px;
+  bottom: -30px;
+  margin-top: 40px;
+}
+
+.announce-description {
+  position: relative;
+  left: 100px;
+}
+
+.announce-label:hover::after{
+  content: "Announce to Homepage";
+  position: relative;
+  bottom: 80px;
+  left: 60px;
+  white-space: nowrap;
+  background-color: bisque;
+  padding: 0.5em;
+  border-radius: 0.5em;
+  color: red;
+}
+
+html, body {
   height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;   /* disable scroll */
+}
+
+.messages-container {
+  height: 80vh;
+  overflow-y: scroll;
 }
 .messages-container {
-  flex: 1;
+  top: 30px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  height: 80vh;
   overflow-y: scroll;
 }
 .message {
@@ -73,6 +128,7 @@ export default defineComponent({
   padding: 10px;
   border: 1px solid #ccc;
   border-radius: 5px;
+  width: 800px;
 }
 .message-info {
   display: flex;
@@ -130,4 +186,27 @@ input::placeholder{
   left: 50%;
   transform: translateX(-50%);
 }
+
+.url-redirection {
+  position: fixed;
+  right: -30%;
+  top: 75%;
+
+}
+
+.url-redirection button {
+  padding: 10px;
+  border-radius: 2px;
+  border: none;
+  background-color: #007BFF;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+  margin: 0 auto;
+}
+
+.url-redirection button:hover {
+  background-color: #0056b3;
+}
+
 </style>
