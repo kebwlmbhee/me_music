@@ -1,28 +1,33 @@
 <template>
-  <div class="chat-container">
-    <div class="messages-container" v-if="messages.length > 0">
-      <div class="message" v-for="(message, index) in messages" :key="index">
-        <div class="message-info">
-          <div class="message-author">{{ message.author }}</div>
-          <div class="message-time">{{ chatroom.getTimeString(message.time) }}</div>
-        </div>
-        <div class="message-text">{{ message.text }}</div>
-      </div>
-    </div>
-    <div class="form-container">
-    <form class="message-input" @submit.prevent="sendMessage">
-      <input type="text" v-model="author" placeholder="Your name">
-      <input type="text" v-model="text" placeholder="Type your message here...">
-      <div class="announce-container">
-        <div class="announce-label">
-          <input type="checkbox" v-model="isAnnounce" id="announcement">
+  <div class="page-container">
+    <div class="chat-container">
+      <div class="messages-container" ref="chatMessages" v-if="messages.length > 0">
+        <div class="message" v-for="(message, index) in messages" :key="index">
+          <div class="message-info">
+            <div class="message-author">{{ message.author }}</div>
+            <div class="message-time">{{ chatroom.getTimeString(message.time) }}</div>
+          </div>
+          <div class="message-text">{{ message.text }}</div>
         </div>
       </div>
-      <button type="submit">Send</button>
-    </form>
-    <div class="url-redirection">
-      <button @click="redirectToUrl">Go to Announcement</button>
-    </div>
+      <div class="form-container">
+      <form class="message-input" @submit.prevent="sendMessage">
+        <input type="text" v-model="author" placeholder="Your name">
+        <input type="text" v-model="text" placeholder="Type your message here...">
+        <div class="announce-container">
+          <div class="announce-label">
+            <input type="checkbox" v-model="isAnnounce" id="announcement">
+          </div>
+        </div>
+        <button type="submit">Send</button>
+      </form>
+      <div class="url-redirection">
+        <button @click="redirectToUrl">Go to Announcement</button>
+      </div>
+      <div class="scroll-to-bottom" @click="scrollToBottom">
+        Scroll to Bottom
+      </div>
+      </div>
     </div>
   </div>
 </template>
@@ -55,6 +60,13 @@ export default defineComponent({
     redirectToUrl() {
       window.open('/homepage', '_blank');
     },
+    scrollToBottom() {
+      const chatMessages = this.$refs.chatMessages;
+      if (chatMessages) {
+        const scrollHeight = chatMessages.scrollHeight;
+        chatMessages.scrollTop = scrollHeight; // 設置 scrollTop 屬性
+      }
+    },
     sendMessage() {
       if (!this.author) {
         alert('Please enter your name!');
@@ -75,6 +87,19 @@ export default defineComponent({
 </script>
 
 <style scope>
+
+.page-container {
+  height: 500px;
+  position: relative;
+}
+
+.chat-container {
+  /* 設置內容區域的高度和樣式 */
+  height: calc(100% - 50px); /* 減去按鈕區域的高度 */
+  overflow-y: auto;
+  padding: 20px;
+  background-color: #f5f5f5;
+}
 
 .announce-container{
   margin-right: 60px;
@@ -109,18 +134,10 @@ html, body {
 }
 
 .messages-container {
-  height: 80vh;
-  overflow-y: scroll;
+  height: 100%;
+  overflow-y: auto;
 }
-.messages-container {
-  top: 30px;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  align-items: center;
-  height: 80vh;
-  overflow-y: scroll;
-}
+
 .message {
   font-size: 30px;
   margin: auto;
@@ -205,6 +222,22 @@ input::placeholder{
 
 .url-redirection button:hover {
   background-color: #0056b3;
+}
+
+.scroll-to-bottom {
+  position: absolute;
+  bottom: 80%;
+  right: -40%;
+  transform: translateX(-50%);
+  padding: 10px;
+  background-color: #bb9362;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.scroll-to-bottom button:hover {
+  background-color: #ab6c2c;
 }
 
 </style>
