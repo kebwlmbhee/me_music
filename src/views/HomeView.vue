@@ -5,6 +5,9 @@
     <router-link to="/api_function">
             <v-btn>API_Function</v-btn>
         </router-link>
+    <router-link to="/Home">
+            <v-btn>首頁</v-btn>
+    </router-link>
     <div>
       <h4> {{ userProfile.name }} </h4>
       <img v-bind:src="userProfile.avatar" alt="">

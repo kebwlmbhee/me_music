@@ -1,4 +1,5 @@
 <template>
+    <!-- <audio autoplay src="../views/Test.mp3"></audio> -->
     <v-app id="inspire">
         <!-- 左邊 -->
         <v-navigation-drawer
@@ -17,8 +18,8 @@
               size="28" color="grey-lighten-1" :title="chatroom.alt">
               <v-menu activator="parent">
                   <v-list>
-                  <v-list-item value="Enter" title="Enter" to="/Home/Chat" @click="chatdataTransfer(index)"></v-list-item>
-                  <v-list-item value="Delete" title="Delete"></v-list-item>
+                  <v-list-item title="Enter" to="/Home/Chat" @click="this.chatdataTransfer(index)"></v-list-item>
+                  <v-list-item title="Delete"></v-list-item>
                   </v-list>
               </v-menu>
             </v-btn>
@@ -78,100 +79,88 @@
             <router-view v-if="isRouterAlive"></router-view>
         </v-main>
         <!-- 底下輸入框 -->
-        <v-footer
-            app
-            height="72"
-        >
+        <v-footer app height="72">
             <v-text-field v-model="message"
             bg-color="grey-lighten-1"
             class="rounded-pill overflow-hidden"
-            density="compact"
-            hide-details
-            variant="solo"
-            clearable
+            density="compact" hide-details
+            variant="solo" clearable
             @keydown.enter="addchatData"
             ></v-text-field>
         </v-footer>
     </v-app>
 </template>
-
-<script setup> 
-import { ref, reactive ,provide} from 'vue';
-import { mapActions } from 'pinia';
+<script>
+import { mapActions,mapStores } from 'pinia';
 import UserStatus from '@/stores/UserStatus';
 import { useChatDataStore } from '../stores/chatdata';
-import { useRoute } from "vue-router"
-
-const route = useRoute()
-const store = useChatDataStore()
-const Explores = reactive([
+export default {
+    data(){
+        return{
+            Explores:[
                 { title:"探索", to:"/Home/Explore"},
                 { title:"我的音樂記錄", to:"/Home/MusicRecord"},
                 { title:"建立播放清單", to:"/Where"}
-            ])
-const isRouterAlive = ref(true)
-const SelectedPage = ref("大廳")
-setTimeout(()=>{
-    SelectedPage.value = route.name
-},100)
-const FakeData = reactive({
-    ChatroomMembers:[
-      { ava:"", Name:"member1", alt:"M1"},
-      { ava:"", Name:"member2", alt:"M2"},
-      { ava:"", Name:"member3", alt:"M3"},
-      { ava:"", Name:"member4", alt:"M4"},
-      { ava:"", Name:"member5", alt:"M5"},
-    ],
-    Chatrooms:[ // 代表你有多少已進入的聊天室
-      { ava:"", Name:"ChatRoom1", alt:"C1"},
-      { ava:"", Name:"ChatRoom2", alt:"C2"},
-      { ava:"", Name:"ChatRoom3", alt:"C3"},
-      { ava:"", Name:"ChatRoom4", alt:"C4"},
-    ],
-    ChatData:[
-        { sender:"John", content:"這是我的內容喔"},
-        { sender:"Tess", content:"這是Tess的內容喔"},
-        { sender:"Tess", content:"這是Tess的內容喔"},
-        { sender:"John", content:"這是我的內容喔"},
-        { sender:"John", content:"這是我的內容喔"},
-        { sender:"Hso!", content:"這是Hso!的內容喔"},
-    ],
-})
-const message = ref("")
-// 以下皆為 function
-
-// 重新載入當前頁面?
-function reload(){
-    isRouterAlive.value = false
-    SelectedPage.value = route.name
-    setTimeout(()=>{
-        console.log("reload")
-        isRouterAlive.value = true 
-    },100)
-}
-provide("Reload",reload)
-
-// TODO : 這裡要做獲取 串接API 聊天室資料
-// 好像有點問題  無法重新附值?
-function chatdataTransfer(index){
-  store.ClearChatData()
-  store.enterChatroom(FakeData['ChatData'])
-  store.addNewData({ sender :index , content:"test" })
-}
-// 新增聊天資料
-function addchatData(){
-  console.log(message.value)
-  store.addNewData({ sender : "A", content:message.value})
-  message.value = ""
-}
-</script>
-<script>
-export default {
+            ],
+            FakeData :{
+                ChatroomMembers:[
+                { ava:"", Name:"member1", alt:"M1"},
+                { ava:"", Name:"member2", alt:"M2"},
+                { ava:"", Name:"member3", alt:"M3"},
+                { ava:"", Name:"member4", alt:"M4"},
+                { ava:"", Name:"member5", alt:"M5"},
+                ],
+                Chatrooms:[ // 代表你有多少已進入的聊天室
+                { ava:"", Name:"ChatRoom1", alt:"C1"},
+                { ava:"", Name:"ChatRoom2", alt:"C2"},
+                { ava:"", Name:"ChatRoom3", alt:"C3"},
+                { ava:"", Name:"ChatRoom4", alt:"C4"},
+                ],
+                ChatData:[
+                    { sender:"John", content:"這是我的內容喔"},
+                    { sender:"Tess", content:"這是Tess的內容喔"},
+                    { sender:"Tess", content:"這是Tess的內容喔"},
+                    { sender:"John", content:"這是我的內容喔"},
+                    { sender:"John", content:"這是我的內容喔"},
+                    { sender:"Hso!", content:"這是Hso!的內容喔"},
+                ],
+            },
+            message: "",SelectedPage:"大廳",isRouterAlive:true
+        }
+    },
+    computed:{
+        ...mapStores(useChatDataStore)
+    },
     methods:{
-        ...mapActions(UserStatus,['checkAuth'] )
-    },mounted(){
-        console.log("mounted")
+        chatdataTransfer(i){   // 獲取聊天室資料 (附帶清除)
+            console.log("test")
+            this.chatdataStore.ClearChatData()
+            this.chatdataStore.enterChatroom(this.FakeData['ChatData'])
+            this.chatdataStore.addNewData({ sender :i , content:"test" })
+        },addchatData(){       // 新增聊天室資料
+            console.log(this.message)
+            this.chatdataStore.addNewData({ sender : "A", content:this.message})
+            this.message = ""
+        },reload(){   // 重新加載頁面 ? 
+            this.isRouterAlive = false
+            this.SelectedPage = this.$route.name
+            setTimeout(()=>{
+                console.log("reload")
+                this.isRouterAlive = true 
+            },100)
+        },
+        ...mapActions(UserStatus,['checkAuth'] ),
+    }
+    ,mounted(){
+        setTimeout(()=>{
+            this.SelectedPage = this.$route.name
+        },100)
         this.checkAuth();
+    },
+    provide(){
+        return {
+            Reload:this.reload
+        }
     }
 }
 </script>
