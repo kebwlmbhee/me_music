@@ -82,7 +82,7 @@ export default{
         ...mapState(UserStatus, ['authCode', 'userProfile']),
     },
     methods:{
-        searchItem(query, limit, type ) {
+        searchItem(query, limit) {
             let url = `https://api.spotify.com/v1/search/?q=${query}&type=track&limit=${limit}`;
             let config = {
                 headers: {
