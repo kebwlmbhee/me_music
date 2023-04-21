@@ -52,11 +52,14 @@
                         <v-avatar v-for="n in checkSong.artists.length" :key="n">
                             <v-img :src="imgSrc"></v-img>
                         </v-avatar>
+                        <!-- 點播按鈕 -->
                         <v-card-actions>
                             <v-spacer></v-spacer>
-                            <v-btn color="white" size="small" style="background-color: green;align-self: flex-end;">點播</v-btn>
+                            <v-btn color="white" size="small" style="background-color: green;" 
+                                @click="AddNewSong">點播</v-btn>
                         </v-card-actions>
                     </div>
+                    <!-- 關閉按鈕 -->
                     <div style="align-self: flex-start;">
                         <v-icon @click="trigger_pop_up(false)">mdi-chevron-double-down</v-icon>
                     </div>
@@ -68,18 +71,19 @@
 
 <script>
 import UserStatus from '@/stores/UserStatus';
-import { mapState, mapActions} from 'pinia';
+import MusicQueue from '../stores/MusicQueue';
+import { mapState, mapActions,mapStores} from 'pinia';
 export default{
-    inject:["Reload"],
+    inject:["Reload","AddMusic"],
     data(){
         return{
             test:30,imgSrc:'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRXGQDqS3rBb7GyPj87cxlKGJM1VC3CFIaUBg&usqp=CAU',
             searchText:"W" , searchResponse:[] , popUpWindow:false,
-            checkSong:{name:"",image:"",artists:[]}
+            checkSong:{name:"",image:"",artists:[], mp3_url:""}
         }
     },
     computed:{
-        ...mapState(UserStatus, ['authCode', 'userProfile']),
+        ...mapState(UserStatus, ['authCode']),
     },
     methods:{
         searchItem(query, limit, type ) {
@@ -98,7 +102,7 @@ export default{
                 })
         },
         trigger_pop_up(up_or_down, data = null){
-            console.log(data) //data.album.images 圖片  data.artists[] 歌手 data.name 名稱
+            // console.log(data) //data.album.images 圖片  data.artists[] 歌手 data.name 名稱
             if(!up_or_down) { //不觸發 或是 取消觸發
                 this.popUpWindow = false ;
                 return;
@@ -108,11 +112,18 @@ export default{
             this.checkSong = {
                 name:data.name,
                 image:data.album.images[0].url,
-                artists:data.artists
+                artists:data.artists,
+                mp3_url:data.preview_url
             }
+            // console.log(this.checkSong);
+        },
+        AddNewSong(){
+            console.log("Add New Song Start");
+            this.AddMusicToTheQueue_2(this.checkSong.name, this.checkSong.artists, this.checkSong.image, this.checkSong.mp3_url);
+            this.AddMusic();
         },
         ...mapActions(UserStatus,['checkAuth'] ),
-
+        ...mapActions(MusicQueue,['AddMusicToTheQueue_2']),
     },
     mounted(){
         this.checkAuth();

@@ -2,10 +2,7 @@
     <!-- <audio autoplay src="../views/Test.mp3"></audio> -->
     <v-app id="inspire">
         <!-- 左邊 -->
-        <v-navigation-drawer
-            color="grey-lighten-3"
-            rail
-        >
+        <v-navigation-drawer color="grey-lighten-3" rail>
             <v-btn class="d-block text-center mx-auto mt-4 rounded-circle"
             color="grey-darken-1" size="36" to="/Home"
             @click="()=>{SelectedPage = '大廳'}">
@@ -48,15 +45,7 @@
             <v-app-bar-title class="font-weight-bold">#{{ SelectedPage }}</v-app-bar-title> 
             <v-spacer></v-spacer>
 
-            <v-responsive max-width="156">
-            <v-text-field
-                bg-color="grey-lighten-2"
-                class="rounded-pill overflow-hidden"
-                density="compact"
-                hide-details
-                variant="solo"
-            ></v-text-field>
-            </v-responsive>
+            <user-profile-button :userName="'eedasdat'"></user-profile-button>
         </v-app-bar>
 
         <!-- 右邊的東東 -->
@@ -67,11 +56,15 @@
                     link >
                     <!-- :prepend-avatar="'https://cdn.vuetifyjs.com/images/lists/1.jpg'" -->
                     <template v-slot:prepend>
-                    <v-avatar color="brown">{{ member.alt }}</v-avatar>
+                        <v-avatar color="brown">{{ member.alt }}</v-avatar>
                     </template>
-
                 </v-list-item>
             </v-list>
+            <v-divider></v-divider>
+            <div>
+                <audio :src="currentMusic_url" autoplay id="mainAudio" controls
+                 @ended="whenMusicEnded"></audio>
+            </div>
         </v-navigation-drawer>
 
         <!-- 要放Page的地方  應該用Router Route  或是Component -->
@@ -91,9 +84,13 @@
     </v-app>
 </template>
 <script>
-import { mapActions,mapStores } from 'pinia';
+import { mapActions,mapState,mapStores } from 'pinia';
 import UserStatus from '@/stores/UserStatus';
+import MusicQueue from '@/stores/MusicQueue';
 import { useChatDataStore } from '../stores/chatdata';
+
+import UserProfileButton from '../components/UserProfileButton.vue';
+
 export default {
     data(){
         return{
@@ -125,11 +122,16 @@ export default {
                     { sender:"Hso!", content:"這是Hso!的內容喔"},
                 ],
             },
-            message: "",SelectedPage:"大廳",isRouterAlive:true
+            message: "",SelectedPage:"大廳",isRouterAlive:true,
+            currentMusic_url:"" 
         }
     },
+    components:{
+        UserProfileButton
+    }
+    ,
     computed:{
-        ...mapStores(useChatDataStore)
+        ...mapStores(useChatDataStore),
     },
     methods:{
         chatdataTransfer(i){   // 獲取聊天室資料 (附帶清除)
@@ -149,18 +151,36 @@ export default {
                 this.isRouterAlive = true 
             },100)
         },
+        whenMusicEnded(){  // 當音樂播放結束
+            console.log("music is ended");
+            var nextMusic = this.ShiftTheMusic();
+            var mainAudio = document.getElementById("mainAudio")
+            if(nextMusic == null){
+                return;
+            }
+            this.currentMusic_url = nextMusic.mp3;
+        },
+        WhenAddTheNewMusic(){
+            console.log("WhenAddTheNewMusic Start")
+            var mainAudio = document.getElementById("mainAudio")
+            if(!mainAudio.paused) return;
+            this.currentMusic_url = this.ShiftTheMusic().mp3;
+        },
         ...mapActions(UserStatus,['checkAuth'] ),
+        ...mapActions(MusicQueue,['ShiftTheMusic'])
     }
     ,mounted(){
         setTimeout(()=>{
             this.SelectedPage = this.$route.name
         },100)
         this.checkAuth();
+        /// TODO : 要先獲取當前的 MusicQueue 存儲 於FireBase
     },
     provide(){
         return {
-            Reload:this.reload
+            Reload:this.reload,
+            AddMusic:this.WhenAddTheNewMusic
         }
-    }
+    },
 }
 </script>
