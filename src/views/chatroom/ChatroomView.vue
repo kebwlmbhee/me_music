@@ -11,33 +11,31 @@
         </div>
       </div>
       <div class="form-container">
-      <form class="message-input" @submit.prevent="sendMessage">
-        <input type="text" v-model="author" placeholder="Your name">
-        <input type="text" v-model="text" placeholder="Type your message here...">
-        <div class="announce-container">
-          <div class="announce-label">
-            <input type="checkbox" v-model="isAnnounce" id="announcement">
+        <form class="message-input" @submit.prevent="sendMessage">
+          <input type="text" v-model="author" placeholder="Your name" />
+          <input type="text" v-model="text" placeholder="Type your message here..." />
+          <div class="announce-container">
+            <div class="announce-label">
+              <input type="checkbox" v-model="isAnnounce" id="announcement" />
+            </div>
           </div>
+          <button type="submit">Send</button>
+        </form>
+        <div class="url-redirection">
+          <button @click="redirectToUrl">Go to Announcement</button>
         </div>
-        <button type="submit">Send</button>
-      </form>
-      <div class="url-redirection">
-        <button @click="redirectToUrl">Go to Announcement</button>
-      </div>
-      <div class="scroll-to-bottom" @click="scrollToBottom">
-        Scroll to Bottom
-      </div>
+        <div class="scroll-to-bottom" @click="scrollToBottom">Scroll to Bottom</div>
       </div>
     </div>
   </div>
 </template>
 
 <script>
-import { defineComponent } from 'vue';
+import { defineComponent } from 'vue'
 
-import Chatroom from './chatroom.js';
+import Chatroom from './chatroom.js'
 
-const chatroom = new Chatroom();
+const chatroom = new Chatroom()
 
 export default defineComponent({
   data() {
@@ -51,43 +49,42 @@ export default defineComponent({
   created() {
     new Promise((resolve) => {
       chatroom.onMessage((messages) => {
-        this.messages = messages;
-        resolve(this.messages);
-      });
-    });
+        this.messages = messages
+        resolve(this.messages)
+      })
+    })
   },
   methods: {
     redirectToUrl() {
-      window.open('/homepage', '_blank');
+      window.open('/homepage', '_blank')
     },
     scrollToBottom() {
-      const chatMessages = this.$refs.chatMessages;
+      const chatMessages = this.$refs.chatMessages
       if (chatMessages) {
-        const scrollHeight = chatMessages.scrollHeight;
-        chatMessages.scrollTop = scrollHeight; // 設置 scrollTop 屬性
+        const scrollHeight = chatMessages.scrollHeight
+        chatMessages.scrollTop = scrollHeight // 設置 scrollTop 屬性
       }
     },
     sendMessage() {
       if (!this.author) {
-        alert('Please enter your name!');
-        return;
+        alert('Please enter your name!')
+        return
       }
-      if (!this.text){
-        alert('message is empty!');
-        return;
+      if (!this.text) {
+        alert('message is empty!')
+        return
       }
-      chatroom.sendMessage(this.author, this.text, this.isAnnounce);
-      this.text = '';
+      chatroom.sendMessage(this.author, this.text, this.isAnnounce)
+      this.text = ''
     }
   },
   mounted() {
-    this.chatroom = chatroom;
+    this.chatroom = chatroom
   }
-});
+})
 </script>
 
 <style scope>
-
 .page-container {
   height: 500px;
   position: relative;
@@ -101,7 +98,7 @@ export default defineComponent({
   background-color: #f5f5f5;
 }
 
-.announce-container{
+.announce-container {
   margin-right: 60px;
   height: 80px;
   width: 80px;
@@ -114,8 +111,8 @@ export default defineComponent({
   left: 100px;
 }
 
-.announce-label:hover::after{
-  content: "Announce to Homepage";
+.announce-label:hover::after {
+  content: 'Announce to Homepage';
   position: relative;
   bottom: 80px;
   left: 60px;
@@ -126,11 +123,12 @@ export default defineComponent({
   color: red;
 }
 
-html, body {
+html,
+body {
   height: 100%;
   margin: 0;
   padding: 0;
-  overflow: hidden;   /* disable scroll */
+  overflow: hidden; /* disable scroll */
 }
 
 .messages-container {
@@ -155,7 +153,7 @@ html, body {
   font-weight: bold;
 }
 .message-time {
-  margin-top: auto; 
+  margin-top: auto;
   font-size: 20px;
   color: #666;
 }
@@ -184,16 +182,16 @@ html, body {
   padding: 10px;
   border-radius: 5px;
   border: none;
-  background-color: #4CAF50;
+  background-color: #4caf50;
   color: white;
   font-weight: bold;
   cursor: pointer;
 }
-.message-input button:hover{
+.message-input button:hover {
   background-color: rgb(92, 153, 243);
   color: white;
 }
-input::placeholder{
+input::placeholder {
   font-size: 20px;
 }
 .form-container {
@@ -213,7 +211,7 @@ input::placeholder{
   padding: 10px;
   border-radius: 2px;
   border: none;
-  background-color: #007BFF;
+  background-color: #007bff;
   color: white;
   font-weight: bold;
   cursor: pointer;
@@ -239,5 +237,4 @@ input::placeholder{
 .scroll-to-bottom button:hover {
   background-color: #ab6c2c;
 }
-
 </style>
