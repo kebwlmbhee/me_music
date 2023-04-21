@@ -7,7 +7,9 @@
           <li>
             <div class="announcement-author">Author: {{ announcement.author }}</div>
             <div class="announcement-text">Content: {{ announcement.text }}</div>
-            <div class="announcement-time">Time: {{ chatroom.getTimeString(announcement.time) }}</div>
+            <div class="announcement-time">
+              Time: {{ chatroom.getTimeString(announcement.time) }}
+            </div>
           </li>
         </ul>
       </div>
@@ -19,48 +21,46 @@
 </template>
 
 <script>
-import { set, ref, db } from '/src/firebaseConf.js';
-import Chatroom from '/src/views/chatroom/chatroom.js';
-import { defineComponent } from 'vue';
+import { set, ref, db } from '/src/firebaseConf.js'
+import Chatroom from '/src/views/chatroom/chatroom.js'
+import { defineComponent } from 'vue'
 
-const chatroom = new Chatroom();
+const chatroom = new Chatroom()
 
 export default defineComponent({
   data() {
     return {
       announcements: [],
       keys: []
-    };
+    }
   },
   created() {
     new Promise((resolve) => {
-      this.announcementRef = ref(db, 'announcement');
+      this.announcementRef = ref(db, 'announcement')
       chatroom.onAnnouncement((messages) => {
         // sort by timestamp
-        messages.sort((a, b) => b.time - a.time);
+        messages.sort((a, b) => b.time - a.time)
         // keep the lastest 10 announcements
-        while(messages.length > 10)
-          messages.pop();
+        while (messages.length > 10) messages.pop()
 
-        this.announcements = messages;
-        set(this.announcementRef, this.announcements);
-        resolve(this.announcements);
-      });
-    });
+        this.announcements = messages
+        set(this.announcementRef, this.announcements)
+        resolve(this.announcements)
+      })
+    })
   },
   methods: {
     redirectToUrl() {
-      window.open('/chatroom', '_blank');
+      window.open('/chatroom', '_blank')
     }
   },
   mounted() {
-    this.chatroom = chatroom;
+    this.chatroom = chatroom
   }
 })
 </script>
 
 <style scoped>
-
 .announcement-container {
   position: fixed;
   bottom: 20;
@@ -71,7 +71,8 @@ export default defineComponent({
   overflow-y: scroll;
 }
 
-html, body {
+html,
+body {
   overflow: hidden;
 }
 
@@ -126,14 +127,13 @@ li {
   padding: 10px;
   border-radius: 4px;
   border: none;
-  background-color: #bb9362; 
-  color: white; 
-  font-weight: bold; 
-  cursor: pointer; 
+  background-color: #bb9362;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
 }
 
 .url-redirection button:hover {
   background-color: #ab6c2c;
 }
-
 </style>
