@@ -1,0 +1,30 @@
+<template>
+     <v-responsive max-width="258">
+        <v-btn size="x-large" rounded="xl" border>
+            {{ userName }}
+            <template v-slot:prepend>
+                <v-avatar color="brown">{{ userName[0] }}</v-avatar>
+            </template>
+
+            <v-menu activator="parent">
+                <v-list>
+                    <v-list-item title="Enter" ></v-list-item>
+                    <v-list-item title="Delete"></v-list-item>
+                </v-list>
+            </v-menu>
+        </v-btn>
+    </v-responsive>
+    
+</template>
+
+<script>
+export default {
+    name:"UserProfileButton",
+    props:{
+        userName:String,
+    }
+}
+</script>
+
+<style scoped>
+</style>
