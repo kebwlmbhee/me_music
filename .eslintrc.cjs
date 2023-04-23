@@ -7,7 +7,7 @@ module.exports = {
     'plugin:vue/vue3-essential',
     'eslint:recommended',
     '@vue/eslint-config-prettier/skip-formatting',
-    //
+    // 避免 eslint 阻擋
     'plugin:cypress/recommended'
   ],
   parserOptions: {
