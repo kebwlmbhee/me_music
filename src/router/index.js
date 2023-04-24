@@ -21,7 +21,7 @@ const router = createRouter({
         { path: '', name: '大廳', component: Explore },
         { path: 'Chat', name: '聊天室', component: ChatRoom },
         { path: 'MusicRecord', name: '我的音樂記錄', component: MusicRecord },
-        { path: 'Explore', name: '探索', component: Explore }
+        { path: 'Explore', name: '探索', component: Explore },
       ]
     },
     {
@@ -76,6 +76,18 @@ const router = createRouter({
       redirect: {
         name: 'login'
       }
+    },
+    {
+      path: '/UI',
+      name: 'UItest',
+      component:() => import('../components/SDJ/UI.vue'),
+      children: [
+        { 
+          path: '/UI/',
+          name: 'Content',
+          component:() => import('../components/SDJ/ChatLobby.vue')
+        }
+      ]
     }
   ]
 })
