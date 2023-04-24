@@ -21,7 +21,7 @@ const router = createRouter({
         { path: '', name: '大廳', component: Explore },
         { path: 'Chat', name: '聊天室', component: ChatRoom },
         { path: 'MusicRecord', name: '我的音樂記錄', component: MusicRecord },
-        { path: 'Explore', name: '探索', component: Explore },
+        { path: 'Explore', name: '探索', component: Explore }
       ]
     },
     {
@@ -64,6 +64,11 @@ const router = createRouter({
       name: 'homepage',
       component: () => import('/src/views/chatroom/HomepageView.vue')
     },
+    {
+      path: '/musicQueue',
+      name: 'musicQueue',
+      component: () => import('/src/views/musicQ/MusicQueueView.vue')
+    },
     // 404
     {
       path: '/:pathMatch(.*)*',
@@ -80,12 +85,12 @@ const router = createRouter({
     {
       path: '/UI',
       name: 'UItest',
-      component:() => import('../components/SDJ/UI.vue'),
+      component: () => import('../components/SDJ/UI.vue'),
       children: [
-        { 
+        {
           path: '/UI/',
           name: 'Content',
-          component:() => import('../components/SDJ/ChatLobby.vue')
+          component: () => import('../components/SDJ/ChatLobby.vue')
         }
       ]
     }
