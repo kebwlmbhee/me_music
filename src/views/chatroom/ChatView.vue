@@ -1,6 +1,6 @@
 <template>
   <v-list>
-      <div v-for="(message, index) in messages" :key="index" class="text-center">
+      <div v-for="(message, index) in this.allMessages" :key="index" class="text-center">
           <v-label v-if="checkTime(index)">{{ message.time }}</v-label>
           <v-list-item>
               <template v-slot:prepend>
@@ -14,8 +14,8 @@
 </template>
 
 <script>
-import {useChatDataStore } from '@/stores/chatdata'
-import {storeToRefs} from 'pinia' 
+import { mapActions,mapState,mapStores } from 'pinia';
+import ChatData from '@/stores/ChatData';
 
 import { db } from '../../firebaseConf.js';
 import Chatroom from './chatroom.js';
@@ -26,33 +26,26 @@ export default {
   data(){
       return{
           currentTime:Date,
-          messages:[]
+           text:""
       }
   },
   created(){
       // 發送時間: messages[].time    發信人: messages[].author  內容: messages[].text
-      chatroom.onMessage((messages) => {
-          this.messages = messages;
-          this.currentTime = messages[0].time
-      });
-
-  },methods:{
+    this.GetChatroomMessages();
+  },computed:{
+    ...mapState[ChatData,["allMessages"]]
+  },
+  methods:{
       checkTime(currentIndex){
           if(currentIndex === 0) return true;
-          console.log(this.messages[currentIndex].time);
-          console.log(this.messages[currentIndex-1].time);
-          if(Math.abs(this.messages[currentIndex].time - this.messages[currentIndex-1].time) > (10 * 60 * 1000 )){
+          if(Math.abs(this.allMessages[currentIndex].time - this.allMessages[currentIndex-1].time) > (10 * 60 * 1000 )){
               console.log("true")
               return true;
           }
               
           else return false;
-      }
-  },
-  setup(){
-      const store = useChatDataStore()
-      const {ChatData} = storeToRefs(store)
-      return {store}
+      },
+      ...mapActions(ChatData,["GetChatroomMessages"]),
   }
 }
 </script>
