@@ -1,6 +1,7 @@
-import { describe, expect, test } from 'vitest'
+import { describe, expect, it, test } from 'vitest'
 import { mount } from '@vue/test-utils'
 import TestVitest from '@/components/TestVitest.vue'
+import vuetify from '@/plugins/vuetify';
 
 describe('import vue components', () => {
     test('normal imports as expected', async () => {
@@ -8,9 +9,12 @@ describe('import vue components', () => {
         expect(TestVitest).toBeDefined()
     })
 
-    test('mount component', async () => {
+    it('mount component', async () => {
         expect(TestVitest).toBeTruthy()
         const wrapper = mount(TestVitest, {
+            global: {
+                plugins: [vuetify],
+            },
             props: {
                 count: 4,
             },
