@@ -73,12 +73,9 @@
         </v-main>
         <!-- 底下輸入框 -->
         <v-footer app height="72">
-            <v-text-field v-model="message"
-            bg-color="grey-lighten-1"
-            class="rounded-pill overflow-hidden"
-            density="compact" hide-details
-            variant="solo" clearable
-            @keydown.enter="addchatData"
+            <v-text-field v-model="message" bg-color="grey-lighten-1"
+            class="rounded-pill overflow-hidden" density="compact" hide-details
+            variant="solo" clearable @keydown.enter="addchatData"
             ></v-text-field>
         </v-footer>
     </v-app>
@@ -87,7 +84,7 @@
 import { mapActions,mapState,mapStores } from 'pinia';
 import UserStatus from '@/stores/UserStatus';
 import MusicQueue from '@/stores/MusicQueue';
-import { useChatDataStore } from '../stores/chatdata';
+import ChatData from '@/stores/ChatData';
 
 import UserProfileButton from '../components/UserProfileButton.vue';
 
@@ -123,7 +120,7 @@ export default {
                 ],
             },
             message: "",SelectedPage:"大廳",isRouterAlive:true,
-            currentMusic_url:"" 
+            currentMusic_url:"" ,
         }
     },
     components:{
@@ -131,17 +128,14 @@ export default {
     }
     ,
     computed:{
-        ...mapStores(useChatDataStore),
+        ...mapStores(ChatData),
     },
     methods:{
         chatdataTransfer(i){   // 獲取聊天室資料 (附帶清除)
-            console.log("test")
-            this.chatdataStore.ClearChatData()
-            this.chatdataStore.enterChatroom(this.FakeData['ChatData'])
-            this.chatdataStore.addNewData({ sender :i , content:"test" })
+            console.log("data transfer")
         },addchatData(){       // 新增聊天室資料
             console.log(this.message)
-            this.chatdataStore.addNewData({ sender : "A", content:this.message})
+            this.AddChatroomMessage("Test Author", this.message, false)
             this.message = ""
         },reload(){   // 重新加載頁面 ? 
             this.isRouterAlive = false
@@ -167,7 +161,8 @@ export default {
             this.currentMusic_url = this.ShiftTheMusic().mp3;
         },
         ...mapActions(UserStatus,['checkAuth'] ),
-        ...mapActions(MusicQueue,['ShiftTheMusic'])
+        ...mapActions(MusicQueue,['ShiftTheMusic']),
+        ...mapActions(ChatData,["AddChatroomMessage"]),
     }
     ,mounted(){
         setTimeout(()=>{
