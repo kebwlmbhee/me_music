@@ -1,4 +1,4 @@
-import { db, ref, push, onValue, remove, set } from '/src/firebaseConf.js'
+import { db, ref, push, onValue, remove, set, update } from '/src/firebaseConf.js'
 
 class musicQueue {
   constructor() {
@@ -7,20 +7,20 @@ class musicQueue {
 
   addMusic(artist, songName, url) {
     // push(this.musicQueueRef, newMusic);
-    const musicRef = push(ref(db, '/musicQueue'))
-    const musicId = musicRef.key
+    const musicRef = push(this.musicQueueRef)
+    const musicKey = musicRef.key
 
     const newMusic = {
       artist: artist,
-      song: songName,
+      songName: songName,
       url: url,
-      id: musicId
+      key: musicKey
     }
     set(musicRef, newMusic)
   }
 
   removeMusic(music) {
-    remove(ref(db, `/musicQueue/${music.id}`)).catch((error) => console.error(error))
+    remove(ref(db, `/musicQueue/${music.key}`)).catch((error) => console.error(error))
   }
 
   onMusic(callback) {
@@ -33,6 +33,12 @@ class musicQueue {
         callback(musics)
       }
     })
+  }
+
+  replaceMusic(firstMusic, targetMusic) {
+    this.removeMusic(targetMusic)
+    targetMusic.key = firstMusic.key
+    update(ref(db, `/musicQueue/${firstMusic.key}`), targetMusic)
   }
 }
 
