@@ -13,9 +13,11 @@ import iconFonts from '@/plugins/vuetify'
 
 // import './assets/main.css'
 
-const pinia = createPinia();
+const pinia = createPinia()
 // To allow using `this.router.xxx` in @/store/*.js
-pinia.use(({ store }) => { store.router = markRaw(router) });
+pinia.use(({ store }) => {
+  store.router = markRaw(router)
+})
 
 const app = createApp(App)
 
