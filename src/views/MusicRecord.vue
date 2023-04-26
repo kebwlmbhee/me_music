@@ -37,6 +37,9 @@
         @click="trigger_pop_up(true, search)"
       >
         <v-img v-if="search.album.images[0].url" :src="search.album.images[0].url"></v-img>
+        <v-tooltip activator="parent" location="start">
+          {{ search.name }}
+        </v-tooltip>
       </v-sheet>
     </div>
     <!-- 彈出視窗 -->
@@ -49,7 +52,6 @@
           <div>
             <v-card-title>{{ checkSong.name }}</v-card-title>
             <v-card-subtitle>{{ checkSong.artists[0].name }}</v-card-subtitle>
-            <v-card-text>Description</v-card-text>
           </div>
           <v-spacer></v-spacer>
           <!-- 應該要放頭像  但沒有ˊˇˋ -->
@@ -77,10 +79,9 @@
 
 <script>
 import UserStatus from '@/stores/UserStatus'
-import MusicQueue from '../stores/MusicQueue'
 import { mapState, mapActions } from 'pinia'
 export default {
-  inject: ['Reload', 'AddMusic'],
+  inject: ['Reload', 'AddMusic', 'PlayPreview', 'PausePreview'],
   data() {
     return {
       test: 30,
@@ -113,11 +114,14 @@ export default {
     trigger_pop_up(up_or_down, data = null) {
       // console.log(data) //data.album.images 圖片  data.artists[] 歌手 data.name 名稱
       if (!up_or_down) {
-        //不觸發 或是 取消觸發
+        // 不觸發 或是 取消觸發
+        // 還要取消Preview 的播歌
         this.popUpWindow = false
+        this.PausePreview()
         return
       }
-      //要觸發
+      // 要觸發
+      // 還要開始Preview播歌
       this.popUpWindow = true
       this.checkSong = {
         name: data.name,
@@ -125,21 +129,15 @@ export default {
         artists: data.artists,
         mp3_url: data.preview_url
       }
-      // console.log(this.checkSong);
+      this.PlayPreview(this.checkSong.mp3_url)
     },
     // TODO : 串點播API
     AddNewSong() {
-      console.log('Add New Song Start')
-      this.AddMusicToTheQueue_2(
-        this.checkSong.name,
-        this.checkSong.artists,
-        this.checkSong.image,
-        this.checkSong.mp3_url
-      )
-      this.AddMusic()
+      console.log('Add New Song to Start')
+      console.log(this.checkSong)
+      this.trigger_pop_up(false)
     },
-    ...mapActions(UserStatus, ['checkAuth']),
-    ...mapActions(MusicQueue, ['AddMusicToTheQueue_2'])
+    ...mapActions(UserStatus, ['checkAuth'])
   },
   mounted() {
     this.checkAuth()
