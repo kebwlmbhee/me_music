@@ -76,6 +76,18 @@ const router = createRouter({
       redirect: {
         name: 'login'
       }
+    },
+    {
+      path: '/UI',
+      name: 'UItest',
+      component: () => import('../components/SDJ/UI.vue'),
+      children: [
+        {
+          path: '/UI/',
+          name: 'Content',
+          component: () => import('../components/SDJ/ChatLobby.vue')
+        }
+      ]
     }
   ]
 })

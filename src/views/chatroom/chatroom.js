@@ -1,4 +1,4 @@
-import { db, ref, push, onValue } from '/src/firebaseConf.js'
+import { db, ref, push, set, remove, onValue } from '/src/firebaseConf.js'
 
 class Chatroom {
   constructor() {
@@ -15,7 +15,11 @@ class Chatroom {
     }
     push(this.chatroomRef, newMessage)
     if (isAnnounce) {
-      push(this.announcementRef, newMessage)
+      const announcement = push(this.announcementRef)
+      const announcementId = announcement.key
+      newMessage.id = announcementId
+      console.log(newMessage.id)
+      set(announcement, newMessage)
     }
   }
 
@@ -41,6 +45,12 @@ class Chatroom {
         callback(messages)
       }
     })
+  }
+
+  removeAnnouncement(announcement) {
+    console.log(announcement)
+    console.log(announcement.id)
+    remove(ref(db, `/announcement/${announcement.id}`))
   }
 
   getTimeString(timestamp) {
