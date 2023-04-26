@@ -1,5 +1,7 @@
 // Why not createWebHistory? Spotify auth callback will not provide /#/ in URL
 import { createRouter, createWebHistory } from 'vue-router'
+import UserStatus from '../stores/UserStatus'
+
 import HomeView from '../views/HomeView.vue'
 import LoginView from '../views/LoginView.vue'
 import CallbackView from '../views/CallbackView.vue'
@@ -79,4 +81,12 @@ const router = createRouter({
     }
   ]
 })
+
+router.beforeEach(() => {
+  // ✅ This will work because the router starts its navigation after
+  // the router is installed and pinia will be installed too
+  const user_status = UserStatus()
+  user_status.checkAuth()
+})
+
 export default router
