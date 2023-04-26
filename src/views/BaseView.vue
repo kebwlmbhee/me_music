@@ -1,48 +1,11 @@
 <template>
   <!-- <audio autoplay src="../views/Test.mp3"></audio> -->
   <v-app id="inspire">
-    <!-- 左邊 -->
-    <v-navigation-drawer color="grey-lighten-3" rail>
-      <v-btn
-        class="d-block text-center mx-auto mt-4 rounded-circle"
-        color="grey-darken-1"
-        size="36"
-        to="/Home"
-        @click="
-          () => {
-            SelectedPage = '大廳'
-          }
-        "
-      >
-      </v-btn>
-
-      <v-divider class="mx-3 my-5"></v-divider>
-
-      <v-btn
-        v-for="(chatroom, index) in FakeData['Chatrooms']"
-        :key="index"
-        class="d-block text-center mx-auto mb-9 rounded-circle"
-        size="28"
-        color="grey-lighten-1"
-        :title="chatroom.alt"
-      >
-        <v-menu activator="parent">
-          <v-list>
-            <v-list-item
-              title="Enter"
-              to="/Home/Chat"
-              @click="this.chatdataTransfer(index)"
-            ></v-list-item>
-            <v-list-item title="Delete"></v-list-item>
-          </v-list>
-        </v-menu>
-      </v-btn>
-    </v-navigation-drawer>
     <!-- 左-2 -->
     <v-navigation-drawer width="244" permanent>
       <!-- 左-2 放商標的? -->
       <!--  -->
-      <v-sheet color="grey-lighten-5" height="128" width="100%">
+      <v-sheet color="grey-lighten-5" height="128" width="100%" @click="clickLobby">
         <v-img
           src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRXGQDqS3rBb7GyPj87cxlKGJM1VC3CFIaUBg&usqp=CAU"
           alt="Fake"
@@ -95,12 +58,13 @@
       <v-divider></v-divider>
       <div>
         <audio
-          :src="currentMusic_url"
+          :src="MainMusic_url"
           autoplay
           id="mainAudio"
           controls
           @ended="whenMusicEnded"
         ></audio>
+        <audio :src="SecondMusic_url" id="secondAudio" autoplay controls loop></audio>
       </div>
     </v-navigation-drawer>
 
@@ -146,13 +110,6 @@ export default {
           { ava: '', Name: 'member4', alt: 'M4' },
           { ava: '', Name: 'member5', alt: 'M5' }
         ],
-        Chatrooms: [
-          // 代表你有多少已進入的聊天室
-          { ava: '', Name: 'ChatRoom1', alt: 'C1' },
-          { ava: '', Name: 'ChatRoom2', alt: 'C2' },
-          { ava: '', Name: 'ChatRoom3', alt: 'C3' },
-          { ava: '', Name: 'ChatRoom4', alt: 'C4' }
-        ],
         ChatData: [
           { sender: 'John', content: '這是我的內容喔' },
           { sender: 'Tess', content: '這是Tess的內容喔' },
@@ -165,7 +122,8 @@ export default {
       message: '',
       SelectedPage: '大廳',
       isRouterAlive: true,
-      currentMusic_url: ''
+      MainMusic_url: '',
+      SecondMusic_url: ''
     }
   },
   components: {
@@ -175,6 +133,12 @@ export default {
     ...mapStores(ChatData)
   },
   methods: {
+    clickLobby() {
+      this.SelectedPage = '大廳'
+      this.$router.push({
+        path: '/Home'
+      })
+    },
     chatdataTransfer(i) {
       // 獲取聊天室資料 (附帶清除)
       console.log(`data transfer = ${i}`)
@@ -201,13 +165,24 @@ export default {
       if (nextMusic == null) {
         return
       }
-      this.currentMusic_url = nextMusic.mp3
+      this.MainMusic_url = nextMusic.mp3
     },
     WhenAddTheNewMusic() {
       console.log('WhenAddTheNewMusic Start')
       var mainAudio = document.getElementById('mainAudio')
       if (!mainAudio.paused) return
-      this.currentMusic_url = this.ShiftTheMusic().mp3
+      this.MainMusic_url = this.ShiftTheMusic().mp3
+    },
+    PlayPreviewAudio(url) {
+      // 控制Second Audio 播放
+      // 當開始播放時 靜音MainAudio
+      // 開始播放 Second Audio
+      console.log('Play Second Audio' + url)
+    },
+    PausePreviewAudio() {
+      // 當暫停時 使MainAudio靜音取消
+      // 暫停播放 Second Audio
+      console.log('Pause Second Audio')
     },
     ...mapActions(UserStatus, ['checkAuth']),
     ...mapActions(MusicQueue, ['ShiftTheMusic']),
@@ -223,7 +198,9 @@ export default {
   provide() {
     return {
       Reload: this.reload,
-      AddMusic: this.WhenAddTheNewMusic
+      AddMusic: this.WhenAddTheNewMusic,
+      PlayPreview: this.PlayPreviewAudio,
+      PausePreview: this.PausePreviewAudio
     }
   }
 }

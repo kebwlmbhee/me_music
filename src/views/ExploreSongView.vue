@@ -13,8 +13,27 @@
       </div>
     </v-card>
 
-    <v-list>
-      <v-list-item v-for="n in 10" :key="n"> test :{{ n }} </v-list-item>
+    <v-list class="overflow-auto">
+      <v-list-item
+        v-for="(item, index) in allData.tracks.items"
+        :key="index"
+        @click="clickOneSong(item.track.id)"
+      >
+        <v-card flat border>
+          <div class="d-flex flex-nowrap flex-row justify-start align-center">
+            <v-avatar rounded="0" size="90" class="ma-3">
+              <v-img :src="item.track.album.images[0].url" alt="Not Found"></v-img>
+            </v-avatar>
+            <div>
+              <v-card-title class="font-weight-bold">{{ item.track.name }}</v-card-title>
+              <v-card-subtitle>{{ item.track.artists[0].name }}</v-card-subtitle>
+              <v-card-actions>
+                <v-btn border icon="mdi-plus" size="x-small"></v-btn>
+              </v-card-actions>
+            </div>
+          </div>
+        </v-card>
+      </v-list-item>
     </v-list>
   </div>
 </template>
@@ -34,6 +53,7 @@ export default {
     ...mapState(UserStatus, ['authCode', 'userProfile'])
   },
   methods: {
+    // TODO 串API ˊ ˇ ˋ
     searchPlayListTracks() {
       let ID = this.$route.query.id
       let url = `https://api.spotify.com/v1/playlists/${ID}`
@@ -45,7 +65,7 @@ export default {
       }
       this.$http.get(url, config).then((res) => {
         this.allData = res.data
-        console.log(this.allData)
+        console.log(this.allData.tracks.items)
         this.loaded = true
       })
 
@@ -63,6 +83,11 @@ export default {
       //                                       .release_date  專輯日期
       //                           .name                      歌曲名稱
       //                           .id                        歌曲ID
+    },
+    // TODO : 單點歌曲
+    clickOneSong(track_id) {
+      console.log(`我想點播id="${track_id}"的歌`)
+      // TODO : 點播歌曲
     }
   },
   created() {

@@ -127,6 +127,7 @@ export default {
       }
       // console.log(this.checkSong);
     },
+    // TODO : 串點播API
     AddNewSong() {
       console.log('Add New Song Start')
       this.AddMusicToTheQueue_2(
