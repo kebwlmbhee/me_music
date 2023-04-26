@@ -7,7 +7,8 @@ import NotFoundView from '../views/NotFoundView.vue'
 
 import Base from '../views/BaseView.vue'
 import Explore from '../views/ExploreView.vue'
-import ChatRoom from '../views/Chatroom/ChatView.vue'
+import ExploreSong from '../views/ExploreSongView.vue'
+import ChatRoom from '../views/chatroom/ChatView.vue'
 import MusicRecord from '../views/MusicRecord.vue'
 
 const router = createRouter({
@@ -22,6 +23,7 @@ const router = createRouter({
         { path: 'Chat', name: '聊天室', component: ChatRoom },
         { path: 'MusicRecord', name: '我的音樂記錄', component: MusicRecord },
         { path: 'Explore', name: '探索', component: Explore },
+        { path: 'ExploreSong', name: '探索歌單', component: ExploreSong }
       ]
     },
     {
@@ -80,12 +82,12 @@ const router = createRouter({
     {
       path: '/UI',
       name: 'UItest',
-      component:() => import('../components/SDJ/UI.vue'),
+      component: () => import('../components/SDJ/UI.vue'),
       children: [
-        { 
+        {
           path: '/UI/',
           name: 'Content',
-          component:() => import('../components/SDJ/ChatLobby.vue')
+          component: () => import('../components/SDJ/ChatLobby.vue')
         }
       ]
     }

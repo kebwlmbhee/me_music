@@ -1,29 +1,29 @@
-import { reactive } from 'vue'
 import { defineStore } from 'pinia'
 
-import { db } from '../firebaseConf.js';
-import Chatroom from '../views/chatroom/chatroom.js';
-const chatroom = new Chatroom(db);
+import { db } from '../firebaseConf.js'
+import Chatroom from '../views/chatroom/chatroom.js'
+const chatroom = new Chatroom(db)
 
 export default defineStore('ChatData', {
   state: () => {
-    return{
-      allMessages:[]
+    return {
+      allMessages: []
     }
-  },actions:{
-    GetChatroomMessages(){
+  },
+  actions: {
+    GetChatroomMessages() {
       chatroom.onMessage((messages) => {
-        this.allMessages = messages;
-      });
+        this.allMessages = messages
+      })
     },
-    AddChatroomMessage(author, text, isAnnounce){
+    AddChatroomMessage(author, text, isAnnounce) {
       if (!author) {
         alert('Please enter your name!')
-        return;
+        return
       }
       if (!text) {
         alert('message is empty!')
-        return;
+        return
       }
       const newMessage = {
         author: author,
@@ -35,5 +35,4 @@ export default defineStore('ChatData', {
       chatroom.sendMessage(author, text, isAnnounce)
     }
   }
-
 })
