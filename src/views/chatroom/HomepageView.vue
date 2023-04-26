@@ -2,7 +2,7 @@
   <div>
     <h1>Announcements:</h1>
     <div class="announcement-container" v-if="announcements.length > 0">
-      <div v-for="(announcement, index) in announcements" :key="index">
+      <div v-for="announcement in announcements" :key="announcement.id">
         <ul>
           <li>
             <div class="announcement-author">Author: {{ announcement.author }}</div>
@@ -21,11 +21,8 @@
 </template>
 
 <script>
-import { set, ref, db } from '/src/firebaseConf.js'
 import Chatroom from '/src/views/chatroom/chatroom.js'
 import { defineComponent } from 'vue'
-
-const chatroom = new Chatroom()
 
 export default defineComponent({
   data() {
@@ -35,27 +32,33 @@ export default defineComponent({
     }
   },
   created() {
-    new Promise((resolve) => {
-      this.announcementRef = ref(db, 'announcement')
-      chatroom.onAnnouncement((messages) => {
-        // sort by timestamp
-        messages.sort((a, b) => b.time - a.time)
-        // keep the lastest 10 announcements
-        while (messages.length > 10) messages.pop()
-
-        this.announcements = messages
-        set(this.announcementRef, this.announcements)
-        resolve(this.announcements)
-      })
+    this.chatroom = new Chatroom()
+    this.chatroom.onAnnouncement((messages) => {
+      // // sort by timestamp
+      // messages.sort((a, b) => b.time - a.time)
+      // // keep the lastest 10 announcements
+      // while (messages.length > 10) {
+      //   messages.pop()
+      // }
+      // resolve(this.announcements)
+      this.announcements = messages
+      // sort by timestamp
+      this.announcements.sort((a, b) => b.time - a.time)
+      // keep the lastest 10 announcements
+      while (this.announcements.length > 10) {
+        // 獲取最後一個元素
+        const announcement = this.announcements[this.announcements.length - 1]
+        // 刪除最後一個元素(Website)
+        this.announcements.pop()
+        // 刪除最後一個元素(Firebase)
+        this.chatroom.removeAnnouncement(announcement)
+      }
     })
   },
   methods: {
     redirectToUrl() {
       window.open('/chatroom', '_blank')
     }
-  },
-  mounted() {
-    this.chatroom = chatroom
   }
 })
 </script>
