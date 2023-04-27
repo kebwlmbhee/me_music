@@ -17,7 +17,7 @@
             ></span
           >
         </div>
-        <button @click="manualPlayMusic(music)" class="play-music-btn">Play</button>
+        <button @click="cutMusic(music)" class="play-music-btn">Play</button>
         <button @click="deleteMusic(music)" class="delete-music-btn">Delete</button>
       </li>
     </ul>
@@ -32,6 +32,7 @@
   </div>
   <div>
     <transition name="fade" mode="out-in">
+      <!-- 如果 showMessage 為 true，顯示訊息 -->
       <div v-if="showMessage" key="message" class="message">
         {{ delayedMessage }}
       </div>
@@ -40,17 +41,21 @@
 </template>
 
 <script>
-// TODO: 切歌時的公告需要進行廣播，讓所有人知道即將被切歌，可能前端要使用彈出式視窗呈現
+// TODO(前端): 切歌時的公告要使用彈出式視窗呈現
 // TODO: 如果A切歌途中偵測到另一人切歌(B)時的處置方式，
 //       是需要當前的切歌被迫取消，改為B的切歌？ => 需要監聽另一個值判斷當前切歌與否
-//       兩者的切歌都被接受，但A的歌曲就等於幾乎沒播就被強制切掉 => 不做處置
 import musicQueue from '/src/views/musicQ/musicQueue.js'
 
+// 延遲 5 秒(顯示切歌訊息)
 const timeDelaySecond = 5
 
 export default {
   data() {
     return {
+      isEnd: false,
+      isPause: false,
+      isPlay: true,
+      upcomingMusic: '',
       showMessage: false,
       delayedMessage: '',
 
@@ -67,6 +72,37 @@ export default {
     this.musicQueue.onMusic((musics) => {
       this.musics = musics
     })
+
+    // 實時獲取 showMessage 的 boolean value
+    this.musicQueue.onCutting((isCutting) => {
+      this.showMessage = isCutting
+    })
+
+    // 實時獲取 upcomingMusic，位於 musicQueue 頂端的資料
+    this.musicQueue.onUpcomingMusic((music) => {
+      this.upcomingMusic = music
+    })
+  },
+  watch: {
+    // 減輕 firebase onValue() 的負擔，當 showMessage 為 true 時才調用 onCuttingMessage
+    showMessage(newVal) {
+      // 有所變動時
+      if (newVal) {
+        this.musicQueue.onCuttingMessage((cuttingMessage) => {
+          this.delayedMessage = cuttingMessage
+        })
+      }
+    },
+    upcomingMusic: {
+      // 新舊值處理，僅當新值不等於舊值且舊值不為空時，才會進行切歌並播放音樂
+      handler(newVal, oldVal) {
+        if (newVal !== oldVal && oldVal != '') {
+          this.playCutMusic()
+        }
+      },
+      // 初始化的變動不會響應 watch
+      immediate: false
+    }
   },
   methods: {
     addMusic() {
@@ -77,10 +113,11 @@ export default {
       this.songName = ''
       this.url = ''
     },
-    // 資料庫中第一首歌自動播放和歌曲結束時調用
-    // 應該要有自動跳至下一首的邏輯(前端補)
+    // TODO(前端) 應該要有自動播放當前歌曲(播完的歌曲會從 firebase 中被移除)的邏輯
+
+    // 資料庫中第一首歌自動播放和歌曲結束欲播放下一首時調用
     // 參數為下一首歌
-    autoPlayMusic(music) {
+    playNextMusic(music) {
       // 如果不是 firebase 的第一首，代表已經播完一首歌，刪除該首歌
       if (this.musics[0].key != music.key) {
         this.musicQueue.removeMusic(music)
@@ -90,14 +127,21 @@ export default {
       console.log('Playing music:', music.songName)
     },
     // 手動強制切歌
-    manualPlayMusic(music) {
+    // 參數為切歌完後即將要播的歌
+    cutMusic(music) {
       // 尋找目標音樂在 musics 陣列中的索引
       const index = this.musics.findIndex((m) => m.key === music.key)
 
+      // 按下 musicQueue 第一首歌時不響應(第一首歌應該正在播放)
+      if (index === 0) {
+        console.log(`the first music is already playing NOW.`)
+        return
+      }
       // 取得目標音樂
       const targetMusic = this.musics[index]
 
-      console.log(targetMusic)
+      // 將即將要播的寫入 firebase
+      this.musicQueue.setUpcomingMusic(targetMusic)
 
       // 取得頂端音樂
       const firstMusic = this.musics[0]
@@ -114,31 +158,46 @@ export default {
 
         // 切歌
         this.musicQueue.replaceMusic(firstMusic, targetMusic)
-
-        // 在這裡觸發播放音樂的邏輯
-        console.log('Playing music:', music.songName)
       }, timeDelaySecond * 1000)
     },
     deleteMusic(music) {
-      // 從 musics 陣列中移除指定音樂(Website)
-      const index = this.musics.findIndex((m) => m.key === music.key)
-      this.musics.splice(index, 1)
-
-      // 從 musicQueue 中移除指定音樂(Firebase)
+      // 從 musicQueue 中移除指定音樂
       this.musicQueue.removeMusic(music)
     },
     showDelayedMessage(targetMusic) {
-      this.showMessage = true
-      let secondsLeft = timeDelaySecond // 設定初始秒數
-      this.delayedMessage = `${secondsLeft} 秒後進行切歌，即將播放： ${targetMusic.songName}`
+      // 寫入 isCutting 為 true，顯示切歌訊息
+      this.musicQueue.setCutting(true)
+
+      // 設定初始秒數
+      let secondsLeft = timeDelaySecond
+
+      // 初始訊息
+      let msg = `${secondsLeft} 秒後進行切歌，即將播放： ${targetMusic.artist} - ${targetMusic.songName}`
+
+      // 存進 firebase
+      this.musicQueue.setterCutMusicMessage(msg)
+
       const intervalId = setInterval(() => {
-        secondsLeft-- // 每秒減少一秒
-        this.delayedMessage = `${secondsLeft} 秒後進行切歌，即將播放： ${targetMusic.songName}`
+        // 每秒減少一秒
+        secondsLeft--
+
+        // 訊息變更
+        msg = `${secondsLeft} 秒後進行切歌，即將播放： ${targetMusic.artist} - ${targetMusic.songName}`
+        this.musicQueue.setterCutMusicMessage(msg)
         if (secondsLeft === 0) {
-          clearInterval(intervalId) // 清除計時器
-          this.showMessage = false // 隱藏訊息
+          // 清除計時器
+          clearInterval(intervalId)
+          // 寫入 isCutting 為 false，隱藏切歌訊息
+          this.musicQueue.setCutting(false)
         }
+        // 毫秒數
       }, 1000)
+    },
+    // TODO(前端): 實作切歌後的播放歌曲
+    playCutMusic() {
+      setTimeout(() => {
+        console.log(this.upcomingMusic)
+      }, timeDelaySecond * 1000)
     }
   }
 }
