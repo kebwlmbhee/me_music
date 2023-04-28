@@ -8,8 +8,17 @@ import router from './router'
 
 // Vuetify
 import 'vuetify/styles'
+import { createVuetify } from 'vuetify'
+import * as components from 'vuetify/components'
+import * as directives from 'vuetify/directives'
+
 // add Vuetify icon
 import iconFonts from '@/plugins/vuetify'
+
+const vuetify = createVuetify({
+  components,
+  directives
+})
 
 // import './assets/main.css'
 
@@ -21,6 +30,7 @@ pinia.use(({ store }) => {
 
 const app = createApp(App)
 
+app.use(vuetify)
 app.use(pinia)
 app.use(router)
 app.use(iconFonts)
