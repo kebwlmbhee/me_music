@@ -49,7 +49,7 @@ export default {
     clickPlaylist(list_id) {
       this.$router.push({
         path: '/Home/ExploreSong',
-        query: { id: list_id }
+        query: { id: list_id, type: 'playlist' }
       })
     },
     searchPlayList() {

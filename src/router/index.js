@@ -10,6 +10,7 @@ import Explore from '../views/ExploreView.vue'
 import ExploreSong from '../views/ExploreSongView.vue'
 import ChatRoom from '../views/chatroom/ChatView.vue'
 import MusicRecord from '../views/MusicRecord.vue'
+import ChatLobby from '../components/SDJ/ChatLobby.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -19,7 +20,7 @@ const router = createRouter({
       name: '大廳',
       component: Base,
       children: [
-        { path: '', name: '大廳', component: Explore },
+        { path: '', name: '大廳', component: ChatLobby },
         { path: 'Chat', name: '聊天室', component: ChatRoom },
         { path: 'MusicRecord', name: '我的音樂記錄', component: MusicRecord },
         { path: 'Explore', name: '探索', component: Explore },

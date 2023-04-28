@@ -11,6 +11,18 @@
       </v-list-item>
     </div>
   </v-list>
+  <v-footer app height="60">
+    <v-text-field
+      v-model="text"
+      bg-color="grey-lighten-1"
+      class="rounded-pill overflow-hidden"
+      density="compact"
+      hide-details
+      variant="solo"
+      clearable
+      @keydown.enter="SendMessage('TestAuthor')"
+    ></v-text-field>
+  </v-footer>
 </template>
 
 <script>
@@ -48,6 +60,25 @@ export default {
     },
     TimeStampToDateString(timeStamp) {
       return chatroom.getTimeString(timeStamp)
+    },
+    SendMessage(author, isAnnounce = false) {
+      if (!author) {
+        alert('Please enter your name!')
+        return
+      }
+      if (!this.text) {
+        alert('message is empty!')
+        return
+      }
+      const newMessage = {
+        author: author,
+        text: this.text,
+        time: Date.now(),
+        isAnnounce: isAnnounce
+      }
+      this.allMessages.push(newMessage)
+      chatroom.sendMessage(author, this.text, isAnnounce)
+      this.text = ''
     },
     ...mapActions(ChatData, ['GetChatroomMessages'])
   }

@@ -1,9 +1,9 @@
 <template>
   <!-- <audio autoplay src="../views/Test.mp3"></audio> -->
   <v-app id="inspire">
-    <!-- 左-2 -->
+    <!-- 左 -->
     <v-navigation-drawer width="244" permanent>
-      <!-- 左-2 放商標的? -->
+      <!-- 左 放商標的? -->
       <!--  -->
       <v-sheet color="grey-lighten-5" height="128" width="100%" @click="clickLobby">
         <v-img
@@ -72,26 +72,12 @@
     <v-main>
       <router-view v-if="isRouterAlive"></router-view>
     </v-main>
-    <!-- 底下輸入框 -->
-    <v-footer app height="72">
-      <v-text-field
-        v-model="message"
-        bg-color="grey-lighten-1"
-        class="rounded-pill overflow-hidden"
-        density="compact"
-        hide-details
-        variant="solo"
-        clearable
-        @keydown.enter="addchatData"
-      ></v-text-field>
-    </v-footer>
   </v-app>
 </template>
 <script>
-import { mapActions, mapStores } from 'pinia'
+import { mapActions } from 'pinia'
 import UserStatus from '@/stores/UserStatus'
 import MusicQueue from '@/stores/MusicQueue'
-import ChatData from '@/stores/ChatData'
 
 import UserProfileButton from '../components/UserProfileButton.vue'
 
@@ -100,7 +86,8 @@ export default {
     return {
       Explores: [
         { title: '探索', to: '/Home/Explore' },
-        { title: '我的音樂記錄', to: '/Home/MusicRecord' }
+        { title: '我的音樂記錄', to: '/Home/MusicRecord' },
+        { title: '聊天室', to: '/Home/Chat' }
       ],
       FakeData: {
         ChatroomMembers: [
@@ -109,14 +96,6 @@ export default {
           { ava: '', Name: 'member3', alt: 'M3' },
           { ava: '', Name: 'member4', alt: 'M4' },
           { ava: '', Name: 'member5', alt: 'M5' }
-        ],
-        ChatData: [
-          { sender: 'John', content: '這是我的內容喔' },
-          { sender: 'Tess', content: '這是Tess的內容喔' },
-          { sender: 'Tess', content: '這是Tess的內容喔' },
-          { sender: 'John', content: '這是我的內容喔' },
-          { sender: 'John', content: '這是我的內容喔' },
-          { sender: 'Hso!', content: '這是Hso!的內容喔' }
         ]
       },
       message: '',
@@ -129,25 +108,12 @@ export default {
   components: {
     UserProfileButton
   },
-  computed: {
-    ...mapStores(ChatData)
-  },
   methods: {
     clickLobby() {
       this.SelectedPage = '大廳'
       this.$router.push({
         path: '/Home'
       })
-    },
-    chatdataTransfer(i) {
-      // 獲取聊天室資料 (附帶清除)
-      console.log(`data transfer = ${i}`)
-    },
-    addchatData() {
-      // 新增聊天室資料
-      console.log(this.message)
-      this.AddChatroomMessage('Test Author', this.message, false)
-      this.message = ''
     },
     reload() {
       // 重新加載頁面 ?
@@ -191,8 +157,7 @@ export default {
       secondAudio.pause()
     },
     ...mapActions(UserStatus, ['checkAuth']),
-    ...mapActions(MusicQueue, ['ShiftTheMusic']),
-    ...mapActions(ChatData, ['AddChatroomMessage'])
+    ...mapActions(MusicQueue, ['ShiftTheMusic'])
   },
   mounted() {
     setTimeout(() => {

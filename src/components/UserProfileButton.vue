@@ -8,7 +8,7 @@
 
       <v-menu activator="parent">
         <v-list>
-          <v-list-item title="Log Out"></v-list-item>
+          <v-list-item title="Log Out" @click="logout"></v-list-item>
         </v-list>
       </v-menu>
     </v-btn>
@@ -16,10 +16,16 @@
 </template>
 
 <script>
+import { mapActions } from 'pinia'
+import UserStatus from '@/stores/UserStatus'
+
 export default {
   name: 'UserProfileButton',
   props: {
     userName: String
+  },
+  methods: {
+    ...mapActions(UserStatus, ['logout'])
   }
 }
 </script>
