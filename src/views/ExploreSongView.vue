@@ -1,5 +1,9 @@
+<!-- 
+  此頁面針對 給予PlayList ID、Album ID 或 Artist ID 
+  並且讓此頁面知道Type後 進入
+ -->
 <template>
-  <div v-if="loaded">
+  <div v-if="!loaded">
     <v-card flat border>
       <div class="d-flex flex-nowrap flex-row justify-start align-center">
         <v-avatar rounded="0" size="125" class="ma-5">
@@ -8,12 +12,14 @@
         <div>
           <v-card-item>{{ allData.type }}</v-card-item>
           <v-card-title class="font-weight-bold text-h4">{{ allData.name }}</v-card-title>
-          <v-card-subtitle>{{ allData.description }}</v-card-subtitle>
+          <v-card-text>
+            {{ allData.description }}
+          </v-card-text>
         </div>
       </div>
     </v-card>
-
-    <v-list class="overflow-auto">
+    <!-- Playlist -->
+    <v-list v-if="type == 'playlist'" class="overflow-auto">
       <v-list-item
         v-for="(item, index) in allData.tracks.items"
         :key="index"
@@ -22,11 +28,38 @@
         <v-card flat border>
           <div class="d-flex flex-nowrap flex-row justify-start align-center">
             <v-avatar rounded="0" size="90" class="ma-3">
-              <v-img :src="item.track.album.images[0].url" alt="Not Found"></v-img>
+              <v-img
+                v-if="item.track.album.images.length != 0"
+                :src="item.track.album.images[0].url"
+                alt="Not Found"
+              ></v-img>
             </v-avatar>
             <div>
               <v-card-title class="font-weight-bold">{{ item.track.name }}</v-card-title>
               <v-card-subtitle>{{ item.track.artists[0].name }}</v-card-subtitle>
+              <v-card-actions>
+                <v-btn border icon="mdi-plus" size="x-small"></v-btn>
+              </v-card-actions>
+            </div>
+          </div>
+        </v-card>
+      </v-list-item>
+    </v-list>
+    <!-- Album -->
+    <v-list v-else-if="type == 'album'" class="overflow-auto">
+      <v-list-item
+        v-for="(item, index) in allData.tracks.items"
+        :key="index"
+        @click="clickOneSong(item.track.id)"
+      >
+        <v-card flat border>
+          <div class="d-flex flex-nowrap flex-row justify-start align-center">
+            <v-avatar rounded="0" size="90" class="ma-3">
+              <v-img :src="allData.images[0].url" alt="Not Found"></v-img>
+            </v-avatar>
+            <div>
+              <v-card-title class="font-weight-bold">{{ item.name }}</v-card-title>
+              <v-card-subtitle>{{ item.artists[0].name }}</v-card-subtitle>
               <v-card-actions>
                 <v-btn border icon="mdi-plus" size="x-small"></v-btn>
               </v-card-actions>
@@ -46,13 +79,45 @@ export default {
   data() {
     return {
       allData: [],
-      loaded: false
+      loaded: false,
+      type: ''
     }
   },
   computed: {
     ...mapState(UserStatus, ['authCode', 'userProfile'])
   },
   methods: {
+    // TODO : Artist暫時無法做  因為沒辦法取得
+    searchTypeRedirect(type) {
+      this.loaded = true
+      switch (type) {
+        case 'playlist':
+          this.searchPlayListTracks().then((data) => {
+            console.log(data)
+            this.allData = data
+            this.loaded = false
+          })
+          break
+        case 'artist':
+          this.searchArtistTracks().then((data) => {
+            this.allData = data
+            // this.loaded = false
+          })
+          break
+        case 'album':
+          this.searchAlbumTracks().then((data) => {
+            console.log(data)
+            this.allData = data
+            this.loaded = false
+          })
+          break
+        default:
+          alert('無法進入')
+          this.$router.go(1)
+          break
+      }
+    },
+    // 搜尋當前要查詢的PlayList
     // TODO 串API ˊ ˇ ˋ
     searchPlayListTracks() {
       let ID = this.$route.query.id
@@ -63,12 +128,11 @@ export default {
           Authorization: `Bearer ${this.authCode.access_token}`
         }
       }
-      this.$http.get(url, config).then((res) => {
-        this.allData = res.data
-        console.log(this.allData.tracks.items)
-        this.loaded = true
+      return new Promise((resolve) => {
+        this.$http.get(url, config).then((res) => {
+          resolve(res.data)
+        })
       })
-
       //        data.name                                     PlayList名稱
       //        data.description                              PlayList介紹
       //        data.images[]                                 Playlist圖片
@@ -84,6 +148,37 @@ export default {
       //                           .name                      歌曲名稱
       //                           .id                        歌曲ID
     },
+    searchAlbumTracks() {
+      let ID = this.$route.query.id
+      let url = `https://api.spotify.com/v1/albums/${ID}`
+      let config = {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${this.authCode.access_token}`
+        }
+      }
+      return new Promise((resolve) => {
+        this.$http.get(url, config).then((res) => {
+          resolve(res.data)
+        })
+      })
+    },
+    searchArtistTracks() {
+      let ID = this.$route.query.id
+      let url = `https://api.spotify.com/v1/artists/${ID}/albums`
+      let config = {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${this.authCode.access_token}`
+        }
+      }
+      console.log('artist search')
+      return new Promise((resolve) => {
+        this.$http.get(url, config).then((res) => {
+          resolve(res.data)
+        })
+      })
+    },
     // TODO : 單點歌曲
     clickOneSong(track_id) {
       console.log(`我想點播id="${track_id}"的歌`)
@@ -91,8 +186,8 @@ export default {
     }
   },
   created() {
-    this.loaded = false
-    this.searchPlayListTracks()
+    this.type = this.$route.query.type
+    this.searchTypeRedirect(this.type)
   }
 }
 </script>

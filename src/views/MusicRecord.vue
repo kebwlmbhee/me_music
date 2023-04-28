@@ -2,16 +2,14 @@
   <div class="TestContainer">
     <!-- 最上方搜尋按鈕處 -->
     <v-app-bar flat>
-      <div class="directionButton">
-        <v-btn height="100%" color="white" style="background-color: black">L</v-btn>
-        <v-btn height="100%" color="white" style="background-color: black">R</v-btn>
-      </div>
-      <!-- <v-btn class="searchButton" border flat @click="searchItem(searchText, 30, 0 )">歌手</v-btn> -->
-      <v-btn class="searchButton" border flat @click="searchItem(searchText, 30)">歌曲</v-btn>
-      <!-- <v-btn class="searchButton" border flat @click="searchItem(searchText, 30, 2 )">播放清單</v-btn> -->
-      <v-btn class="searchButton" border flat @click="searchItem(searchText, 30)">專輯</v-btn>
+      <v-tabs v-model="searchTab" align-tabs="title">
+        <v-tab value="0">歌曲</v-tab>
+        <v-tab value="1">歌手</v-tab>
+        <v-tab value="2">播放清單</v-tab>
+        <v-tab value="3">專輯</v-tab>
+      </v-tabs>
     </v-app-bar>
-    <v-divider color="black" class="border-opacity-70" inset></v-divider>
+    <v-divider color="black" class="border-opacity-70"></v-divider>
     <!-- Title 跟 排序按鈕處 -->
     <v-card flat class="sortCard">
       <v-card-title class="font-weight-bold text-h3">
@@ -22,26 +20,31 @@
         <v-btn>Last 6 Months</v-btn>
         <v-btn>Last Year</v-btn>
         <v-spacer></v-spacer>
-        <v-select label="Sort" variant="underlined" :items="['Test1', 'Test2', 'Test3']">
-        </v-select>
+        <v-text-field
+          v-model="searchText"
+          label="Search"
+          variant="underlined"
+          @keydown.enter="searchInputCallback"
+        >
+        </v-text-field>
+        <!-- <v-select label="Sort" variant="underlined" :items="['Test1', 'Test2', 'Test3']"></v-select> -->
       </v-card-actions>
     </v-card>
     <!-- 歌曲裝載處 -->
-    <div class="songContainer overflow-auto">
-      <v-sheet
-        v-for="(search, index) in searchResponse"
-        :key="index"
-        height="10%"
-        width="10%"
-        border
-        @click="trigger_pop_up(true, search)"
-      >
-        <v-img v-if="search.album.images[0].url" :src="search.album.images[0].url"></v-img>
-        <v-tooltip activator="parent" location="start">
-          {{ search.name }}
-        </v-tooltip>
-      </v-sheet>
-    </div>
+    <v-window v-if="!loaded" v-model="searchTab">
+      <v-window-item value="0">
+        <AllTypeMusicContainer :type="0" :In_Datas="searchTracksResponse" />
+      </v-window-item>
+      <v-window-item value="1">
+        <AllTypeMusicContainer :type="1" :In_Datas="searchArtistsResponse" />
+      </v-window-item>
+      <v-window-item value="2">
+        <AllTypeMusicContainer :type="2" :In_Datas="searchPlaylistsResponse" />
+      </v-window-item>
+      <v-window-item value="3">
+        <AllTypeMusicContainer :type="3" :In_Datas="searchAlbumsResponse" />
+      </v-window-item>
+    </v-window>
     <!-- 彈出視窗 -->
     <div v-if="popUpWindow" class="TestFooter">
       <v-card class="TestCard" color="white" width="100%" height="100%" rounded="0">
@@ -79,36 +82,77 @@
 
 <script>
 import UserStatus from '@/stores/UserStatus'
+import AllTypeMusicContainer from '../components/AllTypeMusicContainer.vue'
 import { mapState, mapActions } from 'pinia'
+
 export default {
   inject: ['Reload', 'AddMusic', 'PlayPreview', 'PausePreview'],
   data() {
     return {
-      test: 30,
+      loaded: false,
       imgSrc:
         'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRXGQDqS3rBb7GyPj87cxlKGJM1VC3CFIaUBg&usqp=CAU',
-      searchText: 'W',
-      searchResponse: [],
+      searchText: '',
+      searchCount: 30,
+      searchTab: '',
+      searchArtistsResponse: [],
+      searchTracksResponse: [],
+      searchPlaylistsResponse: [],
+      searchAlbumsResponse: [],
       popUpWindow: false,
       checkSong: { name: '', image: '', artists: [], mp3_url: '' }
     }
+  },
+  components: {
+    AllTypeMusicContainer
   },
   computed: {
     ...mapState(UserStatus, ['authCode'])
   },
   methods: {
+    // TODO : 如果 query 是空值  要怎麼辦ㄋ
     searchItem(query, limit) {
-      let url = `https://api.spotify.com/v1/search/?q=${query}&type=track&limit=${limit}`
+      this.loaded = true
+      let url_0 = `https://api.spotify.com/v1/search/?q=${
+        query == '' ? 'a' : query
+      }&type=track&limit=${limit}`
+      let url_1 = `https://api.spotify.com/v1/search/?q=${
+        query == '' ? 'a' : query
+      }&type=artist&limit=${limit}`
+      let url_2 = `https://api.spotify.com/v1/search/?q=${
+        query == '' ? 'a' : query
+      }&type=playlist&limit=${limit}`
+      let url_3 = `https://api.spotify.com/v1/search/?q=${
+        query == '' ? 'a' : query
+      }&type=album&limit=${limit}`
       let config = {
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${this.authCode.access_token}`
         }
       }
-      this.$http.get(url, config).then((res) => {
+      const TrackPromise = this.$http.get(url_0, config).then((res) => {
         let data = res.data
-        this.searchResponse = data.tracks.items
-        // console.log(this.searchResponse)
+        this.searchTracksResponse = data.tracks.items
+        // console.log(this.searchTracksResponse)
+      })
+      const ArtistPromise = this.$http.get(url_1, config).then((res) => {
+        let data = res.data
+        this.searchArtistsResponse = data.artists.items
+        // console.log(this.searchArtistsResponse)
+      })
+      const PlaylistPromise = this.$http.get(url_2, config).then((res) => {
+        let data = res.data
+        this.searchPlaylistsResponse = data.playlists.items
+        // console.log(this.searchPlaylistsResponse)
+      })
+      const AlbumPromise = this.$http.get(url_3, config).then((res) => {
+        let data = res.data
+        this.searchAlbumsResponse = data.albums.items
+        // console.log(this.searchAlbumsResponse)
+      })
+      Promise.all([AlbumPromise, ArtistPromise, PlaylistPromise, TrackPromise]).then(() => {
+        this.loaded = false
       })
     },
     trigger_pop_up(up_or_down, data = null) {
@@ -131,17 +175,34 @@ export default {
       }
       this.PlayPreview(this.checkSong.mp3_url)
     },
+    // 新增新的歌曲
     // TODO : 串點播API
     AddNewSong() {
       console.log('Add New Song to Start')
       console.log(this.checkSong)
       this.trigger_pop_up(false)
     },
+    // 輸入的CallBack
+    searchInputCallback() {
+      this.$router.push({
+        path: '/Home/MusicRecord',
+        query: { search: this.searchText }
+      })
+      this.searchItem(this.searchText, this.searchCount)
+    },
     ...mapActions(UserStatus, ['checkAuth'])
+  },
+  provide() {
+    return {
+      Trigger_Popup: this.trigger_pop_up
+    }
   },
   mounted() {
     this.checkAuth()
-    this.searchItem('w', 30)
+    let query = this.$route.query.search
+    this.searchText = query
+    if (!query) query = 'a'
+    this.searchItem(query, this.searchCount)
   }
 }
 </script>
@@ -161,14 +222,6 @@ export default {
 }
 .sortCard {
   margin: 5px 10px;
-}
-.songContainer {
-  margin: 5px 15px;
-  height: auto;
-  max-height: 400px;
-  display: flex;
-  flex-flow: row wrap;
-  justify-content: flex-start;
 }
 .TestFooter {
   width: 100%;
