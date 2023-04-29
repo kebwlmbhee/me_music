@@ -1,8 +1,8 @@
 # finished-spotify-api
 
-## current user’s playlists：當前user的所有播放清單
+## current user’s playlists：當前 user 的所有播放清單
 
-## Playlist tracks：輸入playlist id 得到 playlist裡面的音樂
+## Playlist tracks：輸入 playlist id 得到 playlist 裡面的音樂
 
 ## current user’s top tracks (10tracks, medium time)
 
@@ -16,6 +16,4 @@
 
 ## Player function
 
-### Api使用範例請見ApiFunctionView.vue 或是 TemplateView.vue
-
-
+### Api 使用範例請見 ApiFunctionView.vue 或是 TemplateView.vue
