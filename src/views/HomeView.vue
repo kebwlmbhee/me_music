@@ -1,7 +1,4 @@
-<script setup>
-import TestVitest from '../components/TestVitest.vue'
-</script>
-
+<!-- 麻煩把 -->
 <template>
   <main>
     <v-btn v-on:click="logout">Logout</v-btn>
@@ -14,11 +11,6 @@ import TestVitest from '../components/TestVitest.vue'
     <div>
       <h4>{{ userProfile.name }}</h4>
       <img v-bind:src="userProfile.avatar" alt="" />
-    </div>
-
-    <!-- 用來測試 Vitest -->
-    <div>
-      <TestVitest :count="1" />
     </div>
   </main>
 </template>

@@ -35,11 +35,6 @@
       <h4 style="margin-bottom: 20px">add Track Queue</h4>
       <v-btn v-on:click="addQueue">Add Queue</v-btn>
     </div>
-
-    <div>
-      <h4 style="margin-bottom: 20px">put Track Queue</h4>
-      <v-btn v-on:click="putQueue">Put Queue</v-btn>
-    </div>
   </main>
 </template>
 
@@ -53,8 +48,7 @@ export default {
       searchText: '',
       searchResponse: [],
       current_track_name: '',
-      current_track_img: '',
-      device_id: ''
+      current_track_img: ''
     }
   },
   computed: {
@@ -90,26 +84,6 @@ export default {
       this.$http(config).then((res) => {
         console.log(res)
       })
-    },
-
-    putQueue() {
-      let config = {
-        method: 'PUT',
-        url: 'https://api.spotify.com/v1/me/player/play',
-        data: {
-          uris: ['spotify:track:2UREu1Y8CO4jXkbvqAtP7g']
-        },
-        params: {
-          device_id: this.device_id
-        },
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${this.authCode.access_token}`
-        }
-      }
-      this.$http(config).then((res, err) => {
-        console.log(err)
-      })
     }
   },
   mounted() {
@@ -133,7 +107,6 @@ export default {
       // Ready
       player.addListener('ready', ({ device_id }) => {
         console.log('Ready with Device ID', device_id)
-        this.device_id = device_id
       })
 
       // Not Ready
