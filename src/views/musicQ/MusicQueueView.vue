@@ -59,10 +59,9 @@ const timeCutMusicSecond = 3
 export default {
   data() {
     return {
-      isPause: false,
-      isPlay: true,
       isNext: false,
       delayedMessage: '',
+      playMusicTime: '',
 
       id: '',
       artist: '',
@@ -73,7 +72,7 @@ export default {
       musics: []
     }
   },
-  created() {
+  async created() {
     // 在組件創建時註冊 MusicQueue 的監聽器
     // 實時獲取 musicQueue 資料
     this.musicQueue = new musicQueue()
@@ -81,8 +80,15 @@ export default {
       this.musics = musics
     })
 
+    // 實時獲取訊息
     this.musicQueue.onSwitchMusicNotification((message) => {
       this.delayedMessage = message
+    })
+
+    // 取得時間使音樂同步
+    this.musicQueue.getMusicPlayTime((startTime) => {
+      this.playMusicTime = startTime
+      console.log(this.playMusicTime)
     })
   },
   watch: {
@@ -93,6 +99,8 @@ export default {
         if (oldVal[0] && newVal[0] && newVal[0].id !== oldVal[0].id) {
           // 偵測到變動，不用註明是歌曲結束還是被切歌，處理相同的問題
           this.playReplacedMusic(newVal[0])
+        } else if (!newVal) {
+          this.musicQueue.setTransactionMusicPlayTime(0)
         }
       },
       // 初始化的變動不會響應 watch
@@ -124,7 +132,8 @@ export default {
       this.url = ''
     },
 
-    // 添加音樂到 musicQueue ，這裡使用 API 傳入，API 請改用此方法
+    // API 請改用此方法
+    // 添加音樂到 musicQueue ，這裡使用 API 傳入
     // addMusic(id, artist, songName, url, picture, album) {
     //   this.musicQueue.addMusic(id, artist, songName, url, picture, album);
     // },
@@ -164,7 +173,7 @@ export default {
       let msg = `即將播放： ${this.musics[0].artist} - ${this.musics[0].songName}`
 
       // 存進 firebase
-      this.musicQueue.setterSwitchMusicNotification(msg)
+      if (msg !== this.delayedMessage) this.musicQueue.setterSwitchMusicNotification(msg)
 
       // 本地倒數計時
       this.countDownToPlay(msg)
@@ -184,6 +193,8 @@ export default {
         if (newMusic !== this.musics[0]) return
         // TODO(前端): console.log() 應替換為播放歌曲的 code
         console.log(this.musics[0])
+        // 歌曲播放時記錄播放時戳
+        this.musicQueue.setTransactionMusicPlayTime(Date.now())
       }, timeCutMusicSecond * 1000)
     },
     // 歌曲結束時調用，參數為當前已播畢的歌

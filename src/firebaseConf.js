@@ -8,7 +8,8 @@ import {
   remove,
   update,
   runTransaction,
-  limitToFirst
+  limitToFirst,
+  get
 } from 'firebase/database'
 import { getAuth } from 'firebase/auth'
 
@@ -27,4 +28,4 @@ const app = initializeApp(firebaseConfig)
 const auth = getAuth(app)
 const db = getDatabase(app)
 
-export { app, auth, db, ref, push, remove, onValue, set, update, runTransaction, limitToFirst }
+export { app, auth, db, ref, push, remove, onValue, set, update, runTransaction, limitToFirst, get }
