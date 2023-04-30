@@ -1,14 +1,13 @@
-import { db, ref, push, onValue, remove, set, update } from '/src/firebaseConf.js'
+import { db, ref, push, onValue, remove, set, update, runTransaction } from '/src/firebaseConf.js'
 
 class musicQueue {
   constructor() {
     this.musicQueueRef = ref(db, 'musicQueue')
-    this.syncIsCuttingRef = ref(db, 'syncMusicQueue/isCutting')
-    this.syncCuttingMessageRef = ref(db, 'syncMusicQueue/cutMusicMessage')
-    this.syncUpcomingMusicRef = ref(db, 'syncMusicQueue/upcomingMusic')
+    this.syncSwitchMusicNotificationRef = ref(db, 'syncMusicQueue/switchMusicNotification')
+    this.syncIsEnded = ref(db, 'syncMusicQueue/isEnded')
   }
 
-  async addMusic(artist, songName, url) {
+  async addMusic(id, artist, songName, url, picture, album) {
     const musicRef = push(this.musicQueueRef)
     const musicKey = musicRef.key
 
@@ -16,6 +15,9 @@ class musicQueue {
       artist: artist,
       songName: songName,
       url: url,
+      picture: picture,
+      id: id,
+      album: album,
       key: musicKey
     }
     await set(musicRef, newMusic)
@@ -23,6 +25,31 @@ class musicQueue {
 
   removeMusic(music) {
     remove(ref(db, `/musicQueue/${music.key}`)).catch((error) => console.error(error))
+  }
+
+  removeMusicTransaction(music) {
+    const musicRef = ref(db, '/musicQueue')
+    return runTransaction(musicRef, (currentData) => {
+      if (currentData === null) {
+        return currentData
+      }
+
+      const musicQueue = Object.values(currentData)
+
+      if (musicQueue.length === 0) {
+        return currentData
+      }
+
+      const newMusicQueue = musicQueue.filter((m) => m.key !== music.key)
+
+      return newMusicQueue.reduce((data, music, index) => {
+        data[index] = music
+        return data
+      }, {})
+    }).catch((error) => {
+      console.error('Error removing music:', error)
+      throw error
+    })
   }
 
   // 監聽 musicQueue，保持同步
@@ -38,6 +65,15 @@ class musicQueue {
     })
   }
 
+  onMusicTop() {
+    // 监听 musicQueueRef 路径下的子节点变化
+    this.musicQueueRef.on('child_changed', (snapshot) => {
+      // 获取第一个子节点的值
+      const firstChild = snapshot.val()[Object.keys(snapshot.val())[0]]
+      console.log('MusicQueueTop：', firstChild)
+    })
+  }
+
   // 手動切歌
   replaceMusic(firstMusic, targetMusic) {
     this.removeMusic(targetMusic)
@@ -45,48 +81,18 @@ class musicQueue {
     update(ref(db, `/musicQueue/${firstMusic.key}`), targetMusic)
   }
 
-  // 正在切歌/取消切歌
-  setCutting(isCutting) {
-    set(this.syncIsCuttingRef, isCutting)
-  }
-
-  // 監聽是否在切歌中，保持同步
-  onCutting(callback) {
-    onValue(this.syncIsCuttingRef, (snapshot) => {
-      const isCutting = snapshot.val()
-
-      if (typeof callback === 'function') {
-        callback(isCutting)
-      }
-    })
-  }
-
   // 手動切歌的公告寫入 firebase(TODO: 彈窗顯示)
-  setterCutMusicMessage(msg) {
-    set(this.syncCuttingMessageRef, msg)
+  setterSwitchMusicNotification(msg) {
+    set(this.syncSwitchMusicNotificationRef, msg)
   }
 
-  // 監聽切歌訊息(切歌中時會調用)，保持同步
-  onCuttingMessage(callback) {
-    onValue(this.syncCuttingMessageRef, (snapshot) => {
-      const cuttingMessage = snapshot.val()
+  // 監聽下一首歌的訊息(切歌中時會調用、當前音樂播放完畢，欲播下一首時會調用)，保持同步
+  onSwitchMusicNotification(callback) {
+    onValue(this.syncSwitchMusicNotificationRef, (snapshot) => {
+      const value = snapshot.val()
 
       if (typeof callback === 'function') {
-        callback(cuttingMessage)
-      }
-    })
-  }
-
-  setUpcomingMusic(upcomingMusic) {
-    set(this.syncUpcomingMusicRef, upcomingMusic)
-  }
-
-  onUpcomingMusic(callback) {
-    onValue(this.syncUpcomingMusicRef, (snapshot) => {
-      const upcomingMusic = snapshot.val()
-
-      if (typeof callback === 'function') {
-        callback(upcomingMusic)
+        callback(value)
       }
     })
   }

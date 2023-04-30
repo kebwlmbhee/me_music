@@ -4,6 +4,7 @@
     <ul class="music-list" v-if="musics.length > 0">
       <li class="music-item" v-for="music in musics" :key="music.key">
         <div class="music-info">
+          <div class="music-id">id: {{ music.id }}</div>
           <div class="music-artist">Artist: {{ music.artist }}</div>
           <div class="music-song">Song: {{ music.songName }}</div>
           <span
@@ -14,16 +15,22 @@
               target="_blank"
               @click="openMusicUrl(music.url)"
               >{{ music.url }}</a
-            ></span
-          >
+            >
+          </span>
         </div>
         <button @click="cutMusic(music)" class="play-music-btn">Play</button>
         <button @click="deleteMusic(music)" class="delete-music-btn">Delete</button>
+        <div v-if="music.key == musics[0].key">
+          <button @click="musicEnded(music)" class="End-music-btn">EndMusic</button>
+        </div>
       </li>
     </ul>
-    <div class="form-divider"></div>
+
     <!-- 分隔線 -->
+    <div class="form-divider"></div>
+
     <form class="add-music-form" @submit.prevent="addMusic">
+      <input v-model="id" type="text" placeholder="id" class="input-field" />
       <input v-model="artist" type="text" placeholder="Artist" class="input-field" />
       <input v-model="songName" type="text" placeholder="Song Name" class="input-field" />
       <input v-model="url" type="text" placeholder="Type URL" class="input-field" />
@@ -32,8 +39,8 @@
   </div>
   <div>
     <transition name="fade" mode="out-in">
-      <!-- 如果 showMessage 為 true，顯示訊息 -->
-      <div v-if="showMessage" key="message" class="message">
+      <!-- 如果 isCutting 或 isEnded 為 true，顯示訊息 -->
+      <div v-if="isNext" key="message" class="message">
         {{ delayedMessage }}
       </div>
     </transition>
@@ -41,25 +48,26 @@
 </template>
 
 <script>
+// (現在時戳 - 播放時戳) = 現在播放到的秒數
+
 // TODO(前端): 切歌時的公告要使用彈出式視窗呈現
-// TODO: 如果A切歌途中偵測到另一人切歌(B)時的處置方式，
-//       是需要當前的切歌被迫取消，改為B的切歌？ => 需要監聽另一個值判斷當前切歌與否
 import musicQueue from '/src/views/musicQ/musicQueue.js'
 
-// 延遲 5 秒(顯示切歌訊息)
-const timeDelaySecond = 5
+// 延遲 3 秒(顯示待播歌曲訊息)
+const timeCutMusicSecond = 3
 
 export default {
   data() {
     return {
-      isEnd: false,
       isPause: false,
       isPlay: true,
-      upcomingMusic: '',
-      showMessage: false,
+      isNext: false,
       delayedMessage: '',
 
+      id: '',
       artist: '',
+      picture: '',
+      album: '',
       songName: '',
       url: '',
       musics: []
@@ -73,59 +81,54 @@ export default {
       this.musics = musics
     })
 
-    // 實時獲取 showMessage 的 boolean value
-    this.musicQueue.onCutting((isCutting) => {
-      this.showMessage = isCutting
-    })
-
-    // 實時獲取 upcomingMusic，位於 musicQueue 頂端的資料
-    this.musicQueue.onUpcomingMusic((music) => {
-      this.upcomingMusic = music
+    this.musicQueue.onSwitchMusicNotification((message) => {
+      this.delayedMessage = message
     })
   },
   watch: {
-    // 減輕 firebase onValue() 的負擔，當 showMessage 為 true 時才調用 onCuttingMessage
-    showMessage(newVal) {
-      // 有所變動時
-      if (newVal) {
-        this.musicQueue.onCuttingMessage((cuttingMessage) => {
-          this.delayedMessage = cuttingMessage
-        })
-      }
-    },
-    upcomingMusic: {
-      // 新舊值處理，僅當新值不等於舊值且舊值不為空時，才會進行切歌並播放音樂
+    musics: {
+      // 新舊值處理
       handler(newVal, oldVal) {
-        if (newVal !== oldVal && oldVal != '') {
-          this.playCutMusic()
+        // 首位變動才要替換
+        if (oldVal[0] && newVal[0] && newVal[0].id !== oldVal[0].id) {
+          // 偵測到變動，不用註明是歌曲結束還是被切歌，處理相同的問題
+          this.playReplacedMusic(newVal[0])
         }
       },
       // 初始化的變動不會響應 watch
       immediate: false
+    },
+    delayedMessage: {
+      handler(newVal, oldVal) {
+        if (newVal !== oldVal && oldVal != '') {
+          this.showNextMusicMessage()
+        }
+      }
     }
   },
   methods: {
+    // 添加音樂到 musicQueue，這裡使用註冊方式添加
     addMusic() {
-      // 添加音樂到 MusicQueue
-      this.musicQueue.addMusic(this.artist, this.songName, this.url)
+      this.musicQueue.addMusic(
+        this.id,
+        this.artist,
+        this.songName,
+        this.url,
+        this.picture,
+        this.album
+      )
       // 清空輸入欄位
+      this.id = ''
       this.artist = ''
       this.songName = ''
       this.url = ''
     },
-    // TODO(前端) 應該要有自動播放當前歌曲(播完的歌曲會從 firebase 中被移除)的邏輯
 
-    // 資料庫中第一首歌自動播放和歌曲結束欲播放下一首時調用
-    // 參數為下一首歌
-    playNextMusic(music) {
-      // 如果不是 firebase 的第一首，代表已經播完一首歌，刪除該首歌
-      if (this.musics[0].key != music.key) {
-        this.musicQueue.removeMusic(music)
-      }
+    // 添加音樂到 musicQueue ，這裡使用 API 傳入，API 請改用此方法
+    // addMusic(id, artist, songName, url, picture, album) {
+    //   this.musicQueue.addMusic(id, artist, songName, url, picture, album);
+    // },
 
-      // 在這裡觸發播放下一首音樂的程式
-      console.log('Playing music:', music.songName)
-    },
     // 手動強制切歌
     // 參數為切歌完後即將要播的歌
     cutMusic(music) {
@@ -140,64 +143,62 @@ export default {
       // 取得目標音樂
       const targetMusic = this.musics[index]
 
-      // 將即將要播的寫入 firebase
-      this.musicQueue.setUpcomingMusic(targetMusic)
-
       // 取得頂端音樂
       const firstMusic = this.musics[0]
 
-      // 延遲訊息
-      this.showDelayedMessage(targetMusic)
+      // 切歌，將變動存至 firebase
+      this.musicQueue.replaceMusic(firstMusic, targetMusic)
 
-      setTimeout(() => {
-        // 將目標音樂從 musics 陣列中移除
-        this.musics.splice(index, 1)
-
-        // 將目標音樂加入到 musics 陣列的最上面
-        this.musics.unshift(targetMusic)
-
-        // 切歌
-        this.musicQueue.replaceMusic(firstMusic, targetMusic)
-      }, timeDelaySecond * 1000)
+      // 切歌完成，響應至 musicQueue 後才調用延遲訊息，同步本地和遠端
+      this.showNextMusicMessage()
+      console.log('切歌成功')
     },
+    // 從 musicQueue 中移除指定音樂
     deleteMusic(music) {
-      // 從 musicQueue 中移除指定音樂
       this.musicQueue.removeMusic(music)
     },
-    showDelayedMessage(targetMusic) {
-      // 寫入 isCutting 為 true，顯示切歌訊息
-      this.musicQueue.setCutting(true)
-
-      // 設定初始秒數
-      let secondsLeft = timeDelaySecond
-
+    // 設置待播訊息
+    showNextMusicMessage() {
+      if (!this.musics[0]) return
       // 初始訊息
-      let msg = `${secondsLeft} 秒後進行切歌，即將播放： ${targetMusic.artist} - ${targetMusic.songName}`
+      let msg = `即將播放： ${this.musics[0].artist} - ${this.musics[0].songName}`
 
       // 存進 firebase
-      this.musicQueue.setterCutMusicMessage(msg)
+      this.musicQueue.setterSwitchMusicNotification(msg)
 
-      const intervalId = setInterval(() => {
-        // 每秒減少一秒
-        secondsLeft--
-
-        // 訊息變更
-        msg = `${secondsLeft} 秒後進行切歌，即將播放： ${targetMusic.artist} - ${targetMusic.songName}`
-        this.musicQueue.setterCutMusicMessage(msg)
-        if (secondsLeft === 0) {
-          // 清除計時器
-          clearInterval(intervalId)
-          // 寫入 isCutting 為 false，隱藏切歌訊息
-          this.musicQueue.setCutting(false)
-        }
-        // 毫秒數
-      }, 1000)
+      // 本地倒數計時
+      this.countDownToPlay(msg)
+    },
+    // 訊息顯示倒計時
+    countDownToPlay(msg) {
+      this.isNext = true
+      setTimeout(() => {
+        // 訊息等待時間若沒遇到切歌/歌曲結束
+        if (msg === this.delayedMessage) this.isNext = false
+      }, timeCutMusicSecond * 1000)
     },
     // TODO(前端): 實作切歌後的播放歌曲
-    playCutMusic() {
+    playReplacedMusic(newMusic) {
       setTimeout(() => {
-        console.log(this.upcomingMusic)
-      }, timeDelaySecond * 1000)
+        // 確定當前歌曲沒有被切掉，切掉要 return
+        if (newMusic !== this.musics[0]) return
+        // TODO(前端): console.log() 應替換為播放歌曲的 code
+        console.log(this.musics[0])
+      }, timeCutMusicSecond * 1000)
+    },
+    // 歌曲結束時調用，參數為當前已播畢的歌
+    musicEnded(readyToRemoveMusic) {
+      if (readyToRemoveMusic === this.musics[0]) {
+        this.musicQueue
+          .removeMusicTransaction(readyToRemoveMusic)
+          .then(() => {
+            this.showNextMusicMessage()
+            console.log('歌曲播放完畢')
+          })
+          .catch((error) => {
+            console.error(error)
+          })
+      }
     }
   }
 }
@@ -233,6 +234,7 @@ export default {
   flex-direction: column;
 }
 
+.music-id,
 .music-artist,
 .music-song {
   margin-bottom: 5px;
@@ -255,6 +257,15 @@ export default {
   cursor: pointer;
 }
 
+.End-music-btn {
+  background-color: green;
+  margin-left: 30px;
+  color: #fff;
+  border: none;
+  padding: 5px 10px;
+  cursor: pointer;
+}
+
 .add-music-form {
   position: fixed;
   bottom: 50px;
@@ -264,6 +275,7 @@ export default {
 }
 
 .input-field {
+  width: 150px;
   flex: 1;
   padding: 5px;
   margin-right: 5px;
