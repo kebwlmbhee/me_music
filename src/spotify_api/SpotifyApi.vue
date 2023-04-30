@@ -41,6 +41,7 @@
 <script>
 import { mapState, mapActions } from 'pinia'
 import UserStatus from '@/stores/UserStatus'
+import axios from 'axios'
 
 export default {
   data() {
@@ -64,14 +65,15 @@ export default {
 
     //搜尋功能，query為搜尋內容名字，limit為搜尋數量上限，type可替換成track, artist, playlist
     searchItem(query, limit, type) {
-      let url = `https://api.spotify.com/v1/search/?q=${query}&type=${type}&limit=${limit}`
       let config = {
         headers: {
+          method: 'GET',
+          url: `https://api.spotify.com/v1/search/?q=${query}&type=${type}&limit=${limit}`,
           'Content-Type': 'application/json',
           Authorization: `Bearer ${this.authCode.access_token}`
         }
       }
-      this.$http.get(url, config).then((res) => {
+      axios(config).then((res) => {
         let data = res.data
         this.searchResponse = data.artists.items //搜尋結果會存在searchResponse裡面，可以用item.id, item.name, item.image調用不同內容
       })
@@ -79,15 +81,16 @@ export default {
 
     //獲取當前使用者的所有playlist
     getUserPlaylists() {
-      let url = 'https://api.spotify.com/v1/me/playlists'
       let config = {
+        method: 'GET',
+        url: 'https://api.spotify.com/v1/me/playlists',
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${this.authCode.access_token}`
         }
       }
-      this.$http
-        .get(url, config)
+
+      axios(config)
         .then((res) => {
           let data = res.data
           this.playlists = data.items //結果會存在playlists裡面，可以用item.id, item.name, item.image調用不同內容
@@ -99,14 +102,15 @@ export default {
 
     //playlistId為欲獲取的播放清單歌曲的id，傳入播放清單id，獲得該播放清單的所有歌曲
     getPlaylistTracks(playlistId) {
-      let url = `https://api.spotify.com/v1/playlists/${playlistId}/tracks`
       let config = {
+        method: 'GET',
+        url: `https://api.spotify.com/v1/playlists/${playlistId}/tracks`,
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${this.authCode.access_token}`
         }
       }
-      this.$http.get(url, config).then((res) => {
+      axios(config).then((res) => {
         let data = res.data
         this.playlistTracks = data.items //結果會存在playlistTracks裡面，可以用item.id, item.name, item.image調用不同內容
       })
@@ -114,8 +118,9 @@ export default {
 
     //獲取當前使用者最常聽的x首歌，x = limit
     getUserTopTracks() {
-      let url = 'https://api.spotify.com/v1/me/top/tracks'
       let config = {
+        method: 'GET',
+        url: 'https://api.spotify.com/v1/me/top/tracks',
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${this.authCode.access_token}`
@@ -125,8 +130,8 @@ export default {
           limit: 10 // 指定返回的歌曲數量
         }
       }
-      this.$http
-        .get(url, config)
+
+      axios(config)
         .then((res) => {
           let data = res.data
           this.topTracks = data.items //結果會存在topTracks裡面，可以用item.id, item.name, item.image調用不同內容
@@ -138,8 +143,9 @@ export default {
 
     //獲取當前使用者最常聽的x個歌手，x = limit
     getUserTopArtists() {
-      let url = 'https://api.spotify.com/v1/me/top/artists'
       let config = {
+        method: 'GET',
+        url: 'https://api.spotify.com/v1/me/top/artists',
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${this.authCode.access_token}`
@@ -149,8 +155,7 @@ export default {
           limit: 3 // 指定返回的藝術家數量
         }
       }
-      this.$http
-        .get(url, config)
+      axios(config)
         .then((res) => {
           let data = res.data
           this.topArtists = data.items //結果會存在topArtists裡面，可以用item.id, item.name, item.image調用不同內容
@@ -162,14 +167,15 @@ export default {
 
     //獲取當前使用者最近聽的x首歌，x = limit
     getRecentTracks() {
-      let url = `https://api.spotify.com/v1/me/player/recently-played?limit=20`
       let config = {
+        method: 'GET',
+        url: `https://api.spotify.com/v1/me/player/recently-played?limit=20`,
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${this.authCode.access_token}`
         }
       }
-      this.$http.get(url, config).then((res) => {
+      axios(config).then((res) => {
         let data = res.data
         this.recentTracks = data.items //結果會存在recentTracks裡面，可以用item.id, item.name, item.image調用不同內容
       })
@@ -185,7 +191,7 @@ export default {
           Authorization: `Bearer ${this.authCode.access_token}`
         }
       }
-      this.$http(config).then((res) => {
+      axios(config).then((res) => {
         console.log(res)
       })
     }

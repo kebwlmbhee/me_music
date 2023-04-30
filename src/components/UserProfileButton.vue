@@ -3,7 +3,9 @@
     <v-btn size="x-large" rounded="xl" border>
       {{ userName }}
       <template v-slot:prepend>
-        <v-avatar color="brown">{{ userName[0] }}</v-avatar>
+        <v-avatar color="brown">
+          <v-img :src="userImg" :alt="userName"></v-img>
+        </v-avatar>
       </template>
 
       <v-menu activator="parent">
@@ -22,7 +24,8 @@ import UserStatus from '@/stores/UserStatus'
 export default {
   name: 'UserProfileButton',
   props: {
-    userName: String
+    userName: String,
+    userImg: String
   },
   methods: {
     ...mapActions(UserStatus, ['logout'])

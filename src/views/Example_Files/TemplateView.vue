@@ -16,6 +16,7 @@
 <script>
 import { mapState, mapActions } from 'pinia'
 import UserStatus from '@/stores/UserStatus'
+import axios from 'axios'
 
 export default {
   data() {
@@ -31,14 +32,15 @@ export default {
     // 如果 API 要用 Get
     // 範例，假設要串這個: https://developer.spotify.com/documentation/web-api/reference/get-an-artist
     getArtist() {
-      let url = `https://api.spotify.com/v1/artists/0TnOYISbd1XYRBk9myaseg`
       let config = {
+        method: 'GET',
+        url: `https://api.spotify.com/v1/artists/0TnOYISbd1XYRBk9myaseg`,
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${this.authCode.access_token}`
         }
       }
-      this.$http.get(url, config).then((res) => {
+      axios(config).then((res) => {
         let data = res.data
         this.getArtist_data = data
       })
@@ -55,7 +57,7 @@ export default {
           Authorization: `Bearer ${this.authCode.access_token}`
         }
       }
-      this.$http(config).then((res) => {
+      axios(config).then((res) => {
         console.log(res)
       })
     }

@@ -41,6 +41,7 @@
 <script>
 import { mapState, mapActions } from 'pinia'
 import UserStatus from '@/stores/UserStatus'
+import axios from 'axios'
 
 export default {
   data() {
@@ -58,14 +59,15 @@ export default {
     ...mapActions(UserStatus, ['checkAuth', 'logout']),
 
     searchItem(query, limit, type) {
-      let url = `https://api.spotify.com/v1/search/?q=${query}&type=${type}&limit=${limit}`
       let config = {
+        method: 'GET',
+        url: `https://api.spotify.com/v1/search/?q=${query}&type=${type}&limit=${limit}`,
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${this.authCode.access_token}`
         }
       }
-      this.$http.get(url, config).then((res) => {
+      axios(config).then((res) => {
         let data = res.data
         this.searchResponse = data.artists.items
       })
@@ -81,7 +83,7 @@ export default {
           Authorization: `Bearer ${this.authCode.access_token}`
         }
       }
-      this.$http(config).then((res) => {
+      axios(config).then((res) => {
         console.log(res)
       })
     }

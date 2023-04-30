@@ -1,16 +1,35 @@
-import { fileURLToPath } from 'node:url'
-import { mergeConfig } from 'vite'
-import { configDefaults, defineConfig } from 'vitest/config'
-import viteConfig from './vite.config'
+// 參考: https://github.com/ZhiRongDev/vuetify-vite-ts-test
+import { defineConfig } from 'vitest/config';
+import vue from '@vitejs/plugin-vue';
+import vuetify from 'vite-plugin-vuetify';
 
+import { fileURLToPath, URL } from 'node:url';
 
-export default mergeConfig(
-  viteConfig,
-  defineConfig({
-    test: {
-      environment: 'jsdom',
-      exclude: [...configDefaults.exclude, 'e2e/*'],
-      root: fileURLToPath(new URL('./', import.meta.url))
-    }
-  })
-)
+export default defineConfig({
+  // Resolver
+  resolve: {
+    // https://vitejs.dev/config/#resolve-alias
+    alias: {
+      '@': fileURLToPath(new URL('./src', import.meta.url)),
+    },
+  },
+  // plugins
+  plugins: [
+    // Vue3
+    vue(),
+    // Vuetify Loader
+    // https://github.com/vuetifyjs/vuetify-loader
+    vuetify({
+      autoImport: true,
+      styles: { configFile: './src/styles/variables.scss' },
+    }),
+  ],
+  test: {
+    // https://vitest.dev/guide/#configuring-vitest
+    globals: true,
+    environment: 'jsdom',
+    deps: {
+      inline: ['vuetify'],
+    },
+  },
+});

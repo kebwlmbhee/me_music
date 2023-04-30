@@ -74,6 +74,7 @@
 <script>
 import { mapState } from 'pinia'
 import UserStatus from '@/stores/UserStatus'
+import axios from 'axios'
 
 export default {
   data() {
@@ -121,15 +122,16 @@ export default {
     // TODO 串API ˊ ˇ ˋ
     searchPlayListTracks() {
       let ID = this.$route.query.id
-      let url = `https://api.spotify.com/v1/playlists/${ID}`
       let config = {
+        method: 'GET',
+        url: `https://api.spotify.com/v1/playlists/${ID}`,
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${this.authCode.access_token}`
         }
       }
       return new Promise((resolve) => {
-        this.$http.get(url, config).then((res) => {
+        axios(config).then((res) => {
           resolve(res.data)
         })
       })
@@ -150,23 +152,25 @@ export default {
     },
     searchAlbumTracks() {
       let ID = this.$route.query.id
-      let url = `https://api.spotify.com/v1/albums/${ID}`
       let config = {
+        method: 'GET',
+        url: `https://api.spotify.com/v1/albums/${ID}`,
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${this.authCode.access_token}`
         }
       }
       return new Promise((resolve) => {
-        this.$http.get(url, config).then((res) => {
+        axios(config).then((res) => {
           resolve(res.data)
         })
       })
     },
     searchArtistTracks() {
       let ID = this.$route.query.id
-      let url = `https://api.spotify.com/v1/artists/${ID}/albums`
       let config = {
+        method: 'GET',
+        url: `https://api.spotify.com/v1/artists/${ID}/albums`,
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${this.authCode.access_token}`
@@ -174,7 +178,7 @@ export default {
       }
       console.log('artist search')
       return new Promise((resolve) => {
-        this.$http.get(url, config).then((res) => {
+        axios(config).then((res) => {
           resolve(res.data)
         })
       })
