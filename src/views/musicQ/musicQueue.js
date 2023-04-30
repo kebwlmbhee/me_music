@@ -34,33 +34,8 @@ class musicQueue {
     await set(musicRef, newMusic)
   }
 
-  removeMusic(music) {
-    remove(ref(db, `/musicQueue/${music.key}`)).catch((error) => console.error(error))
-  }
-
-  removeMusicTransaction(music) {
-    const musicRef = ref(db, '/musicQueue')
-    return runTransaction(musicRef, (currentData) => {
-      if (currentData === null) {
-        return currentData
-      }
-
-      const musicQueue = Object.values(currentData)
-
-      if (musicQueue.length === 0) {
-        return currentData
-      }
-
-      const newMusicQueue = musicQueue.filter((m) => m.key !== music.key)
-
-      return newMusicQueue.reduce((data, music, index) => {
-        data[index] = music
-        return data
-      }, {})
-    }).catch((error) => {
-      console.error('Error removing music:', error)
-      throw error
-    })
+  async removeMusic(music) {
+    await remove(ref(db, `/musicQueue/${music.key}`))
   }
 
   // 監聽 musicQueue，保持同步
@@ -88,7 +63,9 @@ class musicQueue {
   // 手動切歌
   replaceMusic(firstMusic, targetMusic) {
     targetMusic.key = firstMusic.key
-    update(ref(db, `/musicQueue/${targetMusic.key}`), targetMusic)
+    console.log('手動切歌')
+    console.log(targetMusic.key)
+    update(ref(db, `/musicQueue/${firstMusic.key}`), targetMusic)
     this.removeMusic(targetMusic)
   }
 

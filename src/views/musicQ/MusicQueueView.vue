@@ -201,7 +201,7 @@ export default {
     musicEnded(readyToRemoveMusic) {
       if (readyToRemoveMusic === this.musics[0]) {
         this.musicQueue
-          .removeMusicTransaction(readyToRemoveMusic)
+          .removeMusic(readyToRemoveMusic)
           .then(() => {
             this.showNextMusicMessage()
             console.log('歌曲播放完畢')
