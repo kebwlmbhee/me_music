@@ -25,7 +25,7 @@ class SpotifyApi {
         album_name = track.album.name
       }
     }
-    let artists = track.artists.map((artist) => this.artistFormat(artist))
+    let artists = track.artists.map((artist) => this.artistFormat(artist, image_url))
     return {
       album_name: album_name,
       name: track.name,
@@ -78,12 +78,14 @@ class SpotifyApi {
       // artist從tracks裡面抓
       return track.artists
     })
+    let unique_artists = [...new Set(playlist_artists)]
+    console.log(unique_artists)
     let total_duration_ms = tracks.reduce((acc, track) => acc + track.duration_ms, 0)
     return {
       name: playlist.name,
       id: playlist.id,
       image: image_url,
-      artists: playlist_artists,
+      artists: unique_artists,
       type: playlist.type,
       description: playlist.description,
       duration_ms: total_duration_ms,

@@ -22,11 +22,9 @@ Player function
 
 #
 
-## 更新
-
 ### 資料格式:
-寫在 SpotifyApi.js 內  
-使用一般的object，沒有特別定義class
+目前把整理資料格式的function寫在 SpotifyApi.js 內, 供 SpotifyApi.vue 內部的methods呼叫  
+資料使用一般的object，沒有特別定義class
 #### artist 
 {  
 name          : String  
@@ -64,12 +62,3 @@ type          : String
 description   : String  
 items         : []  (track)  
 }  
-
-### 用法:
-
-加入 
-```
-<script>
-import SpotifyApi from '../spotify_api/SpotifyApi'
-```
-然後把需要用的功能從 SpotifyAPI.vue 複製到其他 .vue 的methods
