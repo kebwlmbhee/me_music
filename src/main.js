@@ -11,7 +11,7 @@ import 'vuetify/styles'
 // add Vuetify icon
 import iconFonts from '@/plugins/vuetify'
 
-// import './assets/main.css'
+import './assets/main.css'
 
 const pinia = createPinia()
 // To allow using `this.router.xxx` in @/store/*.js

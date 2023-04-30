@@ -1,6 +1,6 @@
 import { describe, expect, it, test } from 'vitest'
 import { mount } from '@vue/test-utils'
-import TestVitest from '@/components/TestVitest/TestVitest.vue'
+import TestVitest from '@/components/Vitest_Example/Vitest_Example.vue'
 import vuetify from '@/plugins/vuetify';
 
 describe('import vue components', () => {

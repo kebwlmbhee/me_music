@@ -1,4 +1,4 @@
-import ApiFunctionView from '@/views/ApiFunctionView.vue'
+import ApiFunctionView from '@/views/Example_Files/ApiFunctionView.vue'
 import { createTestingPinia } from '@pinia/testing'
 
 describe('<ApiFunctionView />', () => {

@@ -83,7 +83,7 @@ export default {
           Authorization: `Bearer ${this.authCode.access_token}`
         }
       }
-      this.$http(config).then((res) => {
+      axios(config).then((res) => {
         console.log(res)
       })
     }

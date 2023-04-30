@@ -84,6 +84,7 @@
 import UserStatus from '@/stores/UserStatus'
 import AllTypeMusicContainer from '../components/AllTypeMusicContainer.vue'
 import { mapState, mapActions } from 'pinia'
+import axios from 'axios'
 
 export default {
   inject: ['Reload', 'AddMusic', 'PlayPreview', 'PausePreview'],
@@ -113,40 +114,63 @@ export default {
     // TODO : 如果 query 是空值  要怎麼辦ㄋ
     searchItem(query, limit) {
       this.loaded = true
-      let url_0 = `https://api.spotify.com/v1/search/?q=${
-        query == '' ? 'a' : query
-      }&type=track&limit=${limit}`
-      let url_1 = `https://api.spotify.com/v1/search/?q=${
-        query == '' ? 'a' : query
-      }&type=artist&limit=${limit}`
-      let url_2 = `https://api.spotify.com/v1/search/?q=${
-        query == '' ? 'a' : query
-      }&type=playlist&limit=${limit}`
-      let url_3 = `https://api.spotify.com/v1/search/?q=${
-        query == '' ? 'a' : query
-      }&type=album&limit=${limit}`
-      let config = {
+      let config_0 = {
+        method: 'GET',
+        url: `https://api.spotify.com/v1/search/?q=${
+          query == '' ? 'a' : query
+        }&type=track&limit=${limit}`,
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${this.authCode.access_token}`
         }
       }
-      const TrackPromise = this.$http.get(url_0, config).then((res) => {
+      let config_1 = {
+        method: 'GET',
+        url: `https://api.spotify.com/v1/search/?q=${
+          query == '' ? 'a' : query
+        }&type=artist&limit=${limit}`,
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${this.authCode.access_token}`
+        }
+      }
+      let config_2 = {
+        method: 'GET',
+        url: `https://api.spotify.com/v1/search/?q=${
+          query == '' ? 'a' : query
+        }&type=playlist&limit=${limit}`,
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${this.authCode.access_token}`
+        }
+      }
+      let config_3 = {
+        method: 'GET',
+        url: `https://api.spotify.com/v1/search/?q=${
+          query == '' ? 'a' : query
+        }&type=album&limit=${limit}`,
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${this.authCode.access_token}`
+        }
+      }
+
+      const TrackPromise = axios(config_0).then((res) => {
         let data = res.data
         this.searchTracksResponse = data.tracks.items
         // console.log(this.searchTracksResponse)
       })
-      const ArtistPromise = this.$http.get(url_1, config).then((res) => {
+      const ArtistPromise = axios(config_1).then((res) => {
         let data = res.data
         this.searchArtistsResponse = data.artists.items
         // console.log(this.searchArtistsResponse)
       })
-      const PlaylistPromise = this.$http.get(url_2, config).then((res) => {
+      const PlaylistPromise = axios(config_2).then((res) => {
         let data = res.data
         this.searchPlaylistsResponse = data.playlists.items
         // console.log(this.searchPlaylistsResponse)
       })
-      const AlbumPromise = this.$http.get(url_3, config).then((res) => {
+      const AlbumPromise = axios(config_3).then((res) => {
         let data = res.data
         this.searchAlbumsResponse = data.albums.items
         // console.log(this.searchAlbumsResponse)
@@ -213,16 +237,20 @@ export default {
   height: 100%;
   position: relative;
 }
+
 .directionButton {
   height: 100%;
   margin: 15px 0px 0px 10px;
 }
+
 .searchButton {
   margin: 15px 10px 0px 10px;
 }
+
 .sortCard {
   margin: 5px 10px;
 }
+
 .TestFooter {
   width: 100%;
   height: 150px;
@@ -231,6 +259,7 @@ export default {
 
   /* border: solid 1px black; */
 }
+
 .TestCard {
   margin: 1px;
 }

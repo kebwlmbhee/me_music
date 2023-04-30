@@ -14,7 +14,7 @@ export default {
       const tokenValid = localStorage.getItem('authCode')
       if (tokenValid !== null) {
         // Redirect to home page
-        this.$router.replace('/')
+        this.$router.replace('/Home')
       }
     },
     generateRandomString(length) {

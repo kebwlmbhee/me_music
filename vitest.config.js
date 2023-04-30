@@ -1,3 +1,4 @@
+// 參考: https://github.com/ZhiRongDev/vuetify-vite-ts-test
 import { defineConfig } from 'vitest/config';
 import vue from '@vitejs/plugin-vue';
 import vuetify from 'vite-plugin-vuetify';
