@@ -1,5 +1,5 @@
 <template>
-  <v-btn v-on:click="getToken">Login</v-btn>
+  <v-btn v-on:click="getToken" data-test="login-btn">Login</v-btn>
 </template>
 
 <script>

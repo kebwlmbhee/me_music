@@ -6,6 +6,7 @@
 import { mapState, mapActions } from 'pinia'
 import UserStatus from '@/stores/UserStatus'
 import qs from 'qs'
+import axios from 'axios'
 
 export default {
   data() {
@@ -44,7 +45,7 @@ export default {
       }
 
       // 此為 axios 語法，用來串 API
-      this.$http(authOptions).then((res) => {
+      axios(authOptions).then((res) => {
         // 重要!!! 修改管理全域的 @/stores/UserStatus.js 內的 state 資料
         let data = res.data
         this.authCode.access_token = data.access_token
