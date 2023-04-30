@@ -1,48 +1,11 @@
 <template>
   <!-- <audio autoplay src="../views/Test.mp3"></audio> -->
   <v-app id="inspire">
-    <!-- 左邊 -->
-    <v-navigation-drawer color="grey-lighten-3" rail>
-      <v-btn
-        class="d-block text-center mx-auto mt-4 rounded-circle"
-        color="grey-darken-1"
-        size="36"
-        to="/Home"
-        @click="
-          () => {
-            SelectedPage = '大廳'
-          }
-        "
-      >
-      </v-btn>
-
-      <v-divider class="mx-3 my-5"></v-divider>
-
-      <v-btn
-        v-for="(chatroom, index) in FakeData['Chatrooms']"
-        :key="index"
-        class="d-block text-center mx-auto mb-9 rounded-circle"
-        size="28"
-        color="grey-lighten-1"
-        :title="chatroom.alt"
-      >
-        <v-menu activator="parent">
-          <v-list>
-            <v-list-item
-              title="Enter"
-              to="/Home/Chat"
-              @click="this.chatdataTransfer(index)"
-            ></v-list-item>
-            <v-list-item title="Delete"></v-list-item>
-          </v-list>
-        </v-menu>
-      </v-btn>
-    </v-navigation-drawer>
-    <!-- 左-2 -->
+    <!-- 左 -->
     <v-navigation-drawer width="244" permanent>
-      <!-- 左-2 放商標的? -->
+      <!-- 左 放商標的? -->
       <!--  -->
-      <v-sheet color="grey-lighten-5" height="128" width="100%">
+      <v-sheet color="grey-lighten-5" height="128" width="100%" @click="clickLobby">
         <v-img
           src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRXGQDqS3rBb7GyPj87cxlKGJM1VC3CFIaUBg&usqp=CAU"
           alt="Fake"
@@ -74,15 +37,10 @@
       <v-app-bar-title class="font-weight-bold">#{{ SelectedPage }}</v-app-bar-title>
       <v-spacer></v-spacer>
 
-      <v-responsive max-width="156">
-        <v-text-field
-          bg-color="grey-lighten-2"
-          class="rounded-pill overflow-hidden"
-          density="compact"
-          hide-details
-          variant="solo"
-        ></v-text-field>
-      </v-responsive>
+      <user-profile-button
+        :userName="userProfile.name"
+        :userImg="userProfile.avatar"
+      ></user-profile-button>
     </v-app-bar>
 
     <!-- 右邊的東東 -->
@@ -100,38 +58,39 @@
           </template>
         </v-list-item>
       </v-list>
+      <v-divider></v-divider>
+      <div>
+        <audio
+          :src="MainMusic_url"
+          autoplay
+          id="mainAudio"
+          controls
+          @ended="whenMusicEnded"
+        ></audio>
+        <audio :src="SecondMusic_url" id="secondAudio" autoplay controls loop></audio>
+      </div>
     </v-navigation-drawer>
 
     <!-- 要放Page的地方  應該用Router Route  或是Component -->
     <v-main>
       <router-view v-if="isRouterAlive"></router-view>
     </v-main>
-    <!-- 底下輸入框 -->
-    <v-footer app height="72">
-      <v-text-field
-        v-model="message"
-        bg-color="grey-lighten-1"
-        class="rounded-pill overflow-hidden"
-        density="compact"
-        hide-details
-        variant="solo"
-        clearable
-        @keydown.enter="addchatData"
-      ></v-text-field>
-    </v-footer>
   </v-app>
 </template>
 <script>
-import { mapActions, mapStores } from 'pinia'
+import { mapState, mapActions } from 'pinia'
 import UserStatus from '@/stores/UserStatus'
-import { useChatDataStore } from '../stores/chatdata'
+import MusicQueue from '@/stores/MusicQueue'
+
+import UserProfileButton from '../components/UserProfileButton.vue'
+
 export default {
   data() {
     return {
       Explores: [
         { title: '探索', to: '/Home/Explore' },
         { title: '我的音樂記錄', to: '/Home/MusicRecord' },
-        { title: '建立播放清單', to: '/Where' }
+        { title: '聊天室', to: '/Home/Chat' }
       ],
       FakeData: {
         ChatroomMembers: [
@@ -140,44 +99,27 @@ export default {
           { ava: '', Name: 'member3', alt: 'M3' },
           { ava: '', Name: 'member4', alt: 'M4' },
           { ava: '', Name: 'member5', alt: 'M5' }
-        ],
-        Chatrooms: [
-          // 代表你有多少已進入的聊天室
-          { ava: '', Name: 'ChatRoom1', alt: 'C1' },
-          { ava: '', Name: 'ChatRoom2', alt: 'C2' },
-          { ava: '', Name: 'ChatRoom3', alt: 'C3' },
-          { ava: '', Name: 'ChatRoom4', alt: 'C4' }
-        ],
-        ChatData: [
-          { sender: 'John', content: '這是我的內容喔' },
-          { sender: 'Tess', content: '這是Tess的內容喔' },
-          { sender: 'Tess', content: '這是Tess的內容喔' },
-          { sender: 'John', content: '這是我的內容喔' },
-          { sender: 'John', content: '這是我的內容喔' },
-          { sender: 'Hso!', content: '這是Hso!的內容喔' }
         ]
       },
       message: '',
       SelectedPage: '大廳',
-      isRouterAlive: true
+      isRouterAlive: true,
+      MainMusic_url: '',
+      SecondMusic_url: ''
     }
   },
   computed: {
-    ...mapStores(useChatDataStore)
+    ...mapState(UserStatus, ['authCode', 'userProfile'])
+  },
+  components: {
+    UserProfileButton
   },
   methods: {
-    chatdataTransfer(i) {
-      // 獲取聊天室資料 (附帶清除)
-      console.log('test')
-      this.chatdataStore.ClearChatData()
-      this.chatdataStore.enterChatroom(this.FakeData['ChatData'])
-      this.chatdataStore.addNewData({ sender: i, content: 'test' })
-    },
-    addchatData() {
-      // 新增聊天室資料
-      console.log(this.message)
-      this.chatdataStore.addNewData({ sender: 'A', content: this.message })
-      this.message = ''
+    clickLobby() {
+      this.SelectedPage = '大廳'
+      this.$router.push({
+        path: '/Home'
+      })
     },
     reload() {
       // 重新加載頁面 ?
@@ -188,17 +130,54 @@ export default {
         this.isRouterAlive = true
       }, 100)
     },
-    ...mapActions(UserStatus, ['checkAuth'])
+    whenMusicEnded() {
+      // 當音樂播放結束
+      console.log('music is ended')
+      var nextMusic = this.ShiftTheMusic()
+      if (nextMusic == null) {
+        return
+      }
+      this.MainMusic_url = nextMusic.mp3
+    },
+    WhenAddTheNewMusic() {
+      console.log('WhenAddTheNewMusic Start')
+      var mainAudio = document.getElementById('mainAudio')
+      if (!mainAudio.paused) return
+      this.MainMusic_url = this.ShiftTheMusic().mp3
+    },
+    PlayPreviewAudio(url) {
+      // 控制Second Audio 播放
+      // 當開始播放時 靜音MainAudio
+      // 開始播放 Second Audio
+      console.log('Play Second Audio' + url)
+      var secondAudio = document.getElementById('secondAudio')
+      //if(!secondAudio.paused) secondAudio.pause();
+      secondAudio.load()
+      secondAudio.src = url
+    },
+    PausePreviewAudio() {
+      // 當暫停時 使MainAudio靜音取消
+      // 暫停播放 Second Audio
+      console.log('Pause Second Audio')
+      var secondAudio = document.getElementById('secondAudio')
+      secondAudio.pause()
+    },
+    ...mapActions(UserStatus, ['checkAuth']),
+    ...mapActions(MusicQueue, ['ShiftTheMusic'])
   },
   mounted() {
     setTimeout(() => {
       this.SelectedPage = this.$route.name
     }, 100)
     this.checkAuth()
+    /// TODO : 要先獲取當前的 MusicQueue 存儲 於FireBase
   },
   provide() {
     return {
-      Reload: this.reload
+      Reload: this.reload,
+      AddMusic: this.WhenAddTheNewMusic,
+      PlayPreview: this.PlayPreviewAudio,
+      PausePreview: this.PausePreviewAudio
     }
   }
 }

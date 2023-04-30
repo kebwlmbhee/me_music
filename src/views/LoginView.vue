@@ -1,5 +1,5 @@
 <template>
-  <v-btn v-on:click="getToken">Login</v-btn>
+  <v-btn v-on:click="getToken" data-test="login-btn">Login</v-btn>
 </template>
 
 <script>
@@ -14,7 +14,7 @@ export default {
       const tokenValid = localStorage.getItem('authCode')
       if (tokenValid !== null) {
         // Redirect to home page
-        this.$router.replace('/')
+        this.$router.replace('/Home')
       }
     },
     generateRandomString(length) {

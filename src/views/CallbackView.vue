@@ -6,6 +6,7 @@
 import { mapState, mapActions } from 'pinia'
 import UserStatus from '@/stores/UserStatus'
 import qs from 'qs'
+import axios from 'axios'
 
 export default {
   data() {
@@ -29,7 +30,7 @@ export default {
       let auth_base64 = window.btoa(auth_string)
 
       // 重要!!! Spotify 的 POST 必須照這個格式寫，改了就不能動，我也不知道為什麼
-      let authOptions = {
+      let config = {
         method: 'POST',
         url: 'https://accounts.spotify.com/api/token',
         data: qs.stringify({
@@ -44,7 +45,7 @@ export default {
       }
 
       // 此為 axios 語法，用來串 API
-      this.$http(authOptions).then((res) => {
+      axios(config).then((res) => {
         // 重要!!! 修改管理全域的 @/stores/UserStatus.js 內的 state 資料
         let data = res.data
         this.authCode.access_token = data.access_token
@@ -54,7 +55,7 @@ export default {
         this.authCode.token_type = data.token_type
         this.setTokenLocal()
         // Redirect to home page
-        this.$router.replace('/')
+        this.$router.replace('/Home')
       })
     },
     // 把 User 的 Token 資料存在本地網頁的 localStorage，下次進來網頁就可以用來判斷是否已經有給授權
