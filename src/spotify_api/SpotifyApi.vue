@@ -17,7 +17,7 @@
       <ul>
         <li v-for="item in searchResponse" v-bind:key="item.id">
           <p>Artist: {{ item.name }}</p>
-          <img v-bind:src="item.images[2].url" alt="" />
+          <img v-bind:src="item.image" alt="" />
         </li>
       </ul>
     </div>
@@ -41,12 +41,13 @@
 <script>
 import { mapState, mapActions } from 'pinia'
 import UserStatus from '@/stores/UserStatus'
+import SpotifyApi from './SpotifyApi'
 
 export default {
   data() {
     return {
       searchText: '',
-      searchResponse: [], //searchItem  可能會有track, artist, playlist，獲取資料可使用item.id, item.name, item.image
+      searchResponse: [], //searchItem  可能會有tracks, artists, playlists
       playlists: [], //getUserPlaylists  會有當前user的所有playlist資訊
       playlistTracks: [], //getPlaylistTracks 會有傳入的playlist id裡面的tracks
       topTracks: [], //getUserTopTracks  會有當前user最常聽的10首歌曲 (數量與時間段可改動)
@@ -62,7 +63,10 @@ export default {
   methods: {
     ...mapActions(UserStatus, ['checkAuth', 'logout']),
 
-    //搜尋功能，query為搜尋內容名字，limit為搜尋數量上限，type可替換成track, artist, playlist
+    // 搜尋功能，query為搜尋內容名字，limit為搜尋數量上限，type可替換成track, artist, album, playlist，回傳目標類型的陣列
+    // 搜尋album目前不會回傳完整的資料。ablum.items是空的，albums.duration_ms是0
+    // 需要用到 getPlaylistTracks()
+    // 結果存在 this.searchResponse
     searchItem(query, limit, type) {
       let url = `https://api.spotify.com/v1/search/?q=${query}&type=${type}&limit=${limit}`
       let config = {
@@ -71,13 +75,48 @@ export default {
           Authorization: `Bearer ${this.authCode.access_token}`
         }
       }
-      this.$http.get(url, config).then((res) => {
-        let data = res.data
-        this.searchResponse = data.artists.items //搜尋結果會存在searchResponse裡面，可以用item.id, item.name, item.image調用不同內容
-      })
+      this.$http
+        .get(url, config)
+        .then((res) => {
+          let data = res.data
+          switch (type) {
+            case 'artist':
+              this.searchResponse = data.artists.items.map((artist) =>
+                SpotifyApi.artistFormat(artist)
+              )
+              break
+            case 'track':
+              this.searchResponse = data.tracks.items.map((track) => SpotifyApi.trackFormat(track))
+              break
+            case 'album':
+              this.searchResponse = data.albums.items.map((album) => SpotifyApi.albumFormat(album))
+              break
+            case 'playlist': {
+              const promises = data.playlists.items.map((playlist) => {
+                return this.getPlaylistTracks(playlist.id)
+              })
+              Promise.all(promises).then((results) => {
+                this.searchResponse = data.playlists.items.map((playlist, index) => {
+                  return SpotifyApi.playlistFormat(playlist, results[index])
+                })
+                console.log(JSON.stringify(this.searchResponse))
+              })
+              break
+            }
+            default:
+              console.log('type error in searchItem API method')
+              break
+          }
+        })
+        .catch((err) => {
+          console.log(err)
+        })
     },
 
     //獲取當前使用者的所有playlist
+    // 需要用到getPlaylistTracks()
+    // 結果是一個playlist陣列
+    // 結果存在this.playlists裡面
     getUserPlaylists() {
       let url = 'https://api.spotify.com/v1/me/playlists'
       let config = {
@@ -90,7 +129,15 @@ export default {
         .get(url, config)
         .then((res) => {
           let data = res.data
-          this.playlists = data.items //結果會存在playlists裡面，可以用item.id, item.name, item.image調用不同內容
+          let promises = data.items.map((playlist) => {
+            return this.getPlaylistTracks(playlist.id)
+          })
+          Promise.all(promises).then((results) => {
+            this.playlists = data.items.map((playlist, index) => {
+              return SpotifyApi.playlistFormat(playlist, results[index])
+            })
+            console.log(JSON.stringify(this.playlists))
+          })
         })
         .catch((err) => {
           console.log(err)
@@ -98,6 +145,9 @@ export default {
     },
 
     //playlistId為欲獲取的播放清單歌曲的id，傳入播放清單id，獲得該播放清單的所有歌曲
+    // 會直接被其他取得playlist的method呼叫
+    // 結果是一個track陣列
+    // return結果, 同時也把結果存在this.playlistTracks裡面
     getPlaylistTracks(playlistId) {
       let url = `https://api.spotify.com/v1/playlists/${playlistId}/tracks`
       let config = {
@@ -106,13 +156,28 @@ export default {
           Authorization: `Bearer ${this.authCode.access_token}`
         }
       }
-      this.$http.get(url, config).then((res) => {
-        let data = res.data
-        this.playlistTracks = data.items //結果會存在playlistTracks裡面，可以用item.id, item.name, item.image調用不同內容
-      })
+      return this.$http
+        .get(url, config)
+        .then((res) => {
+          let data = res.data
+          let tracks = data.items.map((item) => {
+            if (!item.track) {
+              return null
+            }
+            return SpotifyApi.trackFormat(item.track)
+          })
+          tracks = tracks.filter((track) => track !== null) // 有些track是null, 這是把它從array裡剔除
+          this.playlistTracks = tracks
+          return tracks
+        })
+        .catch((err) => {
+          console.log(err)
+        })
     },
 
     //獲取當前使用者最常聽的x首歌，x = limit
+    // 結果是一個track陣列
+    // 結果會存在this.topTracks裡面
     getUserTopTracks() {
       let url = 'https://api.spotify.com/v1/me/top/tracks'
       let config = {
@@ -129,7 +194,8 @@ export default {
         .get(url, config)
         .then((res) => {
           let data = res.data
-          this.topTracks = data.items //結果會存在topTracks裡面，可以用item.id, item.name, item.image調用不同內容
+          this.topTracks = data.items.map((track) => SpotifyApi.trackFormat(track))
+          console.log(JSON.stringify(this.topTracks))
         })
         .catch((err) => {
           console.log(err)
@@ -137,6 +203,8 @@ export default {
     },
 
     //獲取當前使用者最常聽的x個歌手，x = limit
+    // 結果是一個artist陣列
+    // 結果會存在this.topArtists裡面
     getUserTopArtists() {
       let url = 'https://api.spotify.com/v1/me/top/artists'
       let config = {
@@ -153,7 +221,8 @@ export default {
         .get(url, config)
         .then((res) => {
           let data = res.data
-          this.topArtists = data.items //結果會存在topArtists裡面，可以用item.id, item.name, item.image調用不同內容
+          this.topArtists = data.items.map((artist) => SpotifyApi.artistFormat(artist))
+          console.log(JSON.stringify(this.topArtists))
         })
         .catch((err) => {
           console.log(err)
@@ -161,6 +230,8 @@ export default {
     },
 
     //獲取當前使用者最近聽的x首歌，x = limit
+    // 結果是一個track陣列
+    // 結果會存在this.recentTracks裡面
     getRecentTracks() {
       let url = `https://api.spotify.com/v1/me/player/recently-played?limit=20`
       let config = {
@@ -171,7 +242,8 @@ export default {
       }
       this.$http.get(url, config).then((res) => {
         let data = res.data
-        this.recentTracks = data.items //結果會存在recentTracks裡面，可以用item.id, item.name, item.image調用不同內容
+        this.recentTracks = data.items.map((item) => SpotifyApi.trackFormat(item.track))
+        console.log(JSON.stringify(this.recentTracks))
       })
     },
 
