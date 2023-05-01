@@ -24,6 +24,7 @@ Player function
 
 ### 資料格式:
 目前把整理資料格式的function寫在 SpotifyApi.js 內, 供 SpotifyApi.vue 內部的methods呼叫  
+由於還沒接getAlbumTracks的API, search album的結果不會包含完整的歌曲資料 (album.items會是空陣列, album.duration_ms是0)  
 資料使用一般的object，沒有特別定義class
 #### artist 
 {  
