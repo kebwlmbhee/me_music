@@ -48,8 +48,6 @@
 </template>
 
 <script>
-// (現在時戳 - 播放時戳) = 現在播放到的秒數
-
 // TODO(前端): 切歌時的公告要使用彈出式視窗呈現
 import musicQueue from '/src/views/musicQ/musicQueue.js'
 

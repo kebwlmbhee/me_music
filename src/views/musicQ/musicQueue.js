@@ -121,6 +121,9 @@ class musicQueue {
         const musicPlayTimeStamp = snapshot.val()
         // 當前時間 - 歌曲播放的時間  (ms -> s)
         let timestamp = (Date.now() - musicPlayTimeStamp) / 1000
+        // 超過 30s -> 0s
+        // 如果所有人離線，timestamp 不再寫入時，應該歸零時間
+        timestamp = timestamp <= 30.0 ? timestamp : 0
         callback(timestamp)
       })
       .catch((error) => {
