@@ -72,7 +72,7 @@ export default {
       musics: []
     }
   },
-  async created() {
+  created() {
     // 在組件創建時註冊 MusicQueue 的監聽器
     // 實時獲取 musicQueue 資料
     this.musicQueue = new musicQueue()
@@ -201,7 +201,7 @@ export default {
     musicEnded(readyToRemoveMusic) {
       if (readyToRemoveMusic === this.musics[0]) {
         this.musicQueue
-          .removeMusic(readyToRemoveMusic)
+          .removeMusicTransaction(readyToRemoveMusic)
           .then(() => {
             this.showNextMusicMessage()
             console.log('歌曲播放完畢')

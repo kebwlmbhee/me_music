@@ -38,6 +38,21 @@ class musicQueue {
     await remove(ref(db, `/musicQueue/${music.key}`))
   }
 
+  removeMusicTransaction(music) {
+    return runTransaction(this.musicQueueRef, (musics) => {
+      let entries = Object.entries(musics)
+
+      if (musics[music.key].id === music.id) {
+        // 首位
+        entries.shift() // 去除首位元素
+        musics = Object.fromEntries(entries)
+      }
+      return musics
+    }).catch((error) => {
+      console.error('Fail to remove first Music: ', error)
+    })
+  }
+
   // 監聽 musicQueue，保持同步
   onMusic(callback) {
     onValue(this.musicQueueRef, (snapshot) => {
@@ -105,7 +120,7 @@ class musicQueue {
       .then((snapshot) => {
         const musicPlayTimeStamp = snapshot.val()
         // 當前時間 - 歌曲播放的時間  (ms -> s)
-        const timestamp = (Date.now() - musicPlayTimeStamp) / 1000
+        let timestamp = (Date.now() - musicPlayTimeStamp) / 1000
         callback(timestamp)
       })
       .catch((error) => {
