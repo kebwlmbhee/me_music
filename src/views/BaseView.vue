@@ -37,7 +37,10 @@
       <v-app-bar-title class="font-weight-bold">#{{ SelectedPage }}</v-app-bar-title>
       <v-spacer></v-spacer>
 
-      <user-profile-button :userName="'eedasdat'"></user-profile-button>
+      <user-profile-button
+        :userName="userProfile.name"
+        :userImg="userProfile.avatar"
+      ></user-profile-button>
     </v-app-bar>
 
     <!-- 右邊的東東 -->
@@ -75,7 +78,7 @@
   </v-app>
 </template>
 <script>
-import { mapActions } from 'pinia'
+import { mapState, mapActions } from 'pinia'
 import UserStatus from '@/stores/UserStatus'
 import MusicQueue from '@/stores/MusicQueue'
 
@@ -104,6 +107,9 @@ export default {
       MainMusic_url: '',
       SecondMusic_url: ''
     }
+  },
+  computed: {
+    ...mapState(UserStatus, ['authCode', 'userProfile'])
   },
   components: {
     UserProfileButton

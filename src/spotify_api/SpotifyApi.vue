@@ -42,6 +42,7 @@
 import { mapState, mapActions } from 'pinia'
 import UserStatus from '@/stores/UserStatus'
 import SpotifyApi from './SpotifyApi'
+import axios from 'axios'
 
 export default {
   data() {
@@ -64,19 +65,19 @@ export default {
     ...mapActions(UserStatus, ['checkAuth', 'logout']),
 
     // 搜尋功能，query為搜尋內容名字，limit為搜尋數量上限，type可替換成track, artist, album, playlist，回傳目標類型的陣列
-    // 搜尋album目前不會回傳完整的資料。ablum.items是空的，albums.duration_ms是0
-    // 需要用到 getPlaylistTracks()
+    // 因為現在還沒有接getAlbumTracks，搜尋album目前不會回傳完整的資料。ablum.items是空的，albums.duration_ms是0
+    // 需要用到 getPlaylistTracks
     // 結果存在 this.searchResponse
     searchItem(query, limit, type) {
-      let url = `https://api.spotify.com/v1/search/?q=${query}&type=${type}&limit=${limit}`
       let config = {
+        method: 'GET',
+        url: `https://api.spotify.com/v1/search/?q=${query}&type=${type}&limit=${limit}`,
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${this.authCode.access_token}`
         }
       }
-      this.$http
-        .get(url, config)
+      axios(config)
         .then((res) => {
           let data = res.data
           switch (type) {
@@ -118,15 +119,16 @@ export default {
     // 結果是一個playlist陣列
     // 結果存在this.playlists裡面
     getUserPlaylists() {
-      let url = 'https://api.spotify.com/v1/me/playlists'
       let config = {
+        method: 'GET',
+        url: 'https://api.spotify.com/v1/me/playlists',
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${this.authCode.access_token}`
         }
       }
-      this.$http
-        .get(url, config)
+
+      axios(config)
         .then((res) => {
           let data = res.data
           let promises = data.items.map((playlist) => {
@@ -147,17 +149,18 @@ export default {
     //playlistId為欲獲取的播放清單歌曲的id，傳入播放清單id，獲得該播放清單的所有歌曲
     // 會直接被其他取得playlist的method呼叫
     // 結果是一個track陣列
-    // return結果, 同時也把結果存在this.playlistTracks裡面
+    // 為了讓其他function方便使用，會return結果
+    // 同時也把結果存在this.playlistTracks裡面
     getPlaylistTracks(playlistId) {
-      let url = `https://api.spotify.com/v1/playlists/${playlistId}/tracks`
       let config = {
+        method: 'GET',
+        url: `https://api.spotify.com/v1/playlists/${playlistId}/tracks`,
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${this.authCode.access_token}`
         }
       }
-      return this.$http
-        .get(url, config)
+      return axios(config)
         .then((res) => {
           let data = res.data
           let tracks = data.items.map((item) => {
@@ -179,8 +182,9 @@ export default {
     // 結果是一個track陣列
     // 結果會存在this.topTracks裡面
     getUserTopTracks() {
-      let url = 'https://api.spotify.com/v1/me/top/tracks'
       let config = {
+        method: 'GET',
+        url: 'https://api.spotify.com/v1/me/top/tracks',
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${this.authCode.access_token}`
@@ -190,8 +194,8 @@ export default {
           limit: 10 // 指定返回的歌曲數量
         }
       }
-      this.$http
-        .get(url, config)
+
+      axios(config)
         .then((res) => {
           let data = res.data
           this.topTracks = data.items.map((track) => SpotifyApi.trackFormat(track))
@@ -206,8 +210,9 @@ export default {
     // 結果是一個artist陣列
     // 結果會存在this.topArtists裡面
     getUserTopArtists() {
-      let url = 'https://api.spotify.com/v1/me/top/artists'
       let config = {
+        method: 'GET',
+        url: 'https://api.spotify.com/v1/me/top/artists',
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${this.authCode.access_token}`
@@ -217,8 +222,7 @@ export default {
           limit: 3 // 指定返回的藝術家數量
         }
       }
-      this.$http
-        .get(url, config)
+      axios(config)
         .then((res) => {
           let data = res.data
           this.topArtists = data.items.map((artist) => SpotifyApi.artistFormat(artist))
@@ -233,14 +237,15 @@ export default {
     // 結果是一個track陣列
     // 結果會存在this.recentTracks裡面
     getRecentTracks() {
-      let url = `https://api.spotify.com/v1/me/player/recently-played?limit=20`
       let config = {
+        method: 'GET',
+        url: `https://api.spotify.com/v1/me/player/recently-played?limit=20`,
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${this.authCode.access_token}`
         }
       }
-      this.$http.get(url, config).then((res) => {
+      axios(config).then((res) => {
         let data = res.data
         this.recentTracks = data.items.map((item) => SpotifyApi.trackFormat(item.track))
         console.log(JSON.stringify(this.recentTracks))
@@ -257,7 +262,7 @@ export default {
           Authorization: `Bearer ${this.authCode.access_token}`
         }
       }
-      this.$http(config).then((res) => {
+      axios(config).then((res) => {
         console.log(res)
       })
     }

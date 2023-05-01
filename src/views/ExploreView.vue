@@ -30,6 +30,7 @@
 import PlayListCard from '../components/PlayListCard.vue'
 import { mapState } from 'pinia'
 import UserStatus from '@/stores/UserStatus'
+import axios from 'axios'
 
 export default {
   data() {
@@ -53,14 +54,15 @@ export default {
       })
     },
     searchPlayList() {
-      let url = 'https://api.spotify.com/v1/search?query=t&type=playlist&limit=20'
       let config = {
+        method: 'GET',
+        url: 'https://api.spotify.com/v1/search?query=t&type=playlist&limit=20',
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${this.authCode.access_token}`
         }
       }
-      this.$http.get(url, config).then((res) => {
+      axios(config).then((res) => {
         let data = res.data
         this.playlists = data.playlists.items
       })
