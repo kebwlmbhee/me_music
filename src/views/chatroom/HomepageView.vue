@@ -34,12 +34,6 @@ export default defineComponent({
   created() {
     this.chatroom = new Chatroom()
     this.chatroom.onAnnouncement((messages) => {
-      // // sort by timestamp
-      // messages.sort((a, b) => b.time - a.time)
-      // // keep the lastest 10 announcements
-      // while (messages.length > 10) {
-      //   messages.pop()
-      // }
       // resolve(this.announcements)
       this.announcements = messages
       // sort by timestamp
