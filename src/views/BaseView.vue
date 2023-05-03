@@ -67,7 +67,7 @@
           controls
           @ended="whenMusicEnded"
         ></audio>
-        <audio :src="SecondMusic_url" id="secondAudio" autoplay controls loop></audio>
+        <audio :src="SecondMusic_url" id="secondAudio" autoplay controls></audio>
       </div>
     </v-navigation-drawer>
 

@@ -52,12 +52,8 @@
     <!-- ----------------------------------------------------- -->
     <!-- Playlist -->
     <v-list v-if="type == 'playlist'" class="overflow-auto">
-      <v-list-item
-        v-for="(item, index) in allData.tracks.items"
-        :key="index"
-        @click="clickOneSong(item.track.id)"
-      >
-        <v-card flat border>
+      <v-list-item v-for="(item, index) in allData.tracks.items" :key="index">
+        <v-card flat border @click="PlayPreview(item.track.preview_url)">
           <div class="d-flex flex-nowrap flex-row justify-start align-center">
             <v-avatar rounded="0" size="90" class="ma-3">
               <v-img
@@ -70,7 +66,12 @@
               <v-card-title class="font-weight-bold">{{ item.track.name }}</v-card-title>
               <v-card-subtitle>{{ item.track.artists[0].name }}</v-card-subtitle>
               <v-card-actions>
-                <v-btn border icon="mdi-plus" size="x-small"></v-btn>
+                <v-btn
+                  border
+                  icon="mdi-plus"
+                  size="x-small"
+                  @click="clickOneSong(item.track.id)"
+                ></v-btn>
               </v-card-actions>
             </div>
           </div>
@@ -79,12 +80,8 @@
     </v-list>
     <!-- Album -->
     <v-list v-else-if="type == 'album'" class="overflow-auto">
-      <v-list-item
-        v-for="(item, index) in allData.tracks.items"
-        :key="index"
-        @click="clickOneSong(item.track.id)"
-      >
-        <v-card flat border>
+      <v-list-item v-for="(item, index) in allData.tracks.items" :key="index">
+        <v-card flat border @click="PlayPreview(item.preview_url)">
           <div class="d-flex flex-nowrap flex-row justify-start align-center">
             <v-avatar rounded="0" size="90" class="ma-3">
               <v-img :src="allData.images[0].url" alt="Not Found"></v-img>
@@ -93,7 +90,12 @@
               <v-card-title class="font-weight-bold">{{ item.name }}</v-card-title>
               <v-card-subtitle>{{ item.artists[0].name }}</v-card-subtitle>
               <v-card-actions>
-                <v-btn border icon="mdi-plus" size="x-small"></v-btn>
+                <v-btn
+                  border
+                  icon="mdi-plus"
+                  size="x-small"
+                  @click="clickOneSong(item.track.id)"
+                ></v-btn>
               </v-card-actions>
             </div>
           </div>
@@ -103,7 +105,7 @@
     <!-- Artists -->
     <v-list v-else-if="type == 'artist'" class="overflow-auto">
       <v-list-item v-for="(item, index) in allData" :key="index">
-        <v-card flat border @click="clickOneSong(item.id)">
+        <v-card flat border @click="PlayPreview(item.preview_url)">
           <div class="d-flex flex-nowrap flex-row justify-start align-center">
             <v-avatar rounded="0" size="90" class="ma-3">
               <v-img :src="item.album.images[0].url" alt="Not Found"></v-img>
@@ -112,7 +114,12 @@
               <v-card-title class="font-weight-bold">{{ item.name }}</v-card-title>
               <v-card-subtitle>{{ item.artists[0].name }}</v-card-subtitle>
               <v-card-actions>
-                <v-btn border icon="mdi-plus" size="x-small"></v-btn>
+                <v-btn
+                  border
+                  icon="mdi-plus"
+                  size="x-small"
+                  @click="clickOneSong(item.track.id)"
+                ></v-btn>
               </v-card-actions>
             </div>
           </div>
@@ -123,11 +130,12 @@
 </template>
 
 <script>
-import { mapState } from 'pinia'
+import { mapState, mapActions } from 'pinia'
 import UserStatus from '@/stores/UserStatus'
 import axios from 'axios'
 
 export default {
+  inject: ['PlayPreview'],
   data() {
     return {
       allData: [],
@@ -258,9 +266,11 @@ export default {
     clickOneSong(track_id) {
       console.log(`教練 我想點播      id="${track_id}"的歌`)
       // TODO : 點播歌曲
-    }
+    },
+    ...mapActions(UserStatus, ['checkAuth'])
   },
   created() {
+    this.checkAuth()
     this.type = this.$route.query.type
     this.searchTypeRedirect(this.$route.query.id, this.type)
   }
