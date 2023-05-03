@@ -7,8 +7,8 @@
         v-model="searchText"
         label="Search"
         variant="outlined"
+        @keydown.enter="searchInputCallback"
       >
-        <!-- @keydown.enter="searchInputCallback" -->
       </v-text-field>
       <v-spacer></v-spacer>
     </v-app-bar>
@@ -22,6 +22,7 @@
           :imgSrc="track.album.images[0].url"
           :type="'track'"
           :id="track.id"
+          :preview_url="track.preview_url"
         />
       </v-list-item>
 
@@ -157,12 +158,6 @@ export default {
       console.log('Add New Song to Start')
       console.log(this.checkSong)
       this.trigger_pop_up(false)
-    },
-    clickCard(id, type) {
-      this.$router.push({
-        path: '/Home/ExploreSong',
-        query: { id: id, type: type }
-      })
     },
     // 輸入的CallBack
     searchInputCallback() {

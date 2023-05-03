@@ -53,7 +53,7 @@
     <!-- Playlist -->
     <v-list v-if="type == 'playlist'" class="overflow-auto">
       <v-list-item v-for="(item, index) in allData.tracks.items" :key="index">
-        <v-card flat border @click="PlayPreview(item.track.preview_url)">
+        <v-card flat border>
           <div class="d-flex flex-nowrap flex-row justify-start align-center">
             <v-avatar rounded="0" size="90" class="ma-3">
               <v-img
@@ -68,11 +68,24 @@
               <v-card-actions>
                 <v-btn
                   border
+                  icon="mdi-play"
+                  size="x-small"
+                  @click="PlayPreview(item.track.preview_url)"
+                ></v-btn>
+                <v-btn
+                  border
                   icon="mdi-plus"
                   size="x-small"
                   @click="clickOneSong(item.track.id)"
                 ></v-btn>
               </v-card-actions>
+            </div>
+            <v-spacer></v-spacer>
+            <div
+              v-if="item.track.preview_url == null"
+              class="text-red text-center font-weight-bold"
+            >
+              未提供音樂
             </div>
           </div>
         </v-card>
@@ -81,7 +94,7 @@
     <!-- Album -->
     <v-list v-else-if="type == 'album'" class="overflow-auto">
       <v-list-item v-for="(item, index) in allData.tracks.items" :key="index">
-        <v-card flat border @click="PlayPreview(item.preview_url)">
+        <v-card flat border>
           <div class="d-flex flex-nowrap flex-row justify-start align-center">
             <v-avatar rounded="0" size="90" class="ma-3">
               <v-img :src="allData.images[0].url" alt="Not Found"></v-img>
@@ -92,11 +105,16 @@
               <v-card-actions>
                 <v-btn
                   border
-                  icon="mdi-plus"
+                  icon="mdi-play"
                   size="x-small"
-                  @click="clickOneSong(item.track.id)"
+                  @click="PlayPreview(item.preview_url)"
                 ></v-btn>
+                <v-btn border icon="mdi-plus" size="x-small" @click="clickOneSong(item.id)"></v-btn>
               </v-card-actions>
+            </div>
+            <v-spacer></v-spacer>
+            <div v-if="item.preview_url == null" class="text-red text-center font-weight-bold">
+              未提供音樂
             </div>
           </div>
         </v-card>
@@ -105,7 +123,7 @@
     <!-- Artists -->
     <v-list v-else-if="type == 'artist'" class="overflow-auto">
       <v-list-item v-for="(item, index) in allData" :key="index">
-        <v-card flat border @click="PlayPreview(item.preview_url)">
+        <v-card flat border>
           <div class="d-flex flex-nowrap flex-row justify-start align-center">
             <v-avatar rounded="0" size="90" class="ma-3">
               <v-img :src="item.album.images[0].url" alt="Not Found"></v-img>
@@ -116,11 +134,16 @@
               <v-card-actions>
                 <v-btn
                   border
-                  icon="mdi-plus"
+                  icon="mdi-play"
                   size="x-small"
-                  @click="clickOneSong(item.track.id)"
+                  @click="PlayPreview(item.preview_url)"
                 ></v-btn>
+                <v-btn border icon="mdi-plus" size="x-small" @click="clickOneSong(item.id)"></v-btn>
               </v-card-actions>
+            </div>
+            <v-spacer></v-spacer>
+            <div v-if="item.preview_url == null" class="text-red text-center font-weight-bold">
+              未提供音樂
             </div>
           </div>
         </v-card>
