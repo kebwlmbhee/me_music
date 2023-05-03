@@ -4,7 +4,8 @@
  -->
 <template>
   <div v-if="!loaded">
-    <v-card flat border>
+    <!-- Playlist -->
+    <v-card v-if="type === 'playlist'" flat border>
       <div class="d-flex flex-nowrap flex-row justify-start align-center">
         <v-avatar rounded="0" size="125" class="ma-5">
           <v-img :src="allData.images[0].url" alt="Not Found"></v-img>
@@ -18,6 +19,37 @@
         </div>
       </div>
     </v-card>
+    <!-- Album -->
+    <v-card v-if="type === 'album'" flat border>
+      <div class="d-flex flex-nowrap flex-row justify-start align-center">
+        <v-avatar rounded="0" size="125" class="ma-5">
+          <v-img :src="allData.images[0].url" alt="Not Found"></v-img>
+        </v-avatar>
+        <div>
+          <v-card-item>{{ allData.type }}</v-card-item>
+          <v-card-title class="font-weight-bold text-h4">{{ allData.name }}</v-card-title>
+          <v-card-text>
+            {{ allData.description }}
+          </v-card-text>
+        </div>
+      </div>
+    </v-card>
+    <!-- Artist -->
+    <v-card v-if="type === 'artist'" flat border>
+      <div class="d-flex flex-nowrap flex-row justify-start align-center">
+        <v-avatar rounded="0" size="125" class="ma-5">
+          <v-img :src="artistData.images[0].url" alt="Not Found"></v-img>
+        </v-avatar>
+        <div>
+          <v-card-item>{{ artistData.type }}</v-card-item>
+          <v-card-title class="font-weight-bold text-h4">{{ artistData.name }}</v-card-title>
+          <v-card-text>
+            {{ artistData.genres.join(',') }}
+          </v-card-text>
+        </div>
+      </div>
+    </v-card>
+    <!-- ----------------------------------------------------- -->
     <!-- Playlist -->
     <v-list v-if="type == 'playlist'" class="overflow-auto">
       <v-list-item
@@ -68,6 +100,25 @@
         </v-card>
       </v-list-item>
     </v-list>
+    <!-- Artists -->
+    <v-list v-else-if="type == 'artist'" class="overflow-auto">
+      <v-list-item v-for="(item, index) in allData" :key="index">
+        <v-card flat border @click="clickOneSong(item.id)">
+          <div class="d-flex flex-nowrap flex-row justify-start align-center">
+            <v-avatar rounded="0" size="90" class="ma-3">
+              <v-img :src="item.album.images[0].url" alt="Not Found"></v-img>
+            </v-avatar>
+            <div>
+              <v-card-title class="font-weight-bold">{{ item.name }}</v-card-title>
+              <v-card-subtitle>{{ item.artists[0].name }}</v-card-subtitle>
+              <v-card-actions>
+                <v-btn border icon="mdi-plus" size="x-small"></v-btn>
+              </v-card-actions>
+            </div>
+          </div>
+        </v-card>
+      </v-list-item>
+    </v-list>
   </div>
 </template>
 
@@ -80,6 +131,7 @@ export default {
   data() {
     return {
       allData: [],
+      artistData: [],
       loaded: false,
       type: ''
     }
@@ -89,42 +141,49 @@ export default {
   },
   methods: {
     // TODO : Artist暫時無法做  因為沒辦法取得
-    searchTypeRedirect(type) {
+    searchTypeRedirect(in_id, type) {
       this.loaded = true
       switch (type) {
-        case 'playlist':
-          this.searchPlayListTracks().then((data) => {
+        case 'playlist': {
+          this.searchPlayListTracks(in_id).then((data) => {
             console.log(data)
             this.allData = data
             this.loaded = false
           })
           break
-        case 'artist':
-          this.searchArtistTracks().then((data) => {
-            this.allData = data
-            // this.loaded = false
+        }
+        case 'artist': {
+          const TracksPromise = this.searchArtistTracks(in_id).then((data) => {
+            this.allData = data.tracks
+          })
+          const ArtistPromise = this.searchArtistsData(in_id).then((data) => {
+            this.artistData = data
+          })
+          Promise.all([TracksPromise, ArtistPromise]).then(() => {
+            this.loaded = false
           })
           break
-        case 'album':
-          this.searchAlbumTracks().then((data) => {
-            console.log(data)
+        }
+        case 'album': {
+          this.searchAlbumTracks(in_id).then((data) => {
             this.allData = data
             this.loaded = false
           })
           break
-        default:
+        }
+        default: {
           alert('無法進入')
           this.$router.go(1)
           break
+        }
       }
     },
     // 搜尋當前要查詢的PlayList
     // TODO 串API ˊ ˇ ˋ
-    searchPlayListTracks() {
-      let ID = this.$route.query.id
+    searchPlayListTracks(id) {
       let config = {
         method: 'GET',
-        url: `https://api.spotify.com/v1/playlists/${ID}`,
+        url: `https://api.spotify.com/v1/playlists/${id}`,
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${this.authCode.access_token}`
@@ -150,11 +209,10 @@ export default {
       //                           .name                      歌曲名稱
       //                           .id                        歌曲ID
     },
-    searchAlbumTracks() {
-      let ID = this.$route.query.id
+    searchAlbumTracks(id) {
       let config = {
         method: 'GET',
-        url: `https://api.spotify.com/v1/albums/${ID}`,
+        url: `https://api.spotify.com/v1/albums/${id}`,
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${this.authCode.access_token}`
@@ -166,17 +224,30 @@ export default {
         })
       })
     },
-    searchArtistTracks() {
-      let ID = this.$route.query.id
+    searchArtistTracks(id) {
       let config = {
         method: 'GET',
-        url: `https://api.spotify.com/v1/artists/${ID}/albums`,
+        url: `https://api.spotify.com/v1/artists/${id}/top-tracks?market=TW`,
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${this.authCode.access_token}`
         }
       }
-      console.log('artist search')
+      return new Promise((resolve) => {
+        axios(config).then((res) => {
+          resolve(res.data)
+        })
+      })
+    },
+    searchArtistsData(id) {
+      let config = {
+        method: 'GET',
+        url: `https://api.spotify.com/v1/artists/${id}`,
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${this.authCode.access_token}`
+        }
+      }
       return new Promise((resolve) => {
         axios(config).then((res) => {
           resolve(res.data)
@@ -185,13 +256,13 @@ export default {
     },
     // TODO : 單點歌曲
     clickOneSong(track_id) {
-      console.log(`我想點播id="${track_id}"的歌`)
+      console.log(`教練 我想點播      id="${track_id}"的歌`)
       // TODO : 點播歌曲
     }
   },
   created() {
     this.type = this.$route.query.type
-    this.searchTypeRedirect(this.type)
+    this.searchTypeRedirect(this.$route.query.id, this.type)
   }
 }
 </script>
