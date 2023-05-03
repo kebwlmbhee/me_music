@@ -54,7 +54,7 @@
         >
           <!-- :prepend-avatar="'https://cdn.vuetifyjs.com/images/lists/1.jpg'" -->
           <template v-slot:prepend>
-            <v-avatar color="brown">{{ member.alt }}</v-avatar>
+            <v-avatar rounded="0" color="brown">{{ member.alt }}</v-avatar>
           </template>
         </v-list-item>
       </v-list>
