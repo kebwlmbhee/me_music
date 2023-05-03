@@ -53,6 +53,11 @@ const router = createRouter({
       name: 'homepage',
       component: () => import('/src/views/chatroom/HomepageView.vue')
     },
+    {
+      path: '/musicQueue',
+      name: 'musicQueue',
+      component: () => import('/src/views/musicQ/MusicQueueView.vue')
+    },
     // 404
     {
       path: '/:pathMatch(.*)*',

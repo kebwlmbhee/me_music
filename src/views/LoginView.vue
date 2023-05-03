@@ -32,6 +32,7 @@ export default {
             user-top-read \
             user-read-email \
             user-read-private \
+            user-read-recently-played \
             user-modify-playback-state \
             user-library-read \
             user-follow-read'
