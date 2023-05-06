@@ -1,5 +1,5 @@
 <template>
-  <v-card variant="outlined">
+  <v-card variant="outlined" @click="clickPlayPreview">
     <div class="d-flex flex-no-wrap justify-start">
       <v-avatar rounded="0" size="72">
         <v-img :src="imgSrc"></v-img>
@@ -16,8 +16,8 @@
         未提供播放
       </div>
       <v-card-actions v-if="type === 'track'">
-        <v-btn icon="mdi-play" @click="clickPlayPreview"> </v-btn>
-        <v-btn icon="mdi-plus" @click="AddToMusicQueue"> </v-btn>
+        <v-btn icon="mdi-play"> </v-btn>
+        <v-btn icon="mdi-plus" @click.stop="AddToMusicQueue"> </v-btn>
       </v-card-actions>
     </div>
   </v-card>

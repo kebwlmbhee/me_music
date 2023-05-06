@@ -41,7 +41,7 @@
     </v-window>
     <!-- 彈出視窗 -->
     <div v-if="popUpWindow" class="TestFooter">
-      <v-card class="TestCard" color="white" width="100%" height="100%" rounded="0">
+      <v-card class="TestCard" color="white" width="100%" height="100%" border rounded="0">
         <div class="d-flex flex-no-wrap align-center">
           <v-avatar class="ma-3" size="100" rounded="0">
             <v-img :src="checkSong.image"></v-img>
@@ -182,10 +182,10 @@ export default {
       this.checkSong = {
         name: data.name,
         image: data.album.images[0].url,
-        artists: data.artists
-        // mp3_url: data.preview_url
+        artists: data.artists,
+        mp3_url: data.preview_url
       }
-      //this.PlayPreview(this.checkSong.mp3_url)
+      this.PlayPreview(this.checkSong.mp3_url)
     },
     // 新增新的歌曲
     // TODO : 串點播API
