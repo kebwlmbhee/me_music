@@ -55,7 +55,7 @@
         >
           <!-- :prepend-avatar="'https://cdn.vuetifyjs.com/images/lists/1.jpg'" -->
           <template v-slot:prepend>
-            <v-avatar color="brown">{{ member.alt }}</v-avatar>
+            <v-avatar rounded="0" color="brown">{{ member.alt }}</v-avatar>
           </template>
         </v-list-item>
       </v-list>
@@ -68,7 +68,7 @@
           controls
           @ended="whenMusicEnded"
         ></audio>
-        <audio :src="SecondMusic_url" id="secondAudio" autoplay controls loop></audio>
+        <audio :src="SecondMusic_url" id="secondAudio" autoplay controls></audio>
       </div>
     </v-navigation-drawer>
 

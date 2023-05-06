@@ -9,6 +9,7 @@ import Explore from '../views/ExploreView.vue'
 import ExploreSong from '../views/ExploreSongView.vue'
 import ChatRoom from '../views/chatroom/ChatView.vue'
 import MusicRecord from '../views/MusicRecord.vue'
+import Search from '../views/SearchPage.vue'
 import ChatLobby from '../components/SDJ/ChatLobby.vue'
 
 const router = createRouter({
@@ -28,7 +29,8 @@ const router = createRouter({
         { path: 'Chat', name: '聊天室', component: ChatRoom },
         { path: 'MusicRecord', name: '我的音樂記錄', component: MusicRecord },
         { path: 'Explore', name: '探索', component: Explore },
-        { path: 'ExploreSong', name: '探索歌單', component: ExploreSong }
+        { path: 'ExploreSong', name: '探索歌單', component: ExploreSong },
+        { path: 'Search', name: '搜尋', component: Search }
       ]
     },
     {

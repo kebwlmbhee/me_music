@@ -1,6 +1,6 @@
 <template>
   <v-card class="cardHover mx-5 my-2" width="125" min-width="100" flat>
-    <v-img :src="imgSrc" alt="Not Found"></v-img>
+    <v-img :src="imgSrc">.</v-img>
     <div class="DescriptionText font-weight-bold">
       {{ playlistName }}
     </div>

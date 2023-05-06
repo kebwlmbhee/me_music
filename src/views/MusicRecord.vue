@@ -8,40 +8,34 @@
         <v-tab value="2">播放清單</v-tab>
         <v-tab value="3">專輯</v-tab>
       </v-tabs>
+      <v-btn @click="TestClick">testBTN</v-btn>
     </v-app-bar>
     <v-divider color="black" class="border-opacity-70"></v-divider>
     <!-- Title 跟 排序按鈕處 -->
     <v-card flat class="sortCard">
       <v-card-title class="font-weight-bold text-h3">
-        Title <v-icon class="text-h6" color="lightgray" @click="Reload">mdi-reload</v-icon>
+        {{ searchTab }}
+        <v-icon class="text-h6" color="lightgray" @click="Reload">mdi-reload</v-icon>
       </v-card-title>
       <v-card-actions>
         <v-btn>Last Month</v-btn>
         <v-btn>Last 6 Months</v-btn>
         <v-btn>Last Year</v-btn>
-        <v-spacer></v-spacer>
-        <v-text-field
-          v-model="searchText"
-          label="Search"
-          variant="underlined"
-          @keydown.enter="searchInputCallback"
-        >
-        </v-text-field>
         <!-- <v-select label="Sort" variant="underlined" :items="['Test1', 'Test2', 'Test3']"></v-select> -->
       </v-card-actions>
     </v-card>
     <!-- 歌曲裝載處 -->
     <v-window v-if="!loaded" v-model="searchTab">
-      <v-window-item value="0">
+      <v-window-item value="歌曲">
         <AllTypeMusicContainer :type="0" :In_Datas="searchTracksResponse" />
       </v-window-item>
-      <v-window-item value="1">
+      <v-window-item value="歌手">
         <AllTypeMusicContainer :type="1" :In_Datas="searchArtistsResponse" />
       </v-window-item>
-      <v-window-item value="2">
+      <v-window-item value="播放清單">
         <AllTypeMusicContainer :type="2" :In_Datas="searchPlaylistsResponse" />
       </v-window-item>
-      <v-window-item value="3">
+      <v-window-item value="專輯">
         <AllTypeMusicContainer :type="3" :In_Datas="searchAlbumsResponse" />
       </v-window-item>
     </v-window>
@@ -93,8 +87,6 @@ export default {
       loaded: false,
       imgSrc:
         'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRXGQDqS3rBb7GyPj87cxlKGJM1VC3CFIaUBg&usqp=CAU',
-      searchText: '',
-      searchCount: 30,
       searchTab: '',
       searchArtistsResponse: [],
       searchTracksResponse: [],
@@ -112,43 +104,39 @@ export default {
   },
   methods: {
     // TODO : 如果 query 是空值  要怎麼辦ㄋ
-    searchItem(query, limit) {
+    searchUserItem() {
       this.loaded = true
+      // user tracks
       let config_0 = {
         method: 'GET',
-        url: `https://api.spotify.com/v1/search/?q=${
-          query == '' ? 'a' : query
-        }&type=track&limit=${limit}`,
+        url: 'https://api.spotify.com/v1/me/tracks',
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${this.authCode.access_token}`
         }
       }
+      // user artists
       let config_1 = {
         method: 'GET',
-        url: `https://api.spotify.com/v1/search/?q=${
-          query == '' ? 'a' : query
-        }&type=artist&limit=${limit}`,
+        url: 'https://api.spotify.com/v1/me/following?type=artist',
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${this.authCode.access_token}`
         }
       }
+      // user playlists
       let config_2 = {
         method: 'GET',
-        url: `https://api.spotify.com/v1/search/?q=${
-          query == '' ? 'a' : query
-        }&type=playlist&limit=${limit}`,
+        url: 'https://api.spotify.com/v1/me/playlists',
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${this.authCode.access_token}`
         }
       }
+      // user albums
       let config_3 = {
         method: 'GET',
-        url: `https://api.spotify.com/v1/search/?q=${
-          query == '' ? 'a' : query
-        }&type=album&limit=${limit}`,
+        url: 'https://api.spotify.com/v1/me/albums',
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${this.authCode.access_token}`
@@ -157,7 +145,7 @@ export default {
 
       const TrackPromise = axios(config_0).then((res) => {
         let data = res.data
-        this.searchTracksResponse = data.tracks.items
+        this.searchTracksResponse = data.items
         // console.log(this.searchTracksResponse)
       })
       const ArtistPromise = axios(config_1).then((res) => {
@@ -167,12 +155,12 @@ export default {
       })
       const PlaylistPromise = axios(config_2).then((res) => {
         let data = res.data
-        this.searchPlaylistsResponse = data.playlists.items
+        this.searchPlaylistsResponse = data.items
         // console.log(this.searchPlaylistsResponse)
       })
       const AlbumPromise = axios(config_3).then((res) => {
         let data = res.data
-        this.searchAlbumsResponse = data.albums.items
+        this.searchAlbumsResponse = data.items
         // console.log(this.searchAlbumsResponse)
       })
       Promise.all([AlbumPromise, ArtistPromise, PlaylistPromise, TrackPromise]).then(() => {
@@ -194,10 +182,10 @@ export default {
       this.checkSong = {
         name: data.name,
         image: data.album.images[0].url,
-        artists: data.artists,
-        mp3_url: data.preview_url
+        artists: data.artists
+        // mp3_url: data.preview_url
       }
-      this.PlayPreview(this.checkSong.mp3_url)
+      //this.PlayPreview(this.checkSong.mp3_url)
     },
     // 新增新的歌曲
     // TODO : 串點播API
@@ -206,13 +194,20 @@ export default {
       console.log(this.checkSong)
       this.trigger_pop_up(false)
     },
-    // 輸入的CallBack
-    searchInputCallback() {
-      this.$router.push({
-        path: '/Home/MusicRecord',
-        query: { search: this.searchText }
+    // 測試
+    TestClick() {
+      let config = {
+        method: 'GET',
+        url: `https://api.spotify.com/v1/search?query=a&type=album&limit=5`,
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${this.authCode.access_token}`
+        }
+      }
+      axios(config).then((res) => {
+        let data = res.data
+        console.log(data)
       })
-      this.searchItem(this.searchText, this.searchCount)
     },
     ...mapActions(UserStatus, ['checkAuth'])
   },
@@ -223,15 +218,12 @@ export default {
   },
   mounted() {
     this.checkAuth()
-    let query = this.$route.query.search
-    this.searchText = query
-    if (!query) query = 'a'
-    this.searchItem(query, this.searchCount)
+    this.searchUserItem()
   }
 }
 </script>
 
-<style>
+<style scoped>
 .TestContainer {
   width: 100%;
   height: 100%;

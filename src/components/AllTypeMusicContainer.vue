@@ -1,6 +1,6 @@
 <template>
   <div
-    class="alltypemusicContainer ma-4 d-flex flex-row flex-wrap justify-space-between overflow-auto"
+    class="alltypemusicContainer ma-4 d-flex flex-row flex-wrap justify-space-around overflow-auto"
   >
     <v-card
       v-for="(data, index) in In_Datas"
@@ -10,14 +10,46 @@
       flat
       @click="ClickImage(data)"
     >
-      <v-img v-if="type == 0" :src="data.album.images[0].url"></v-img>
-      <v-img v-else :src="data.images[0].url"></v-img>
-      <div class="NameText">
-        {{ data.name }}
+      <!-- Track 拿其所屬Album的圖片 -->
+      <div v-if="type == 0">
+        <v-img :src="data.track.album.images[0].url"></v-img>
+        <div class="NameText">
+          {{ data.track.name }}
+        </div>
+        <v-tooltip activator="parent" location="start">
+          {{ data.track.name }}
+        </v-tooltip>
       </div>
-      <v-tooltip activator="parent" location="start">
-        {{ data.name }}
-      </v-tooltip>
+      <!-- Artist -->
+      <div v-else-if="type == 1">
+        <v-img :src="data.images[0].url"></v-img>
+        <div class="NameText">
+          {{ data.name }}
+        </div>
+        <v-tooltip activator="parent" location="start">
+          {{ data.name }}
+        </v-tooltip>
+      </div>
+      <!-- Playlist -->
+      <div v-else-if="type == 2">
+        <v-img :src="data.images[0].url"></v-img>
+        <div class="NameText">
+          {{ data.name }}
+        </div>
+        <v-tooltip activator="parent" location="start">
+          {{ data.name }}
+        </v-tooltip>
+      </div>
+      <!-- Album -->
+      <div v-else-if="type == 3">
+        <v-img :src="data.album.images[0].url"></v-img>
+        <div class="NameText">
+          {{ data.album.name }}
+        </div>
+        <v-tooltip activator="parent" location="start">
+          {{ data.album.name }}
+        </v-tooltip>
+      </div>
     </v-card>
   </div>
 </template>
@@ -33,7 +65,7 @@ export default {
     ClickImage(data) {
       switch (this.type) {
         case 0: //Track
-          this.Trigger_Popup(true, data)
+          this.Trigger_Popup(true, data.track)
           break
         case 1: //Artist
           this.$router.push({
@@ -50,7 +82,7 @@ export default {
         case 3: //Album
           this.$router.push({
             path: '/Home/ExploreSong',
-            query: { id: data.id, type: 'album' }
+            query: { id: data.album.id, type: 'album' }
           })
           break
         default:
