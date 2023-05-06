@@ -26,6 +26,20 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig)
 const auth = getAuth(app)
-const db = getDatabase(app)
+let db = getDatabase(app)
 
-export { app, auth, db, ref, push, remove, onValue, set, update, runTransaction, limitToFirst, get }
+export {
+  firebaseConfig,
+  app,
+  auth,
+  db,
+  ref,
+  push,
+  remove,
+  onValue,
+  set,
+  update,
+  runTransaction,
+  limitToFirst,
+  get
+}
