@@ -29,9 +29,6 @@ const login = (name) => {
 describe('探索頁面', () => {
     beforeEach(() => {
         login('user') // 必要
-    })
-
-    it('進入按鈕', () => {
         cy.get("[data-test='探索']").click()
     })
 })
@@ -39,21 +36,26 @@ describe('探索頁面', () => {
 describe('我的音樂紀錄', () => {
     beforeEach(() => {
         login('user') // 必要
+        cy.get("[data-test='我的音樂記錄']").click()
     })
 
-    it('進入按鈕', () => {
-        cy.get("[data-test='我的音樂記錄']").click()
-        cy.get("[data-test='select-type-btn'] button")
+    it("按鈕", () => {
+        cy.get("[data-test='select-type-btn']").within(() => {
+            cy.get(".v-tab").click({ multiple: true, force: true })
+        })
+    })
 
+    it("音樂卡片", () => {
+        cy.get(".alltypemusicContainer").within(() => {
+            // https://docs.cypress.io/api/commands/click
+            cy.get(".v-card").click({ multiple: true, force: true })
+        })
     })
 })
 
 describe('聊天室', () => {
     beforeEach(() => {
         login('user') // 必要
-    })
-
-    it('進入按鈕', () => {
         cy.get("[data-test='聊天室']").click()
     })
 
@@ -63,7 +65,6 @@ describe('聊天室', () => {
         cy.get('.v-list-item-title').contains('E2E測試')
     })
 })
-
 
 describe('登出測試', () => {
     beforeEach(() => {
