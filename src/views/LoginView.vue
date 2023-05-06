@@ -33,7 +33,9 @@ export default {
             user-read-email \
             user-read-private \
             user-read-recently-played \
-            user-modify-playback-state'
+            user-modify-playback-state \
+            user-library-read \
+            user-follow-read'
 
       const state = this.generateRandomString(16)
       const auth_query_parameters = new URLSearchParams({
