@@ -2,7 +2,7 @@
   <div class="TestContainer">
     <!-- 最上方搜尋按鈕處 -->
     <v-app-bar flat>
-      <v-tabs v-model="searchTab" align-tabs="title">
+      <v-tabs v-model="searchTab" align-tabs="title" data-test="select-type-btn">
         <v-tab value="0">歌曲</v-tab>
         <v-tab value="1">歌手</v-tab>
         <v-tab value="2">播放清單</v-tab>

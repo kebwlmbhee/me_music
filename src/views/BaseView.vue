@@ -24,6 +24,7 @@
               SelectedPage = explore.title
             }
           "
+          :data-test="explore.title"
         >
           <v-list-item-title class="text-left font-weight-black">{{
             explore.title
