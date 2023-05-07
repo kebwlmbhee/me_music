@@ -13,7 +13,7 @@
     </div>
     <div>
       <v-text-field type="text" label="Label" v-model="searchText"></v-text-field>
-      <v-btn v-on:click="searchItem(searchText, 5, 'artist')">Search</v-btn>
+      <v-btn v-on:click="searchItem(searchText, 5, 'playlist')">Search</v-btn>
       <ul>
         <li v-for="item in searchResponse" v-bind:key="item.id">
           <p>Artist: {{ item.name }}</p>
@@ -71,7 +71,7 @@ export default {
     searchItem(query, limit, type) {
       let config = {
         method: 'GET',
-        url: `https://api.spotify.com/v1/search/?q=${query}&type=${type}&limit=${limit}`,
+        url: `https://api.spotify.com/v1/search/?q=${query}&type=${type}&limit=${limit}&market=TW`,
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${this.authCode.access_token}`
@@ -100,7 +100,7 @@ export default {
                 this.searchResponse = data.playlists.items.map((playlist, index) => {
                   return SpotifyApi.playlistFormat(playlist, results[index])
                 })
-                console.log(JSON.stringify(this.searchResponse))
+                console.log(this.searchResponse)
               })
               break
             }
@@ -138,7 +138,7 @@ export default {
             this.playlists = data.items.map((playlist, index) => {
               return SpotifyApi.playlistFormat(playlist, results[index])
             })
-            console.log(JSON.stringify(this.playlists))
+            console.log(this.playlists)
           })
         })
         .catch((err) => {
@@ -154,7 +154,7 @@ export default {
     getPlaylistTracks(playlistId) {
       let config = {
         method: 'GET',
-        url: `https://api.spotify.com/v1/playlists/${playlistId}/tracks`,
+        url: `https://api.spotify.com/v1/playlists/${playlistId}/tracks?market=TW`,
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${this.authCode.access_token}`
@@ -199,7 +199,7 @@ export default {
         .then((res) => {
           let data = res.data
           this.topTracks = data.items.map((track) => SpotifyApi.trackFormat(track))
-          console.log(JSON.stringify(this.topTracks))
+          console.log(this.topTracks)
         })
         .catch((err) => {
           console.log(err)
@@ -226,7 +226,7 @@ export default {
         .then((res) => {
           let data = res.data
           this.topArtists = data.items.map((artist) => SpotifyApi.artistFormat(artist))
-          console.log(JSON.stringify(this.topArtists))
+          console.log(this.topArtists)
         })
         .catch((err) => {
           console.log(err)
@@ -248,7 +248,7 @@ export default {
       axios(config).then((res) => {
         let data = res.data
         this.recentTracks = data.items.map((item) => SpotifyApi.trackFormat(item.track))
-        console.log(JSON.stringify(this.recentTracks))
+        console.log(this.recentTracks)
       })
     },
 
