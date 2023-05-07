@@ -13,7 +13,9 @@
     </div>
     <div>
       <v-text-field type="text" label="Label" v-model="searchText"></v-text-field>
-      <v-btn v-on:click="searchItem(searchText, 5, 'playlist')">Search</v-btn>
+      <v-btn v-on:click="searchItem(searchText, 5, 'playlist', this.authCode.access_token)"
+        >Search</v-btn
+      >
       <ul>
         <li v-for="item in searchResponse" v-bind:key="item.id">
           <p>Artist: {{ item.name }}</p>
@@ -68,13 +70,13 @@ export default {
     // 因為現在還沒有接getAlbumTracks，搜尋album目前不會回傳完整的資料。ablum.items是空的，albums.duration_ms是0
     // 需要用到 getPlaylistTracks
     // 結果存在 this.searchResponse
-    searchItem(query, limit, type) {
+    searchItem(query, limit, type, token) {
       let config = {
         method: 'GET',
         url: `https://api.spotify.com/v1/search/?q=${query}&type=${type}&limit=${limit}&market=TW`,
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${this.authCode.access_token}`
+          Authorization: `Bearer ${token}`
         }
       }
       axios(config)
@@ -94,7 +96,7 @@ export default {
               break
             case 'playlist': {
               const promises = data.playlists.items.map((playlist) => {
-                return this.getPlaylistTracks(playlist.id)
+                return this.getPlaylistTracks(playlist.id, token)
               })
               Promise.all(promises).then((results) => {
                 this.searchResponse = data.playlists.items.map((playlist, index) => {
@@ -118,13 +120,13 @@ export default {
     // 需要用到getPlaylistTracks()
     // 結果是一個playlist陣列
     // 結果存在this.playlists裡面
-    getUserPlaylists() {
+    getUserPlaylists(token) {
       let config = {
         method: 'GET',
         url: 'https://api.spotify.com/v1/me/playlists',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${this.authCode.access_token}`
+          Authorization: `Bearer ${token}`
         }
       }
 
@@ -151,13 +153,13 @@ export default {
     // 結果是一個track陣列
     // 為了讓其他function方便使用，會return結果
     // 同時也把結果存在this.playlistTracks裡面
-    getPlaylistTracks(playlistId) {
+    getPlaylistTracks(playlistId, token) {
       let config = {
         method: 'GET',
         url: `https://api.spotify.com/v1/playlists/${playlistId}/tracks?market=TW`,
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${this.authCode.access_token}`
+          Authorization: `Bearer ${token}`
         }
       }
       return axios(config)
@@ -181,13 +183,13 @@ export default {
     //獲取當前使用者最常聽的x首歌，x = limit
     // 結果是一個track陣列
     // 結果會存在this.topTracks裡面
-    getUserTopTracks() {
+    getUserTopTracks(token) {
       let config = {
         method: 'GET',
         url: 'https://api.spotify.com/v1/me/top/tracks',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${this.authCode.access_token}`
+          Authorization: `Bearer ${token}`
         },
         params: {
           time_range: 'medium_term', // 指定時間範圍
@@ -209,13 +211,13 @@ export default {
     //獲取當前使用者最常聽的x個歌手，x = limit
     // 結果是一個artist陣列
     // 結果會存在this.topArtists裡面
-    getUserTopArtists() {
+    getUserTopArtists(token) {
       let config = {
         method: 'GET',
         url: 'https://api.spotify.com/v1/me/top/artists',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${this.authCode.access_token}`
+          Authorization: `Bearer ${token}`
         },
         params: {
           time_range: 'medium_term', // 指定時間範圍
@@ -236,13 +238,13 @@ export default {
     //獲取當前使用者最近聽的x首歌，x = limit
     // 結果是一個track陣列
     // 結果會存在this.recentTracks裡面
-    getRecentTracks() {
+    getRecentTracks(token) {
       let config = {
         method: 'GET',
         url: `https://api.spotify.com/v1/me/player/recently-played?limit=20`,
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${this.authCode.access_token}`
+          Authorization: `Bearer ${token}`
         }
       }
       axios(config).then((res) => {
@@ -253,13 +255,13 @@ export default {
     },
 
     // 重要!!! Spotify 的 POST 必須照這個格式寫，改了就不能動，我也不知道為什麼
-    addQueue() {
+    addQueue(token) {
       let config = {
         method: 'POST',
         url: 'https://api.spotify.com/v1/me/player/queue/?uri=spotify:track:3KkXRkHbMCARz0aVfEt68P',
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
-          Authorization: `Bearer ${this.authCode.access_token}`
+          Authorization: `Bearer ${token}`
         }
       }
       axios(config).then((res) => {
