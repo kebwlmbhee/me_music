@@ -16,7 +16,7 @@ function generateRandomKey(length) {
     return key;
 }
 
-let mockKey = generateRandomKey(19);
+let mockKey = generateRandomKey(20);
 
 let announcements = [
     { id: '1', text: 'Announcement 1' },
