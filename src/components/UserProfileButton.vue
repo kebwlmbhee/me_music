@@ -1,6 +1,6 @@
 <template>
   <v-responsive max-width="258">
-    <v-btn size="x-large" rounded="xl" border>
+    <v-btn size="x-large" rounded="xl" border data-test="logout-btn_1">
       {{ userName }}
       <template v-slot:prepend>
         <v-avatar color="brown">
@@ -10,7 +10,7 @@
 
       <v-menu activator="parent">
         <v-list>
-          <v-list-item title="Log Out" @click="logout"></v-list-item>
+          <v-list-item title="Log Out" @click="logout" data-test="logout-btn_2"></v-list-item>
         </v-list>
       </v-menu>
     </v-btn>
