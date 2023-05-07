@@ -20,14 +20,14 @@
       hide-details
       variant="solo"
       clearable
-      @keydown.enter="SendMessage('TestAuthor')"
+      @keydown.enter="SendMessage"
     ></v-text-field>
   </v-footer>
 </template>
 
 <script>
-import { mapActions } from 'pinia'
-import ChatData from '@/stores/ChatData'
+import { mapState } from 'pinia'
+import UserStatus from '@/stores/UserStatus'
 
 import { db } from '../../firebaseConf.js'
 import Chatroom from './chatroom.js'
@@ -41,6 +41,9 @@ export default {
       text: '',
       allMessages: []
     }
+  },
+  computed: {
+    ...mapState(UserStatus, ['userProfile'])
   },
   created() {
     // 發送時間: messages[].time    發信人: messages[].author  內容: messages[].text
@@ -61,26 +64,21 @@ export default {
     TimeStampToDateString(timeStamp) {
       return chatroom.getTimeString(timeStamp)
     },
-    SendMessage(author, isAnnounce = false) {
-      if (!author) {
-        alert('Please enter your name!')
-        return
-      }
+    SendMessage(isAnnounce = false) {
       if (!this.text) {
         alert('message is empty!')
         return
       }
       const newMessage = {
-        author: author,
+        author: this.userProfile.name,
         text: this.text,
         time: Date.now(),
         isAnnounce: isAnnounce
       }
       this.allMessages.push(newMessage)
-      chatroom.sendMessage(author, this.text, isAnnounce)
+      chatroom.sendMessage(this.userProfile.name, this.text, isAnnounce)
       this.text = ''
-    },
-    ...mapActions(ChatData, ['GetChatroomMessages'])
+    }
   }
 }
 </script>
