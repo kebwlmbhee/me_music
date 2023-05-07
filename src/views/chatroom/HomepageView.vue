@@ -1,10 +1,14 @@
 <template>
   <div>
     <h1>Announcements:</h1>
+    <!-- 如果公告數量 > 0，判定有無公告，如果沒有公告，就不繼續執行 -->
     <div class="announcement-container" v-if="announcements.length > 0">
+      <!-- 以 id 進行遍歷，以利後續打印訊息至前端網頁 -->
+      <!-- id 是存在 firebase，所以以 id 遍歷不用改，前端可直接拿來套 -->
       <div v-for="announcement in announcements" :key="announcement.id">
         <ul>
           <li>
+            <!-- 打印相關訊息 -->
             <div class="announcement-author">Author: {{ announcement.author }}</div>
             <div class="announcement-text">Content: {{ announcement.text }}</div>
             <div class="announcement-time">
@@ -14,6 +18,7 @@
         </ul>
       </div>
     </div>
+    <!-- 聊天室按鈕 -->
     <div class="url-redirection">
       <button @click="redirectToUrl">Go to Chatroom</button>
     </div>
@@ -27,24 +32,19 @@ import { defineComponent } from 'vue'
 export default defineComponent({
   data() {
     return {
-      announcements: [],
-      keys: []
+      announcements: []
     }
   },
+  // created 的程式碼都請保留
   created() {
     this.chatroom = new Chatroom()
+
+    // 在組件創建時註冊公告 Message 的監聽器
     this.chatroom.onAnnouncement((messages) => {
-      // // sort by timestamp
-      // messages.sort((a, b) => b.time - a.time)
-      // // keep the lastest 10 announcements
-      // while (messages.length > 10) {
-      //   messages.pop()
-      // }
-      // resolve(this.announcements)
       this.announcements = messages
-      // sort by timestamp
+      // 公告依據時戳進行排序，新的優先顯示
       this.announcements.sort((a, b) => b.time - a.time)
-      // keep the lastest 10 announcements
+      // 保持最多 10 筆公告
       while (this.announcements.length > 10) {
         // 獲取最後一個元素
         const announcement = this.announcements[this.announcements.length - 1]
@@ -56,6 +56,8 @@ export default defineComponent({
     })
   },
   methods: {
+    // 跟 chatroom 的按鍵同理，只是這是開新分頁跳轉至聊天室
+    // 前端應該不必保留此 method
     redirectToUrl() {
       window.open('/chatroom', '_blank')
     }

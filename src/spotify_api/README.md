@@ -1,21 +1,65 @@
 # finished-spotify-api
 
-## current user’s playlists：當前user的所有播放清單
+current user’s playlists：當前 user 的所有播放清單
 
-## Playlist tracks：輸入playlist id 得到 playlist裡面的音樂
+Playlist tracks：輸入 playlist id 得到 playlist 裡面的音樂
 
-## current user’s top tracks (10tracks, medium time)
+current user’s top tracks (10tracks, medium time)
 
-## current user’s top artists (3 artists, medium time)
+current user’s top artists (3 artists, medium time)
 
-## current user’s recent played tracks (limit = 20) (max=50)
+current user’s recent played tracks (limit = 20) (max=50)
 
-## Search
+Search
 
-## User id & name
+User id & name
 
-## Player function
+Player function
 
-### Api使用範例請見ApiFunctionView.vue 或是 TemplateView.vue
+#
 
+## Api 使用範例請見 ApiFunctionView.vue 或是 TemplateView.vue
 
+#
+
+### 資料格式:
+目前把整理資料格式的function寫在 SpotifyApi.js 內, 供 SpotifyApi.vue 內部的methods呼叫  
+由於還沒接getAlbumTracks的API, search album的結果不會包含完整的歌曲資料 (album.items會是空陣列, album.duration_ms是0)  
+資料使用一般的object，沒有特別定義class
+#### artist 
+{  
+name          : String  
+image         : String  
+id            : String  
+}  
+#### track 
+{  
+album_name    : String  
+name          : String  
+artists       : []  (artist)  
+image         : String  
+preview_url   : String  
+id            : String  
+duration_ms   : Int  
+}  
+#### album 
+{  
+name          : String  
+artists       : []  (artist)  
+image         : String  
+id            : String  
+duration_ms   : Int  
+type          : String  
+items         : []  (track)  
+}  
+#### playlist 
+{  
+name          : String  
+artists       : []  (artist)  
+image         : String  
+id            : String  
+duration_ms   : Int  
+type          : String  
+description   : String  
+items         : []  (track)  
+}  

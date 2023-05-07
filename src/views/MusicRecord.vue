@@ -2,43 +2,43 @@
   <div class="TestContainer">
     <!-- 最上方搜尋按鈕處 -->
     <v-app-bar flat>
-      <div class="directionButton">
-        <v-btn height="100%" color="white" style="background-color: black">L</v-btn>
-        <v-btn height="100%" color="white" style="background-color: black">R</v-btn>
-      </div>
-      <!-- <v-btn class="searchButton" border flat @click="searchItem(searchText, 30, 0 )">歌手</v-btn> -->
-      <v-btn class="searchButton" border flat @click="searchItem(searchText, 30, 1)">歌曲</v-btn>
-      <!-- <v-btn class="searchButton" border flat @click="searchItem(searchText, 30, 2 )">播放清單</v-btn> -->
-      <v-btn class="searchButton" border flat @click="searchItem(searchText, 30, 3)">專輯</v-btn>
+      <v-tabs v-model="searchTab" align-tabs="title">
+        <v-tab value="歌曲">歌曲</v-tab>
+        <v-tab value="歌手">歌手</v-tab>
+        <v-tab value="播放清單">播放清單</v-tab>
+        <v-tab value="專輯">專輯</v-tab>
+      </v-tabs>
+      <v-btn @click="TestClick">testBTN</v-btn>
     </v-app-bar>
-    <v-divider color="black" class="border-opacity-70" inset></v-divider>
+    <v-divider color="black" class="border-opacity-70"></v-divider>
     <!-- Title 跟 排序按鈕處 -->
     <v-card flat class="sortCard">
       <v-card-title class="font-weight-bold text-h3">
-        Title <v-icon class="text-h6" color="lightgray" @click="Reload">mdi-reload</v-icon>
+        {{ searchTab }}
+        <v-icon class="text-h6" color="lightgray" @click="Reload">mdi-reload</v-icon>
       </v-card-title>
       <v-card-actions>
         <v-btn>Last Month</v-btn>
         <v-btn>Last 6 Months</v-btn>
         <v-btn>Last Year</v-btn>
-        <v-spacer></v-spacer>
-        <v-select label="Sort" variant="underlined" :items="['Test1', 'Test2', 'Test3']">
-        </v-select>
+        <!-- <v-select label="Sort" variant="underlined" :items="['Test1', 'Test2', 'Test3']"></v-select> -->
       </v-card-actions>
     </v-card>
     <!-- 歌曲裝載處 -->
-    <div class="songContainer overflow-auto">
-      <v-sheet
-        v-for="(search, index) in searchResponse"
-        :key="index"
-        height="10%"
-        width="10%"
-        border
-        @click="trigger_pop_up(true, search)"
-      >
-        <v-img v-if="search.album.images[0].url" :src="search.album.images[0].url"></v-img>
-      </v-sheet>
-    </div>
+    <v-window v-if="!loaded" v-model="searchTab">
+      <v-window-item value="歌曲">
+        <AllTypeMusicContainer :type="0" :In_Datas="searchTracksResponse" />
+      </v-window-item>
+      <v-window-item value="歌手">
+        <AllTypeMusicContainer :type="1" :In_Datas="searchArtistsResponse" />
+      </v-window-item>
+      <v-window-item value="播放清單">
+        <AllTypeMusicContainer :type="2" :In_Datas="searchPlaylistsResponse" />
+      </v-window-item>
+      <v-window-item value="專輯">
+        <AllTypeMusicContainer :type="3" :In_Datas="searchAlbumsResponse" />
+      </v-window-item>
+    </v-window>
     <!-- 彈出視窗 -->
     <div v-if="popUpWindow" class="TestFooter">
       <v-card class="TestCard" color="white" width="100%" height="100%" rounded="0">
@@ -49,7 +49,6 @@
           <div>
             <v-card-title>{{ checkSong.name }}</v-card-title>
             <v-card-subtitle>{{ checkSong.artists[0].name }}</v-card-subtitle>
-            <v-card-text>Description</v-card-text>
           </div>
           <v-spacer></v-spacer>
           <!-- 應該要放頭像  但沒有ˊˇˋ -->
@@ -57,16 +56,15 @@
             <v-avatar v-for="n in checkSong.artists.length" :key="n">
               <v-img :src="imgSrc"></v-img>
             </v-avatar>
+            <!-- 點播按鈕 -->
             <v-card-actions>
               <v-spacer></v-spacer>
-              <v-btn
-                color="white"
-                size="small"
-                style="background-color: green; align-self: flex-end"
+              <v-btn color="white" size="small" style="background-color: green" @click="AddNewSong"
                 >點播</v-btn
               >
             </v-card-actions>
           </div>
+          <!-- 關閉按鈕 -->
           <div style="align-self: flex-start">
             <v-icon @click="trigger_pop_up(false)">mdi-chevron-double-down</v-icon>
           </div>
@@ -78,86 +76,173 @@
 
 <script>
 import UserStatus from '@/stores/UserStatus'
+import AllTypeMusicContainer from '../components/AllTypeMusicContainer.vue'
 import { mapState, mapActions } from 'pinia'
+import axios from 'axios'
+
 export default {
-  inject: ['Reload'],
+  inject: ['Reload', 'AddMusic', 'PlayPreview', 'PausePreview'],
   data() {
     return {
-      test: 30,
+      loaded: false,
       imgSrc:
         'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRXGQDqS3rBb7GyPj87cxlKGJM1VC3CFIaUBg&usqp=CAU',
-      searchText: 'W',
-      searchResponse: [],
+      searchTab: '',
+      searchArtistsResponse: [],
+      searchTracksResponse: [],
+      searchPlaylistsResponse: [],
+      searchAlbumsResponse: [],
       popUpWindow: false,
-      checkSong: { name: '', image: '', artists: [] }
+      checkSong: { name: '', image: '', artists: [], mp3_url: '' }
     }
   },
+  components: {
+    AllTypeMusicContainer
+  },
   computed: {
-    ...mapState(UserStatus, ['authCode', 'userProfile'])
+    ...mapState(UserStatus, ['authCode'])
   },
   methods: {
-    searchItem(query, limit) {
-      let url = `https://api.spotify.com/v1/search/?q=${query}&type=track&limit=${limit}`
-      let config = {
+    // TODO : 如果 query 是空值  要怎麼辦ㄋ
+    searchUserItem() {
+      this.loaded = true
+      // user tracks
+      let config_0 = {
+        method: 'GET',
+        url: 'https://api.spotify.com/v1/me/tracks',
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${this.authCode.access_token}`
         }
       }
-      this.$http.get(url, config).then((res) => {
+      // user artists
+      let config_1 = {
+        method: 'GET',
+        url: 'https://api.spotify.com/v1/me/following?type=artist',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${this.authCode.access_token}`
+        }
+      }
+      // user playlists
+      let config_2 = {
+        method: 'GET',
+        url: 'https://api.spotify.com/v1/me/playlists',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${this.authCode.access_token}`
+        }
+      }
+      // user albums
+      let config_3 = {
+        method: 'GET',
+        url: 'https://api.spotify.com/v1/me/albums',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${this.authCode.access_token}`
+        }
+      }
+
+      const TrackPromise = axios(config_0).then((res) => {
         let data = res.data
-        this.searchResponse = data.tracks.items
-        // console.log(this.searchResponse)
+        this.searchTracksResponse = data.items
+        // console.log(this.searchTracksResponse)
+      })
+      const ArtistPromise = axios(config_1).then((res) => {
+        let data = res.data
+        this.searchArtistsResponse = data.artists.items
+        // console.log(this.searchArtistsResponse)
+      })
+      const PlaylistPromise = axios(config_2).then((res) => {
+        let data = res.data
+        this.searchPlaylistsResponse = data.items
+        // console.log(this.searchPlaylistsResponse)
+      })
+      const AlbumPromise = axios(config_3).then((res) => {
+        let data = res.data
+        this.searchAlbumsResponse = data.items
+        // console.log(this.searchAlbumsResponse)
+      })
+      Promise.all([AlbumPromise, ArtistPromise, PlaylistPromise, TrackPromise]).then(() => {
+        this.loaded = false
       })
     },
     trigger_pop_up(up_or_down, data = null) {
-      console.log(data) //data.album.images 圖片  data.artists[] 歌手 data.name 名稱
+      // console.log(data) //data.album.images 圖片  data.artists[] 歌手 data.name 名稱
       if (!up_or_down) {
-        //不觸發 或是 取消觸發
+        // 不觸發 或是 取消觸發
+        // 還要取消Preview 的播歌
         this.popUpWindow = false
+        this.PausePreview()
         return
       }
-      //要觸發
+      // 要觸發
+      // 還要開始Preview播歌
       this.popUpWindow = true
       this.checkSong = {
         name: data.name,
         image: data.album.images[0].url,
         artists: data.artists
+        // mp3_url: data.preview_url
       }
+      //this.PlayPreview(this.checkSong.mp3_url)
+    },
+    // 新增新的歌曲
+    // TODO : 串點播API
+    AddNewSong() {
+      console.log('Add New Song to Start')
+      console.log(this.checkSong)
+      this.trigger_pop_up(false)
+    },
+    // 測試
+    TestClick() {
+      let config = {
+        method: 'GET',
+        url: `https://api.spotify.com/v1/search?query=a&type=album&limit=5`,
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${this.authCode.access_token}`
+        }
+      }
+      axios(config).then((res) => {
+        let data = res.data
+        console.log(data)
+      })
     },
     ...mapActions(UserStatus, ['checkAuth'])
   },
+  provide() {
+    return {
+      Trigger_Popup: this.trigger_pop_up
+    }
+  },
   mounted() {
     this.checkAuth()
-    this.searchItem('w', 30, 0)
+    this.searchUserItem()
   }
 }
 </script>
 
-<style>
+<style scoped>
 .TestContainer {
   width: 100%;
   height: 100%;
   position: relative;
 }
+
 .directionButton {
   height: 100%;
   margin: 15px 0px 0px 10px;
 }
+
 .searchButton {
   margin: 15px 10px 0px 10px;
 }
+
 .sortCard {
   margin: 5px 10px;
 }
-.songContainer {
-  margin: 5px 15px;
-  height: auto;
-  max-height: 400px;
-  display: flex;
-  flex-flow: row wrap;
-  justify-content: flex-start;
-}
+
 .TestFooter {
   width: 100%;
   height: 150px;
@@ -166,6 +251,7 @@ export default {
 
   /* border: solid 1px black; */
 }
+
 .TestCard {
   margin: 1px;
 }

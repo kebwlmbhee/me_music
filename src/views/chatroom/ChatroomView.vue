@@ -1,7 +1,9 @@
 <template>
   <div class="page-container">
     <div class="chat-container">
+      <!-- 如果有訊息才執行 -->
       <div class="messages-container" ref="chatMessages" v-if="messages.length > 0">
+        <!-- 給 message 設 index，遍歷它們並打印相關訊息 -->
         <div class="message" v-for="(message, index) in messages" :key="index">
           <div class="message-info">
             <div class="message-author">{{ message.author }}</div>
@@ -10,20 +12,24 @@
           <div class="message-text">{{ message.text }}</div>
         </div>
       </div>
+      <!-- 輸入表單 -->
       <div class="form-container">
         <form class="message-input" @submit.prevent="sendMessage">
           <input type="text" v-model="author" placeholder="Your name" />
           <input type="text" v-model="text" placeholder="Type your message here..." />
           <div class="announce-container">
+            <!-- checkbox 判定是否要發送公告 -->
             <div class="announce-label">
               <input type="checkbox" v-model="isAnnounce" id="announcement" />
             </div>
           </div>
           <button type="submit">Send</button>
         </form>
+        <!-- 公告按鈕 -->
         <div class="url-redirection">
           <button @click="redirectToUrl">Go to Announcement</button>
         </div>
+        <!-- 滾動至底端的按鈕 -->
         <div class="scroll-to-bottom" @click="scrollToBottom">Scroll to Bottom</div>
       </div>
     </div>
@@ -46,7 +52,10 @@ export default defineComponent({
       messages: []
     }
   },
+  // created 裡的程式碼都請保留
   created() {
+    // 在組件創建時註冊聊天室 Message 的監聽器，如果聊天室訊息變動
+    // 則會呼叫 onMessage 將變動寫入 data 裡的 messages 陣列，並顯示在前端
     new Promise((resolve) => {
       chatroom.onMessage((messages) => {
         this.messages = messages
@@ -55,9 +64,14 @@ export default defineComponent({
     })
   },
   methods: {
+    // 點擊 Go to Announcement 按鍵時會開新分頁
+    // 前端應該不必保留此 method
     redirectToUrl() {
       window.open('/homepage', '_blank')
     },
+    // 滑動到最底端，可以考慮一開始就先讓程式執行此
+    // 讓使用者一開始就會在聊天室底端，以查看最新訊息
+    // 可以找方法看能不能平滑下移(optional)
     scrollToBottom() {
       const chatMessages = this.$refs.chatMessages
       if (chatMessages) {
@@ -65,16 +79,20 @@ export default defineComponent({
         chatMessages.scrollTop = scrollHeight // 設置 scrollTop 屬性
       }
     },
+    // 發送訊息請呼叫此 method，這裡使用 form 表單
     sendMessage() {
+      // 可依需求修改，比如 author 為自動獲取 spotify，這行判斷就可刪
       if (!this.author) {
         alert('Please enter your name!')
         return
       }
+      // 看要不要讓使用者發送空訊息，不要的話就保留此判斷
       if (!this.text) {
         alert('message is empty!')
         return
       }
       chatroom.sendMessage(this.author, this.text, this.isAnnounce)
+      // 最後清除前端的 text，才不會發送後還留著訊息在輸入欄位
       this.text = ''
     }
   },
