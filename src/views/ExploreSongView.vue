@@ -53,7 +53,7 @@
     <!-- Playlist -->
     <v-list v-if="type == 'playlist'" class="overflow-auto">
       <v-list-item v-for="(item, index) in allData.tracks.items" :key="index">
-        <v-card flat border>
+        <v-card flat border @click="PlayPreview(item.track.preview_url)">
           <div class="d-flex flex-nowrap flex-row justify-start align-center">
             <v-avatar rounded="0" size="90" class="ma-3">
               <v-img
@@ -68,15 +68,18 @@
               <v-card-actions>
                 <v-btn
                   border
-                  icon="mdi-play"
-                  size="x-small"
-                  @click="PlayPreview(item.track.preview_url)"
-                ></v-btn>
-                <v-btn
-                  border
                   icon="mdi-plus"
                   size="x-small"
-                  @click="clickOneSong(item.track.id)"
+                  @click.stop="
+                    AddMusic(
+                      item.id,
+                      item.track.artists[0].name,
+                      item.track.name,
+                      item.track.preview_url,
+                      item.track.album.images[0].url,
+                      item.track.album.name
+                    )
+                  "
                 ></v-btn>
               </v-card-actions>
             </div>
@@ -94,7 +97,7 @@
     <!-- Album -->
     <v-list v-else-if="type == 'album'" class="overflow-auto">
       <v-list-item v-for="(item, index) in allData.tracks.items" :key="index">
-        <v-card flat border>
+        <v-card flat border @click="PlayPreview(item.preview_url)">
           <div class="d-flex flex-nowrap flex-row justify-start align-center">
             <v-avatar rounded="0" size="90" class="ma-3">
               <v-img :src="allData.images[0].url" alt="Not Found"></v-img>
@@ -105,11 +108,19 @@
               <v-card-actions>
                 <v-btn
                   border
-                  icon="mdi-play"
+                  icon="mdi-plus"
                   size="x-small"
-                  @click="PlayPreview(item.preview_url)"
+                  @click.stop="
+                    AddMusic(
+                      item.id,
+                      item.artists[0].name,
+                      item.name,
+                      item.preview_url,
+                      allData.images[0].url,
+                      allData.name
+                    )
+                  "
                 ></v-btn>
-                <v-btn border icon="mdi-plus" size="x-small" @click="clickOneSong(item.id)"></v-btn>
               </v-card-actions>
             </div>
             <v-spacer></v-spacer>
@@ -123,7 +134,7 @@
     <!-- Artists -->
     <v-list v-else-if="type == 'artist'" class="overflow-auto">
       <v-list-item v-for="(item, index) in allData" :key="index">
-        <v-card flat border>
+        <v-card flat border @click="PlayPreview(item.preview_url)">
           <div class="d-flex flex-nowrap flex-row justify-start align-center">
             <v-avatar rounded="0" size="90" class="ma-3">
               <v-img :src="item.album.images[0].url" alt="Not Found"></v-img>
@@ -134,11 +145,19 @@
               <v-card-actions>
                 <v-btn
                   border
-                  icon="mdi-play"
+                  icon="mdi-plus"
                   size="x-small"
-                  @click="PlayPreview(item.preview_url)"
+                  @click.stop="
+                    AddMusic(
+                      item.id,
+                      item.artists[0].name,
+                      item.name,
+                      item.preview_url,
+                      item.album.images[0].url,
+                      item.album.name
+                    )
+                  "
                 ></v-btn>
-                <v-btn border icon="mdi-plus" size="x-small" @click="clickOneSong(item.id)"></v-btn>
               </v-card-actions>
             </div>
             <v-spacer></v-spacer>
@@ -158,7 +177,7 @@ import UserStatus from '@/stores/UserStatus'
 import axios from 'axios'
 
 export default {
-  inject: ['PlayPreview'],
+  inject: ['PlayPreview', 'AddMusic'],
   data() {
     return {
       allData: [],
@@ -171,7 +190,6 @@ export default {
     ...mapState(UserStatus, ['authCode', 'userProfile'])
   },
   methods: {
-    // TODO : Artist暫時無法做  因為沒辦法取得
     searchTypeRedirect(in_id, type) {
       this.loaded = true
       switch (type) {

@@ -23,6 +23,7 @@
           :type="'track'"
           :id="track.id"
           :preview_url="track.preview_url"
+          :album="track.album.name"
         />
       </v-list-item>
 
@@ -136,7 +137,7 @@ export default {
       const ArtistPromise = axios(config_1).then((res) => {
         let data = res.data
         this.searchArtistsResponse = data.artists.items
-        console.log(this.searchArtistsResponse)
+        // console.log(this.searchArtistsResponse)
       })
       const PlaylistPromise = axios(config_2).then((res) => {
         let data = res.data
