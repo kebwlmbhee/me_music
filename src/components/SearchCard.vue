@@ -16,8 +16,11 @@
         未提供播放
       </div>
       <v-card-actions v-if="type === 'track'">
-        <v-btn icon="mdi-plus" @click.stop="AddMusic(id, artist, Name, preview_url, imgSrc, album)">
-        </v-btn>
+        <v-btn
+          icon="mdi-plus"
+          @click.stop="AddMusic(id, artist, Name, preview_url, imgSrc, album)"
+        ></v-btn>
+        <v-btn icon="mdi-pause" @click.stop="PausePreview"></v-btn>
       </v-card-actions>
     </div>
   </v-card>
@@ -25,7 +28,7 @@
 
 <script>
 export default {
-  inject: ['PlayPreview', 'AddMusic'],
+  inject: ['PlayPreview', 'PausePreview', 'AddMusic'],
   props: {
     Name: String,
     imgSrc: String,

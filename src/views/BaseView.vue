@@ -155,9 +155,12 @@ export default {
     },
     // 使用Second Audio 預覽音樂
     PlayPreviewAudio(url) {
+      if (url == null) return
       // 控制Second Audio 播放
       // 當開始播放時 靜音MainAudio
       // 開始播放 Second Audio
+      var mainAudio = document.getElementById('mainAudio')
+      mainAudio.volume = 0.0
       console.log('Play Second Audio' + url)
       var secondAudio = document.getElementById('secondAudio')
       //if(!secondAudio.paused) secondAudio.pause();
@@ -168,6 +171,8 @@ export default {
     PausePreviewAudio() {
       // 當暫停時 使MainAudio靜音取消
       // 暫停播放 Second Audio
+      var mainAudio = document.getElementById('mainAudio')
+      mainAudio.volume = 1.0
       console.log('Pause Second Audio')
       var secondAudio = document.getElementById('secondAudio')
       secondAudio.pause()

@@ -81,6 +81,7 @@
                     )
                   "
                 ></v-btn>
+                <v-btn icon="mdi-pause" @click.stop="PausePreview"></v-btn>
               </v-card-actions>
             </div>
             <v-spacer></v-spacer>
@@ -121,6 +122,7 @@
                     )
                   "
                 ></v-btn>
+                <v-btn icon="mdi-pause" @click.stop="PausePreview"></v-btn>
               </v-card-actions>
             </div>
             <v-spacer></v-spacer>
@@ -158,6 +160,7 @@
                     )
                   "
                 ></v-btn>
+                <v-btn icon="mdi-pause" @click.stop="PausePreview"></v-btn>
               </v-card-actions>
             </div>
             <v-spacer></v-spacer>
@@ -177,7 +180,7 @@ import UserStatus from '@/stores/UserStatus'
 import axios from 'axios'
 
 export default {
-  inject: ['PlayPreview', 'AddMusic'],
+  inject: ['PlayPreview', 'PausePreview', 'AddMusic'],
   data() {
     return {
       allData: [],
