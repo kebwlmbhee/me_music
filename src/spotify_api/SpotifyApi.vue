@@ -52,6 +52,7 @@ export default {
             topTracks: [],  //getUserTopTracks  會有當前user最常聽的10首歌曲 (數量與時間段可改動)
             topArtists: [], //getUserTopArtists 會有當前user最常聽的3個歌手 (數量與時間段可改動)
             recentTracks: [],   //getRecentTracks   會有當前user最近聽的20首歌  (數量可改動)
+            albumTracks: [], //getAlbumTracks   會有指定album的所有tracks
             current_track_name: '',
             current_track_img: '',
         }
@@ -79,12 +80,12 @@ export default {
         },
 
         //獲取當前使用者的所有playlist
-        getUserPlaylists() {
+        getUserPlaylists(input) {
             let url = 'https://api.spotify.com/v1/me/playlists';
             let config = {
                 headers: {
                 "Content-Type": "application/json",
-                "Authorization": `Bearer ${this.authCode.access_token}`
+                "Authorization": `Bearer ${input}`
                 }
             };
             this.$http.get(url, config)
@@ -174,6 +175,23 @@ export default {
                 this.recentTracks = data.items; //結果會存在recentTracks裡面，可以用item.id, item.name, item.image調用不同內容
                 })
         },
+
+        //albumId是專輯的id，傳入專輯id，可以獲得專輯的所有歌曲
+        getAlbumTracks(albumId) {
+            let url = `https://api.spotify.com/v1/albums/${albumId}/tracks`;
+            let config = {
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${this.authCode.access_token}`
+                }
+            }
+            this.$http.get(url, config)
+                .then((res) => {
+                    let data = res.data;
+                    this.albumTracks = data.items;
+                })
+        },
+
 
 
         
