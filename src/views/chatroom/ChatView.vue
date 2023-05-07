@@ -1,6 +1,11 @@
 <template>
   <v-list>
-    <div v-for="(message, index) in this.allMessages" :key="index" class="text-center">
+    <div
+      v-for="(message, index) in this.allMessages"
+      :key="index"
+      class="text-center"
+      id="chat-container"
+    >
       <v-label v-if="checkTime(index)">{{ TimeStampToDateString(message.time) }}</v-label>
       <v-list-item>
         <template v-slot:prepend>
@@ -47,8 +52,15 @@ export default {
   },
   created() {
     // 發送時間: messages[].time    發信人: messages[].author  內容: messages[].text
-    chatroom.onMessage((messages) => {
-      this.allMessages = messages
+    let CP = new Promise(() => {
+      chatroom.onMessage((messages) => {
+        this.allMessages = messages
+      })
+    })
+    CP.then(() => {
+      setTimeout(() => {
+        this.ScrollToBottom()
+      }, 300)
     })
   },
   methods: {
@@ -78,7 +90,15 @@ export default {
       this.allMessages.push(newMessage)
       chatroom.sendMessage(this.userProfile.name, this.text, isAnnounce)
       this.text = ''
+    },
+    ScrollToBottom() {
+      var container = document.getElementById('chat-container')
+      if (container == null) return
+      container.scrollTop = container.scrollHeight
     }
+  },
+  watch: {
+    allMessages: 'ScrollToBottom'
   }
 }
 </script>
