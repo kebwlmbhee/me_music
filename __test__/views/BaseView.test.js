@@ -6,6 +6,7 @@ import { createTestingPinia } from '@pinia/testing'
 import BaseView from '@/views/BaseView.vue'
 
 describe('輸入測試標題', () => {
+    // https://pinia.vuejs.org/cookbook/testing.html#unit-testing-components
     let wrapper = mount(BaseView, {
         global: {
             plugins: [vuetify, router, createTestingPinia()],
