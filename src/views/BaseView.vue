@@ -80,7 +80,7 @@
 <script>
 import { mapState, mapActions } from 'pinia'
 import UserStatus from '@/stores/UserStatus'
-import MusicQueue from '@/stores/MusicQueue'
+import musicQueue from '/src/views/musicQ/musicQueue.js'
 
 import UserProfileButton from '../components/UserProfileButton.vue'
 
@@ -105,7 +105,14 @@ export default {
       SelectedPage: '大廳',
       isRouterAlive: true,
       MainMusic_url: '',
-      SecondMusic_url: ''
+      SecondMusic_url: '',
+
+      // Music Queue
+      musics: [],
+      delayedMessage: '',
+      playMusicTime: '',
+      // 測試參數
+      currentIndex: 0
     }
   },
   computed: {
@@ -130,21 +137,23 @@ export default {
         this.isRouterAlive = true
       }, 100)
     },
+    // 當音樂播放結束
     whenMusicEnded() {
-      // 當音樂播放結束
       console.log('music is ended')
-      var nextMusic = this.ShiftTheMusic()
-      if (nextMusic == null) {
-        return
-      }
-      this.MainMusic_url = nextMusic.mp3
-    },
-    WhenAddTheNewMusic() {
-      console.log('WhenAddTheNewMusic Start')
+      this.currentIndex += 1
       var mainAudio = document.getElementById('mainAudio')
-      if (!mainAudio.paused) return
-      this.MainMusic_url = this.ShiftTheMusic().mp3
+      mainAudio.src = this.musics[this.currentIndex].url
     },
+    // 新增音樂到musicQueue但 要提供資料ˊ ˇ ˋ
+    AddMusic(id, artist, songName, url, picture, album) {
+      if (url == null) return
+      this.musicQueue.addMusic(id, artist, songName, url, picture, album)
+
+      setTimeout(() => {
+        console.log(this.musics)
+      }, 2000)
+    },
+    // 使用Second Audio 預覽音樂
     PlayPreviewAudio(url) {
       // 控制Second Audio 播放
       // 當開始播放時 靜音MainAudio
@@ -155,6 +164,7 @@ export default {
       secondAudio.load()
       secondAudio.src = url
     },
+    // 暫停Second Audio 預覽音樂
     PausePreviewAudio() {
       // 當暫停時 使MainAudio靜音取消
       // 暫停播放 Second Audio
@@ -162,20 +172,41 @@ export default {
       var secondAudio = document.getElementById('secondAudio')
       secondAudio.pause()
     },
-    ...mapActions(UserStatus, ['checkAuth']),
-    ...mapActions(MusicQueue, ['ShiftTheMusic'])
+    ...mapActions(UserStatus, ['checkAuth'])
   },
   mounted() {
     setTimeout(() => {
       this.SelectedPage = this.$route.name
     }, 100)
     this.checkAuth()
-    /// TODO : 要先獲取當前的 MusicQueue 存儲 於FireBase
+    this.musicQueue = new musicQueue()
+    // 在組件創建時註冊 MusicQueue 的監聽器
+    // 實時獲取 musicQueue 資料
+    this.musicQueue.onMusic((musics) => {
+      this.musics = musics
+
+      // 時間判斷  但沒有時間 只能從第一首跑
+      this.currentIndex = 0
+      this.currentTime = Date.now()
+      // 播歌判斷
+      var mainAudio = document.getElementById('mainAudio')
+      mainAudio.src = this.musics[this.currentIndex].url
+    })
+    // 實時獲取訊息
+    this.musicQueue.onSwitchMusicNotification((message) => {
+      this.delayedMessage = message
+    })
+    // 取得時間使音樂同步
+    // 我不太懂為何要取得時間
+    this.musicQueue.getMusicPlayTime((startTime) => {
+      this.playMusicTime = startTime
+      console.log(this.playMusicTime)
+    })
   },
   provide() {
     return {
       Reload: this.reload,
-      AddMusic: this.WhenAddTheNewMusic,
+      AddMusic: this.AddMusic,
       PlayPreview: this.PlayPreviewAudio,
       PausePreview: this.PausePreviewAudio
     }
