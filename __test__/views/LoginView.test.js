@@ -2,7 +2,7 @@ import { describe, it, expect, vi } from "vitest";
 import { mount } from "@vue/test-utils";
 import vuetify from "@/plugins/vuetify";
 import router from "@/router";
-import LoginView from '@/views/LoginView.vue'
+import LoginView from '@/views/Login/LoginView.vue'
 
 describe('確認登入功能', () => {
     let wrapper = mount(LoginView, {
