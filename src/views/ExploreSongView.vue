@@ -66,11 +66,8 @@
               <v-card-title class="font-weight-bold">{{ item.track.name }}</v-card-title>
               <v-card-subtitle>{{ item.track.artists[0].name }}</v-card-subtitle>
               <v-card-actions>
-                <v-btn
-                  border
-                  icon="mdi-plus"
-                  size="x-small"
-                  @click.stop="
+                <v-btn border icon="mdi-plus" size="x-small"></v-btn>
+                <!-- @click.stop="
                     AddMusic(
                       item.id,
                       item.track.artists[0].name,
@@ -79,8 +76,7 @@
                       item.track.album.images[0].url,
                       item.track.album.name
                     )
-                  "
-                ></v-btn>
+                  " -->
                 <v-btn icon="mdi-pause" @click.stop="PausePreview"></v-btn>
               </v-card-actions>
             </div>
@@ -107,11 +103,8 @@
               <v-card-title class="font-weight-bold">{{ item.name }}</v-card-title>
               <v-card-subtitle>{{ item.artists[0].name }}</v-card-subtitle>
               <v-card-actions>
-                <v-btn
-                  border
-                  icon="mdi-plus"
-                  size="x-small"
-                  @click.stop="
+                <v-btn border icon="mdi-plus" size="x-small"></v-btn>
+                <!-- @click.stop="
                     AddMusic(
                       item.id,
                       item.artists[0].name,
@@ -120,8 +113,7 @@
                       allData.images[0].url,
                       allData.name
                     )
-                  "
-                ></v-btn>
+                  " -->
                 <v-btn icon="mdi-pause" @click.stop="PausePreview"></v-btn>
               </v-card-actions>
             </div>
@@ -145,11 +137,8 @@
               <v-card-title class="font-weight-bold">{{ item.name }}</v-card-title>
               <v-card-subtitle>{{ item.artists[0].name }}</v-card-subtitle>
               <v-card-actions>
-                <v-btn
-                  border
-                  icon="mdi-plus"
-                  size="x-small"
-                  @click.stop="
+                <v-btn border icon="mdi-plus" size="x-small"></v-btn>
+                <!-- @click.stop="
                     AddMusic(
                       item.id,
                       item.artists[0].name,
@@ -158,8 +147,7 @@
                       item.album.images[0].url,
                       item.album.name
                     )
-                  "
-                ></v-btn>
+                  " -->
                 <v-btn icon="mdi-pause" @click.stop="PausePreview"></v-btn>
               </v-card-actions>
             </div>
@@ -180,7 +168,7 @@ import UserStatus from '@/stores/UserStatus'
 import axios from 'axios'
 
 export default {
-  inject: ['PlayPreview', 'PausePreview', 'AddMusic'],
+  inject: ['PlayPreview', 'PausePreview'],
   data() {
     return {
       allData: [],

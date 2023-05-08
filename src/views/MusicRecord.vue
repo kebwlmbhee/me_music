@@ -15,7 +15,7 @@
     <v-card flat class="sortCard">
       <v-card-title class="font-weight-bold text-h3">
         {{ searchTab }}
-        <v-icon class="text-h6" color="lightgray" @click="Reload">mdi-reload</v-icon>
+        <v-icon class="text-h6" color="lightgray">mdi-reload</v-icon>
       </v-card-title>
       <v-card-actions>
         <v-btn>Last Month</v-btn>
@@ -81,7 +81,7 @@ import { mapState, mapActions } from 'pinia'
 import axios from 'axios'
 
 export default {
-  inject: ['Reload', 'AddMusic', 'PlayPreview', 'PausePreview'],
+  inject: ['PlayPreview', 'PausePreview'],
   data() {
     return {
       loaded: false,

@@ -7,6 +7,7 @@
         v-model="searchText"
         label="Search"
         variant="outlined"
+        @click:prepend="searchInputCallback"
         @keydown.enter="searchInputCallback"
       >
       </v-text-field>
@@ -70,7 +71,6 @@ import { mapState, mapActions } from 'pinia'
 import axios from 'axios'
 
 export default {
-  inject: ['AddMusic'],
   data() {
     return {
       loaded: false,
@@ -162,6 +162,10 @@ export default {
     },
     // 輸入的CallBack
     searchInputCallback() {
+      if (this.searchText == '') {
+        alert('搜尋不能為空')
+        return
+      }
       this.$router.push({
         path: '/Home/Search',
         query: { search: this.searchText }

@@ -16,10 +16,8 @@
         未提供播放
       </div>
       <v-card-actions v-if="type === 'track'">
-        <v-btn
-          icon="mdi-plus"
-          @click.stop="AddMusic(id, artist, Name, preview_url, imgSrc, album)"
-        ></v-btn>
+        <v-btn icon="mdi-plus"></v-btn>
+        <!-- @click.stop="AddMusic(id, artist, Name, preview_url, imgSrc, album)" -->
         <v-btn icon="mdi-pause" @click.stop="PausePreview"></v-btn>
       </v-card-actions>
     </div>
@@ -28,7 +26,7 @@
 
 <script>
 export default {
-  inject: ['PlayPreview', 'PausePreview', 'AddMusic'],
+  inject: ['PlayPreview', 'PausePreview'],
   props: {
     Name: String,
     imgSrc: String,
@@ -50,10 +48,6 @@ export default {
           query: { id: this.id, type: this.type }
         })
       }
-    },
-    AddToMusicQueue() {
-      if (this.preview_url == null) return
-      // this.AddMusic(this.id, this.artist, this.Name, this.preview_url, this.imgSrc, this.album)
     }
   }
 }
