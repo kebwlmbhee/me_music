@@ -31,6 +31,7 @@ describe('chatroom.js', () => {
 
     // 每個單一測試前呼叫
     beforeEach(() => {
+        
         chatroom = new Chatroom();
 
         // mock firebase function
@@ -79,10 +80,12 @@ describe('chatroom.js', () => {
     })
 
     it('Chatroom class 存在', () => {
+
         expect(chatroom).toBeDefined();
     })
 
     describe('Chatroom attribute', () => {
+
         it('chatroomRef 初始化', () => {
             expect(chatroom.chatroomRef).toStrictEqual(ref(db, 'chatroom'));
         });
@@ -97,6 +100,7 @@ describe('chatroom.js', () => {
         describe('sendMessage function', () => {
 
             it('聊天室傳入訊息', () => {
+
                 const author = 'John';
                 const text = 'Hello, world!';
                 const isAnnounce = true;
@@ -117,6 +121,7 @@ describe('chatroom.js', () => {
             })
 
             it('正常發送公告', () => {
+
                 chatroom.sendMessage('John', 'Hello', true);
 
                 // 模擬 push 方法的返回值
@@ -150,6 +155,7 @@ describe('chatroom.js', () => {
             })
 
             it('不發送公告', () => {
+
                 chatroom.sendMessage('John', 'Hello', false);
                 // push 方法不應該被呼叫
                 expect(push).not.toHaveBeenCalledWith(chatroom.announcementRef);
@@ -162,6 +168,7 @@ describe('chatroom.js', () => {
         describe('onMessage function', () => {
 
             it('實時獲取聊天室的訊息變更', () => {
+
                 chatroom.onMessage((messages) => {
                     this.messages = messages
                 })
@@ -215,6 +222,7 @@ describe('chatroom.js', () => {
         })
 
         describe('getTimeString function', () => {
+
             it('時間格式是否正確', () => {
                 // 取得現在時戳
                 const timestamp = Date.now();
