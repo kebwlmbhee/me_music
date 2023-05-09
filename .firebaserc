@@ -1,8 +1,5 @@
 {
   "projects": {
-    "default": "memusic-97d9b",
-    "memusic": "memusic-97d9b"
-  },
-  "targets": {},
-  "etags": {}
+    "default": "memusic-97d9b"
+  }
 }
