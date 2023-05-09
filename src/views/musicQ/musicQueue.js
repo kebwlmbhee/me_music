@@ -77,11 +77,13 @@ class musicQueue {
 
   // 手動切歌
   replaceMusic(firstMusic, targetMusic) {
+    const toBeRemovedMusic = targetMusic
+    this.removeMusic(toBeRemovedMusic)
+
+    // 將 firstMusic 的 key 賦值給 targetMusic
     targetMusic.key = firstMusic.key
-    console.log('手動切歌')
-    console.log(targetMusic.key)
+    // 替換歌曲
     update(ref(db, `/musicQueue/${firstMusic.key}`), targetMusic)
-    this.removeMusic(targetMusic)
   }
 
   // 手動切歌的公告寫入 firebase(TODO: 彈窗顯示)
