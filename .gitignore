@@ -29,4 +29,5 @@ package-lock.json
 *.sw?
 
 # firebase cache
-.firebase
+.firebase/
+*.cache
