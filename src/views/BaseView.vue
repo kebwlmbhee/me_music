@@ -54,7 +54,7 @@
     </v-app-bar>
 
     <!-- 右邊的東東 -->
-    <v-navigation-drawer location="right" permanent color="grey-lighten-3">
+    <v-navigation-drawer location="right" permanent color="grey-lighten-3   ">
       <music-que />
       <div>
         <audio
@@ -193,12 +193,12 @@ export default {
     // 當音樂播放結束
     whenMusicEnded() {
       // var mainAudio = document.getElementById('mainAudio')
-      if (this.currentMusic === this.musics[0]) {
+      if (this.MainMusic_url === this.musics[0].url) {
         this.musicQueue
-          .removeMusicTransaction(this.currentMusic)
+          .removeMusicTransaction(this.musics[0])
           .then(() => {
             // this.showNextMusicMessage()
-            console.log('歌曲播放完畢')
+            console.log('歌曲播放完畢2')
           })
           .catch((error) => {
             alert(error)
@@ -211,12 +211,11 @@ export default {
         // 確定當前歌曲沒有被切掉，切掉要 return
         if (newMusic !== this.musics[0]) return
         // TODO(前端): console.log() 應替換為播放歌曲的 code
-        console.log(this.musics[0])
-        var mainAudio = document.getElementById('mainAudio')
-        mainAudio.src = this.musics[0].url
+        console.log(`playReplacedMusic`)
+        this.MainMusic_url = this.musics[0].url
         // 歌曲播放時記錄播放時戳
         this.musicQueue.setTransactionMusicPlayTime(Date.now())
-      }, 100)
+      }, 3000)
     },
     DialogCallback() {
       // music Queue
@@ -226,17 +225,13 @@ export default {
         var mainAudio = document.getElementById('mainAudio')
         this.playMusicTime = startTime
         mainAudio.currentTime = this.playMusicTime
-        console.log(`this.playMusicTime = ${this.playMusicTime}`)
       })
 
       // 在組件創建時註冊 MusicQueue 的監聽器
       // 實時獲取 musicQueue 資料
       this.musicQueue.onMusic((musics) => {
-        var mainAudio = document.getElementById('mainAudio')
         this.musics = musics
-        this.currentMusic = this.musics[0]
-        mainAudio.src = this.musics[0].url
-        mainAudio.play()
+        console.log('this is on music')
       })
 
       // 實時獲取訊息
@@ -270,6 +265,11 @@ export default {
           this.playReplacedMusic(newVal[0])
         } else if (!newVal) {
           this.musicQueue.setTransactionMusicPlayTime(0)
+        } else if (!oldVal[0] && newVal) {
+          // 代表目前musicQueue為空
+          // 然後新增歌曲
+          console.log('目前沒歌, 然後新增歌, 故 播新的第一首')
+          this.MainMusic_url = newVal[0].url
         }
       },
       // 初始化的變動不會響應 watch
