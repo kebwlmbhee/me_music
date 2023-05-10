@@ -18,6 +18,7 @@
   </v-list>
   <v-footer app height="60">
     <v-text-field
+      data-test="chatroom-input"
       v-model="text"
       bg-color="grey-lighten-1"
       class="rounded-pill overflow-hidden"
