@@ -12,7 +12,7 @@ import {
   get
 } from 'firebase/database'
 import { getAuth } from 'firebase/auth'
-import firebaseConfig from '/.firebase/firebaseInfo.js'
+import firebaseConfig from '.firebase/firebaseInfo.js'
 
 const app = initializeApp(firebaseConfig)
 const auth = getAuth(app)
