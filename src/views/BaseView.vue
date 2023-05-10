@@ -31,6 +31,7 @@
             }
           "
           :data-test="explore.title"
+          border
         >
           <v-list-item-title class="text-left font-weight-black">{{
             explore.title
@@ -40,7 +41,7 @@
     </v-navigation-drawer>
 
     <!-- 右中-上 -->
-    <v-app-bar class="px-2" color="grey-lighten-4" flat height="72">
+    <v-app-bar class="px-2" color="grey-lighten-3" flat height="72">
       <v-app-bar-title class="font-weight-bold">#{{ SelectedPage }}</v-app-bar-title>
       <v-spacer></v-spacer>
       <v-btn class="ma-3 font-weight-bold" border @click="MuteButtonControl">{{
@@ -53,7 +54,7 @@
     </v-app-bar>
 
     <!-- 右邊的東東 -->
-    <v-navigation-drawer location="right" permanent>
+    <v-navigation-drawer location="right" permanent color="grey-lighten-3">
       <music-que />
       <div>
         <audio
@@ -71,7 +72,7 @@
     <v-main>
       <router-view></router-view>
     </v-main>
-
+    <!-- 跳彈窗 -->
     <v-dialog v-model="dialog" width="auto">
       <v-card>
         <v-card-text> Welcome to the clickLobby </v-card-text>
