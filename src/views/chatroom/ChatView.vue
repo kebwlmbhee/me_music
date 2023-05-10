@@ -1,5 +1,7 @@
 <template>
-  <v-app>
+  <v-app v-if="isTesting" />
+
+  <div v-if="!isTesting">
     <v-list>
       <div
         v-for="(message, index) in this.allMessages"
@@ -30,7 +32,7 @@
         @keydown.enter="SendMessage"
       ></v-text-field>
     </v-footer>
-  </v-app>
+  </div>
 </template>
 
 <script>
@@ -41,21 +43,26 @@ import Chatroom from './chatroom.js'
 const chatroom = new Chatroom()
 
 export default {
-  name: 'ChatRoom',
   data() {
     return {
-      currentTime: Date,
       text: '',
       allMessages: []
+    }
+  },
+  props: {
+    isTesting: {
+      type: Boolean,
+      default: false
     }
   },
   computed: {
     ...mapState(UserStatus, ['userProfile'])
   },
   created() {
+    this.chatroom = chatroom
     // 發送時間: messages[].time    發信人: messages[].author  內容: messages[].text
     let CP = new Promise(() => {
-      chatroom.onMessage((messages) => {
+      this.chatroom.onMessage((messages) => {
         this.allMessages = messages
       })
     })
@@ -76,11 +83,15 @@ export default {
       else return false
     },
     TimeStampToDateString(timeStamp) {
-      return chatroom.getTimeString(timeStamp)
+      return this.chatroom.getTimeString(timeStamp)
     },
     SendMessage(isAnnounce = false) {
       if (!this.text) {
         alert('message is empty!')
+        return
+      }
+      if (this.userProfile.name == '') {
+        alert('沒有姓名, 可能需要重新登入')
         return
       }
       const newMessage = {
@@ -89,7 +100,7 @@ export default {
         isAnnounce: isAnnounce
       }
       this.allMessages.push(newMessage)
-      chatroom.sendMessage(this.userProfile.name, this.text, isAnnounce)
+      this.chatroom.sendMessage(this.userProfile.name, this.text, isAnnounce)
       this.text = ''
     },
     ScrollToBottom() {
@@ -97,9 +108,6 @@ export default {
       if (container == null) return
       container.scrollTop = container.scrollHeight
     }
-  },
-  mounted() {
-    this.chatroom = chatroom
   }
 }
 </script>
