@@ -16,8 +16,7 @@
         未提供播放
       </div>
       <v-card-actions v-if="type === 'track'">
-        <v-btn icon="mdi-plus"></v-btn>
-        <!-- @click.stop="AddMusic(id, artist, Name, preview_url, imgSrc, album)" -->
+        <v-btn icon="mdi-plus" @click.stop="clickAdd"></v-btn>
         <v-btn icon="mdi-pause" @click.stop="PausePreview"></v-btn>
       </v-card-actions>
     </div>
@@ -25,6 +24,9 @@
 </template>
 
 <script>
+import { mapState, mapActions } from 'pinia'
+import UserStatus from '@/stores/UserStatus'
+import AudioControl from '@/stores/AudioControl'
 export default {
   inject: ['PlayPreview', 'PausePreview'],
   props: {
@@ -34,13 +36,15 @@ export default {
     id: String,
     type: String,
     preview_url: String,
-    album: String
+    album: {}
+  },
+  computed: {
+    ...mapState(UserStatus, ['authCode'])
   },
   methods: {
     clickPlayPreview() {
       if (this.type === 'track') {
-        if (this.preview_url == null) return
-
+        if (this.preview_url == null) alert('沒有提供這首歌')
         this.PlayPreview(this.preview_url)
       } else {
         this.$router.push({
@@ -48,7 +52,23 @@ export default {
           query: { id: this.id, type: this.type }
         })
       }
-    }
+    },
+    clickAdd() {
+      if (this.preview_url == null) {
+        alert('沒有提供這首歌')
+        return
+      }
+      this.stateUpdateWithData(
+        this.id,
+        this.artist,
+        this.Name,
+        this.preview_url,
+        this.imgSrc,
+        this.album
+      )
+      this.addQue()
+    },
+    ...mapActions(AudioControl, ['addQue', 'UseTrackIdStateUpdate', 'stateUpdateWithData'])
   }
 }
 </script>
