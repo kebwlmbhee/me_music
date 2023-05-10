@@ -12,30 +12,38 @@
           :key="index"
           :value="item"
           :height="80"
-          @click.stop
+          :active="false"
         >
-          <!-- Music Image -->
-          <template v-slot:prepend>
-            <div class="img">
-              <v-img :src="item.picture" :width="50"></v-img>
+          <div class="d-flex" id="listItem">
+            <!-- Music Image -->
+            <v-list-item-avatar>
+              <v-img :src="item.picture" :width="50"></v-img
+            ></v-list-item-avatar>
+            <!-- Music Title -->
+            <div class="d-flex flex-column pl-5">
+              <v-list-item-title> {{ item.songName }}</v-list-item-title>
+              <!-- Music Artist -->
+              <v-list-item-subtitle>{{ item.artist }}</v-list-item-subtitle>
+              <!-- divider -->
+              <v-divider></v-divider>
             </div>
-          </template>
-          <!-- Music Title -->
-          <v-list-item-title> {{ item.songName }}</v-list-item-title>
-          <!-- Music Artist -->
-          <v-list-item-subtitle>{{ item.artist }}</v-list-item-subtitle>
-          <!-- divider -->
-          <v-divider></v-divider>
+          </div>
           <!-- overlay -->
-          <v-overlay activator="parent" contained class="align-center justify-center">
-            <v-btn variant="flat" @click="changeTrack">切換到這一首歌</v-btn>
+          <v-overlay
+            activator="parent"
+            class="align-center justify-center"
+            contained
+            scrim="#00ACC1"
+          >
+            <v-btn variant="flat" @click="switchTrack(index)" :disabled="isDisabled(index)">
+              {{ index === 0 ? state.firstText : state.otherText }}
+            </v-btn>
           </v-overlay>
         </v-list-item>
       </v-list>
     </div>
-    <v-snackbar v-model="state.snackbar" :timeout="state.timeout">
-      {{ state.text }}
-
+    <v-snackbar v-model="state.snackbar" :timeout="-1">
+      {{ state.snackbarMsg }}
       <template v-slot:actions>
         <v-btn color="blue" variant="text" @click="state.snackbar = false"> Close </v-btn>
       </template>
@@ -48,26 +56,99 @@
 import { reactive } from 'vue'
 import musicQueue from '/src/views/musicQ/musicQueue.js'
 import AudioControl from '../../stores/AudioControl'
+const musicQue = new musicQueue()
 
 export default {
   setup() {
     const audio = reactive(AudioControl())
 
     const state = reactive({
+      // 控制切歌button
+      firstText: '正在播放',
+      otherText: '切換到這一首歌',
+      switching: false,
+
+      // 控制snackbar顯示
       snackbar: false,
-      text: 'test',
-      timeout: 2000
+      snackbarMsg: '',
+      timeout: 3000,
+      timeLeft: 3,
+      intervalId: function none() {},
+      recentLength: 0
     })
-    const musicQue = new musicQueue()
+
     musicQue.onMusic((musics) => {
       audio.musics = musics
-      //console.log(state.musics)
+
+      if (state.recentLength === 0 || state.recentLength < musics.length) {
+        state.recentLength = musics.length
+      }
+
+      if (state.recentLength > musics.length && musics.length != 0) {
+        // 將當前長度放到變數recentLength
+        state.recentLength = musics.length
+        clearInterval(state.intervalId)
+        state.switching = true
+        //console.log(index)
+
+        state.timeLeft = 3
+
+        state.snackbarMsg = `即將播放： ${musics[0].artist} - ${musics[0].songName}   (${state.timeLeft})`
+        state.snackbar = true
+
+        state.intervalId = setInterval(() => {
+          if (state.timeLeft > 1) {
+            state.timeLeft--
+            state.snackbarMsg = `即將播放： ${musics[0].artist} - ${musics[0].songName}   (${state.timeLeft})`
+          } else {
+            state.switching = false
+            state.snackbar = false
+            clearInterval(state.intervalId)
+          }
+        }, 1000)
+      }
     })
 
-    function changeTrack() {}
+    function switchTrack(index) {
+      // clearInterval(state.intervalId)
 
+      // state.switching = true
+      //console.log(index)
+      audio.switchMusic(index)
+      // state.timeLeft = 3
+      // state.snackbarMsg = `${audio.snackbarMsg}  (${state.timeLeft})`
+      // state.snackbar = true
+
+      // state.intervalId = setInterval(() => {
+      //   if (state.timeLeft > 1) {
+      //     state.timeLeft--;
+      //     state.snackbarMsg = `${audio.snackbarMsg}  (${state.timeLeft})`
+      //   } else {
+      //     state.switching = false
+      //     state.snackbar = false
+      //     clearInterval(state.intervalId)
+      //   }
+      // }, 1000)
+    }
+
+    function isDisabled(index) {
+      // 加入 3 秒cooldown
+      // return index === 0 || state.switching
+      return index === 0
+    }
+
+    /*
+    watchEffect(() => {
+      setInterval(() => {
+        state.snackbarMsg = `${audio.snackbarMsg}  (${state.timeLeft})`
+        if(state.timeLeft > 0){
+          state.timeLeft--;
+        }
+      }, 1000)
+    })
+*/
     //console.log(state)
-    return { audio, state, changeTrack }
+    return { audio, state, switchTrack, isDisabled }
   }
 }
 </script>

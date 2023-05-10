@@ -44,10 +44,10 @@ export default defineStore('AudioControl ', {
         picture: data.album.images[0].url,
         album: data.album
       }
-      // console.log(temp)
+      console.log(temp)
       this.nowChecking = temp
     },
-    cutMusic(index) {
+    switchMusic(index) {
       // 按下 musicQueue 第一首歌時不響應(第一首歌應該正在播放)
       if (index === 0) {
         console.log(`the first music is already playing NOW.`)
