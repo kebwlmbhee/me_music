@@ -35,7 +35,7 @@
             contained
             scrim="#00ACC1"
           >
-            <v-btn variant="flat" @click="switchTrack(index)" :disabled="isDisabled(index)">
+            <v-btn variant="flat" @click="audio.switchMusic(index)" :disabled="isDisabled(index)">
               {{ index === 0 ? state.firstText : state.otherText }}
             </v-btn>
           </v-overlay>
@@ -63,92 +63,61 @@ export default {
     const audio = reactive(AudioControl())
 
     const state = reactive({
-      // 控制切歌button
+      // control switch button
       firstText: '正在播放',
       otherText: '切換到這一首歌',
       switching: false,
-
-      // 控制snackbar顯示
+      // control snackbar display
       snackbar: false,
       snackbarMsg: '',
       timeout: 3000,
       timeLeft: 3,
       intervalId: function none() {},
-      recentLength: 0
+      first_timestamp: ''
     })
 
+    // when musics diff, doing snackbar
     musicQue.onMusic((musics) => {
+      //  store "musics"  intto pinia/AudioControl
       audio.musics = musics
-
-      if (state.recentLength === 0 || state.recentLength < musics.length) {
-        state.recentLength = musics.length
+      if (state.first_timestamp === '') {
+        // record First_timestamp
+        state.first_timestamp = `${audio.musics[0].timestamp}`
       }
-
-      if (state.recentLength > musics.length && musics.length != 0) {
-        // 將當前長度放到變數recentLength
-        state.recentLength = musics.length
+      // determine is first music diff
+      if (state.first_timestamp != audio.musics[0].timestamp && audio.musics.length != 0) {
         clearInterval(state.intervalId)
+        state.first_timestamp = audio.musics[0].timestamp
+        // if is switching, disable all button, not employee
         state.switching = true
-        //console.log(index)
-
         state.timeLeft = 3
-
-        state.snackbarMsg = `即將播放： ${musics[0].artist} - ${musics[0].songName}   (${state.timeLeft})`
+        state.snackbarMsg = `即將播放： ${audio.musics[0].artist} - ${audio.musics[0].songName}   (${state.timeLeft})`
         state.snackbar = true
 
+        // minus timeLeft per second
         state.intervalId = setInterval(() => {
           if (state.timeLeft > 1) {
             state.timeLeft--
-            state.snackbarMsg = `即將播放： ${musics[0].artist} - ${musics[0].songName}   (${state.timeLeft})`
+            state.snackbarMsg = `即將播放： ${audio.musics[0].artist} - ${audio.musics[0].songName}   (${state.timeLeft})`
           } else {
             state.switching = false
             state.snackbar = false
+            // if (timeLeft < 1) delete state.intervalId => stop counter
             clearInterval(state.intervalId)
           }
         }, 1000)
       }
     })
 
-    function switchTrack(index) {
-      // clearInterval(state.intervalId)
-
-      // state.switching = true
-      //console.log(index)
-      audio.switchMusic(index)
-      // state.timeLeft = 3
-      // state.snackbarMsg = `${audio.snackbarMsg}  (${state.timeLeft})`
-      // state.snackbar = true
-
-      // state.intervalId = setInterval(() => {
-      //   if (state.timeLeft > 1) {
-      //     state.timeLeft--;
-      //     state.snackbarMsg = `${audio.snackbarMsg}  (${state.timeLeft})`
-      //   } else {
-      //     state.switching = false
-      //     state.snackbar = false
-      //     clearInterval(state.intervalId)
-      //   }
-      // }, 1000)
-    }
-
     function isDisabled(index) {
-      // 加入 3 秒cooldown
+      // switch music has 3-seconds cooldown
       // return index === 0 || state.switching
+
+      // can't switch to first music
       return index === 0
     }
 
-    /*
-    watchEffect(() => {
-      setInterval(() => {
-        state.snackbarMsg = `${audio.snackbarMsg}  (${state.timeLeft})`
-        if(state.timeLeft > 0){
-          state.timeLeft--;
-        }
-      }, 1000)
-    })
-*/
-    //console.log(state)
-    return { audio, state, switchTrack, isDisabled }
+    return { audio, state, isDisabled }
   }
 }
 </script>
