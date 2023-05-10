@@ -21,7 +21,6 @@ class Chatroom {
       const announcement = push(this.announcementRef)
       const announcementId = announcement.key
       newMessage.id = announcementId
-      console.log(newMessage.id)
       set(announcement, newMessage)
     }
   }
@@ -54,8 +53,6 @@ class Chatroom {
 
   // 移除多餘的公告，因為上限 10 筆，如果超過 10 筆，就要調用此 function 移除最舊的公告
   removeAnnouncement(announcement) {
-    console.log(announcement)
-    console.log(announcement.id)
     remove(ref(db, `/announcement/${announcement.id}`))
   }
 

@@ -2,7 +2,7 @@ import { describe, it, expect} from "vitest";
 import { mount } from "@vue/test-utils";
 import vuetify from "@/plugins/vuetify";
 import router from "@/router";
-import CallbackView from '@/views/CallbackView.vue'
+import CallbackView from '@/views/Login/CallbackView.vue'
 
 describe('輸入測試標題', () => { 
     let wrapper = mount(CallbackView, {

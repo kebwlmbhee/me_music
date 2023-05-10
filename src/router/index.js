@@ -1,7 +1,7 @@
 // Why not createWebHistory? Spotify auth callback will not provide /#/ in URL
 import { createRouter, createWebHistory } from 'vue-router'
-import LoginView from '../views/LoginView.vue'
-import CallbackView from '../views/CallbackView.vue'
+import LoginView from '../views/Login/LoginView.vue'
+import CallbackView from '../views/Login/CallbackView.vue'
 import NotFoundView from '../views/NotFoundView.vue'
 
 import Base from '../views/BaseView.vue'
