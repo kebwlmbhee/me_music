@@ -35,9 +35,8 @@
 import { mapState } from 'pinia'
 import UserStatus from '@/stores/UserStatus'
 
-import { db } from '../../firebaseConf.js'
 import Chatroom from './chatroom.js'
-const chatroom = new Chatroom(db)
+const chatroom = new Chatroom()
 
 export default {
   name: 'ChatRoom',
@@ -85,7 +84,6 @@ export default {
       const newMessage = {
         author: this.userProfile.name,
         text: this.text,
-        time: Date.now(),
         isAnnounce: isAnnounce
       }
       this.allMessages.push(newMessage)
@@ -98,8 +96,8 @@ export default {
       container.scrollTop = container.scrollHeight
     }
   },
-  watch: {
-    allMessages: 'ScrollToBottom'
+  mounted() {
+    this.chatroom = chatroom
   }
 }
 </script>
