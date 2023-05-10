@@ -71,6 +71,7 @@ import { mapState, mapActions } from 'pinia'
 import axios from 'axios'
 
 export default {
+  inject: ['PausePreview'],
   data() {
     return {
       loaded: false,

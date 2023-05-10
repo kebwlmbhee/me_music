@@ -3,10 +3,10 @@
     <!-- 最上方搜尋按鈕處 -->
     <v-app-bar flat>
       <v-tabs v-model="searchTab" align-tabs="title" data-test="select-type-btn">
-        <v-tab value="0">歌曲</v-tab>
-        <v-tab value="1">歌手</v-tab>
-        <v-tab value="2">播放清單</v-tab>
-        <v-tab value="3">專輯</v-tab>
+        <v-tab value="歌曲">歌曲</v-tab>
+        <v-tab value="歌手">歌手</v-tab>
+        <v-tab value="播放清單">播放清單</v-tab>
+        <v-tab value="專輯">專輯</v-tab>
       </v-tabs>
     </v-app-bar>
     <v-divider color="black" class="border-opacity-70"></v-divider>
