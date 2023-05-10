@@ -67,9 +67,9 @@ class musicQueue {
   }
 
   onMusicTop() {
-    // 监听 musicQueueRef 路径下的子节点变化
+    // 監聽 musicQueueRef 路徑下的子節點變化
     this.musicQueueRef.on('child_changed', (snapshot) => {
-      // 获取第一个子节点的值
+      // 獲取第一個子節點的值
       const firstChild = snapshot.val()[Object.keys(snapshot.val())[0]]
       console.log('MusicQueueTop：', firstChild)
     })
@@ -77,11 +77,13 @@ class musicQueue {
 
   // 手動切歌
   replaceMusic(firstMusic, targetMusic) {
+    const toBeRemovedMusic = targetMusic
+    this.removeMusic(toBeRemovedMusic)
+
+    // 將 firstMusic 的 key 賦值給 targetMusic
     targetMusic.key = firstMusic.key
-    console.log('手動切歌')
-    console.log(targetMusic.key)
+    // 替換歌曲
     update(ref(db, `/musicQueue/${firstMusic.key}`), targetMusic)
-    this.removeMusic(targetMusic)
   }
 
   // 手動切歌的公告寫入 firebase(TODO: 彈窗顯示)
