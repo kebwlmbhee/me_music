@@ -1,9 +1,11 @@
 <template>
   <div v-if="!loaded" class="ExploreContainer ma-3">
     <v-text-field
+      prepend-icon="mdi-magnify"
       v-model="search"
       label="Search"
       variant="underlined"
+      @click:prepend="searchCallback"
       @keydown.enter="searchCallback"
     >
     </v-text-field>
@@ -16,18 +18,6 @@
           @click="clickPlaylist(item.id, 'playlist')"
           :description="item.description"
           :playlistTracks="item.tracks.href"
-        />
-      </div>
-    </div>
-
-    <h2>推薦電台</h2>
-    <div class="w-100 d-flex flex-row flex-nowrap overflow-x-auto">
-      <div v-for="(show, index) in shows" :key="index">
-        <PlayListCard
-          :imgSrc="show.images[0].url"
-          :playlistName="show.name"
-          @click="clickPlaylist(show.id, 'show')"
-          :description="show.description"
         />
       </div>
     </div>
@@ -64,6 +54,7 @@ import UserStatus from '@/stores/UserStatus'
 import axios from 'axios'
 
 export default {
+  inject: ['PausePreview'],
   data() {
     return {
       loaded: false,
@@ -86,10 +77,9 @@ export default {
     runSearch() {
       this.loaded = true
       const playlistPromise = this.searchPlayList()
-      const showPromise = this.searchShow()
       const artistPromise = this.searchArtist()
 
-      Promise.all([playlistPromise, showPromise, artistPromise]).then(() => {
+      Promise.all([playlistPromise, artistPromise]).then(() => {
         this.loaded = false
       })
     },
@@ -101,6 +91,10 @@ export default {
       })
     },
     searchCallback() {
+      if (this.search == '') {
+        alert('搜尋不能為空')
+        return
+      }
       this.$router.push({
         path: '/Home/Search',
         query: { search: this.search }
@@ -123,23 +117,6 @@ export default {
         })
       })
     },
-    // 找電台?
-    searchShow() {
-      let config = {
-        method: 'GET',
-        url: 'https://api.spotify.com/v1/search?query=t&type=show&offset=0&limit=10',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${this.authCode.access_token}`
-        }
-      }
-      return new Promise((resolve) => {
-        axios(config).then((res) => {
-          this.shows = res.data.shows.items
-          resolve(true)
-        })
-      })
-    },
     // 找歌手
     searchArtist() {
       let config = {
@@ -158,7 +135,8 @@ export default {
       })
     }
   },
-  mounted() {
+  created() {
+    this.PausePreview()
     this.runSearch()
   }
 }
