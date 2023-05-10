@@ -24,7 +24,7 @@
           :type="'track'"
           :id="track.id"
           :preview_url="track.preview_url"
-          :album="track.album.name"
+          :album="track.album"
         />
       </v-list-item>
 
@@ -33,7 +33,7 @@
         <SearchCard
           :Name="artist.name"
           :artist="artist.genres.join(',')"
-          :imgSrc="artist.images[0].url"
+          :imgSrc="artist.images.length == 0 ? null : artist.images[0].url"
           :type="'artist'"
           :id="artist.id"
         />
@@ -174,8 +174,9 @@ export default {
     },
     ...mapActions(UserStatus, ['checkAuth'])
   },
-  mounted() {
+  created() {
     this.checkAuth()
+    this.PausePreview()
     let query = this.$route.query.search
     this.searchText = query
     if (!query) query = 'a'
