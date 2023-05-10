@@ -1,34 +1,36 @@
 <template>
-  <v-list>
-    <div
-      v-for="(message, index) in this.allMessages"
-      :key="index"
-      class="text-center"
-      id="chat-container"
-    >
-      <v-label v-if="checkTime(index)">{{ TimeStampToDateString(message.time) }}</v-label>
-      <v-list-item>
-        <template v-slot:prepend>
-          <v-avatar color="brown">{{ message.author[0] }}</v-avatar>
-        </template>
-        <v-list-item-subtitle class="text-left">{{ message.author }}</v-list-item-subtitle>
-        <v-list-item-title class="text-left">{{ message.text }}</v-list-item-title>
-      </v-list-item>
-    </div>
-  </v-list>
-  <v-footer app height="60">
-    <v-text-field
-      data-test="chatroom-input"
-      v-model="text"
-      bg-color="grey-lighten-1"
-      class="rounded-pill overflow-hidden"
-      density="compact"
-      hide-details
-      variant="solo"
-      clearable
-      @keydown.enter="SendMessage"
-    ></v-text-field>
-  </v-footer>
+  <v-app>
+    <v-list>
+      <div
+        v-for="(message, index) in this.allMessages"
+        :key="index"
+        class="text-center"
+        id="chat-container"
+      >
+        <v-label v-if="checkTime(index)">{{ TimeStampToDateString(message.time) }}</v-label>
+        <v-list-item>
+          <template v-slot:prepend>
+            <v-avatar color="brown">{{ message.author[0] }}</v-avatar>
+          </template>
+          <v-list-item-subtitle class="text-left">{{ message.author }}</v-list-item-subtitle>
+          <v-list-item-title class="text-left">{{ message.text }}</v-list-item-title>
+        </v-list-item>
+      </div>
+    </v-list>
+    <v-footer app height="60">
+      <v-text-field
+        data-test="chatroom-input"
+        v-model="text"
+        bg-color="grey-lighten-1"
+        class="rounded-pill overflow-hidden"
+        density="compact"
+        hide-details
+        variant="solo"
+        clearable
+        @keydown.enter="SendMessage"
+      ></v-text-field>
+    </v-footer>
+  </v-app>
 </template>
 
 <script>
