@@ -110,7 +110,7 @@ export default {
     }
   },
   computed: {
-    ...mapState(UserStatus, ['authCode', 'userProfile'])
+    ...mapState(UserStatus, ['authCode', 'userProfile', 'my_device_id'])
   },
   components: {
     UserProfileButton
@@ -163,7 +163,7 @@ export default {
       var secondAudio = document.getElementById('secondAudio')
       secondAudio.pause()
     },
-    ...mapActions(UserStatus, ['checkAuth']),
+    ...mapActions(UserStatus, ['checkAuth', 'update_device_id']),
     ...mapActions(MusicQueue, ['ShiftTheMusic'])
   },
   mounted() {
@@ -172,6 +172,69 @@ export default {
     }, 100)
     this.checkAuth()
     /// TODO : 要先獲取當前的 MusicQueue 存儲 於FireBase
+
+    // Web Playback SDK
+    const script = document.createElement('script')
+    script.src = 'https://sdk.scdn.co/spotify-player.js'
+    script.async = true
+    document.body.appendChild(script)
+
+    window.onSpotifyWebPlaybackSDKReady = () => {
+      const player = new window.Spotify.Player({
+        name: 'Web Playback SDK',
+        getOAuthToken: (cb) => {
+          cb(this.authCode.access_token)
+        }
+        // volume: 1
+      })
+
+      // Ready
+      player.addListener('ready', ({ device_id }) => {
+        this.update_device_id(device_id)
+        console.log('Ready with Device ID', device_id)
+      })
+
+      // Not Ready
+      player.addListener('not_ready', ({ device_id }) => {
+        console.log('Device ID has gone offline', device_id)
+      })
+
+      player.addListener('initialization_error', ({ message }) => {
+        console.error(message)
+      })
+
+      player.addListener('authentication_error', ({ message }) => {
+        console.error(message)
+      })
+
+      player.addListener('account_error', ({ message }) => {
+        console.error(message)
+      })
+
+      player.setVolume(1).then(() => {
+        console.log('Volume updated!')
+      })
+
+      // player.addListener('player_state_changed', ({ track_window: { current_track } }) => {
+      //   console.log('Currently Playing', current_track)
+      //   this.current_track_name = current_track.album.name
+      //   this.current_track_img = current_track.album.images[0].url
+      // })
+
+      // document.getElementById('togglePlay').onclick = function () {
+      //   player.togglePlay()
+      // }
+
+      // document.getElementById('togglePrev').onclick = function () {
+      //   player.previousTrack()
+      // }
+
+      // document.getElementById('toggleNext').onclick = function () {
+      //   player.nextTrack()
+      // }
+
+      player.connect()
+    }
   },
   provide() {
     return {

@@ -16,14 +16,31 @@
         未提供播放
       </div>
       <v-card-actions v-if="type === 'track'">
-        <v-btn icon="mdi-play" @click="clickPlayPreview"> </v-btn>
-        <v-btn icon="mdi-plus" @click="AddToMusicQueue"> </v-btn>
+        <v-btn icon @click="clickPlayPreview">
+          <v-icon>mdi-play</v-icon>
+          <v-tooltip activator="parent" location="top"> 在本地試聽 </v-tooltip>
+        </v-btn>
+
+        <v-btn icon @click="AddToMusicQueue">
+          <v-icon>mdi-plus</v-icon>
+          <v-tooltip activator="parent" location="top"> 加入 Music Queue </v-tooltip>
+        </v-btn>
+
+        <!-- Spotify Web Playback  -->
+        <v-btn icon @click="startWebPlayback(id)">
+          <v-icon>mdi-access-point</v-icon>
+          <v-tooltip activator="parent" location="top"> 在 Spotify 聆聽 </v-tooltip>
+        </v-btn>
       </v-card-actions>
     </div>
   </v-card>
 </template>
 
 <script>
+import { mapState } from 'pinia'
+import UserStatus from '@/stores/UserStatus'
+import axios from 'axios'
+
 export default {
   inject: ['PlayPreview'],
   props: {
@@ -33,6 +50,9 @@ export default {
     id: String,
     type: String,
     preview_url: String
+  },
+  computed: {
+    ...mapState(UserStatus, ['authCode', 'userProfile', 'my_device_id'])
   },
   methods: {
     clickPlayPreview() {
@@ -49,6 +69,28 @@ export default {
     },
     AddToMusicQueue() {
       console.log('test')
+    },
+
+    // 連接 Spotify WebPlayback
+    startWebPlayback(track_id) {
+      console.log(this.my_device_id)
+      let config = {
+        method: 'PUT',
+        url: 'https://api.spotify.com/v1/me/player/play',
+        data: {
+          uris: [`spotify:track:${track_id}`]
+        },
+        params: {
+          device_id: this.my_device_id
+        },
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${this.authCode.access_token}`
+        }
+      }
+      axios(config).then((res) => {
+        console.log(res)
+      })
     }
   }
 }
