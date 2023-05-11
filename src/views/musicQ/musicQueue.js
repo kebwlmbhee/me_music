@@ -22,7 +22,7 @@ class musicQueue {
   }
 
   // 在 musicQueue 中加入音樂
-  async addMusic(id, artist, songName, url, picture, album) {
+  async addMusic(id, artist, songName, url, picture, album, timestamp) {
     // 這裡是為了避免直接 push newMusic 後取不到其 firebase 中的 key
 
     // 先 push 隨便一個新的東西
@@ -40,7 +40,9 @@ class musicQueue {
       id: id,
       album: album,
       // 設置 musicKey
-      key: musicKey
+      key: musicKey,
+      // 設置時戳以做刪除判定
+      timestamp: timestamp
     }
     // 將 musicRef 裡的內容重設為 newMusic
     // 使用 await 等待 set 完成才返回，結束函數並進行下一步操作

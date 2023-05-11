@@ -7,6 +7,7 @@
         v-model="searchText"
         label="Search"
         variant="outlined"
+        @click:prepend="searchInputCallback"
         @keydown.enter="searchInputCallback"
       >
       </v-text-field>
@@ -23,6 +24,7 @@
           :type="'track'"
           :id="track.id"
           :preview_url="track.preview_url"
+          :album="track.album"
         />
       </v-list-item>
 
@@ -31,7 +33,7 @@
         <SearchCard
           :Name="artist.name"
           :artist="artist.genres.join(',')"
-          :imgSrc="artist.images[0].url"
+          :imgSrc="artist.images.length == 0 ? null : artist.images[0].url"
           :type="'artist'"
           :id="artist.id"
         />
@@ -69,7 +71,7 @@ import { mapState, mapActions } from 'pinia'
 import axios from 'axios'
 
 export default {
-  inject: ['AddMusic'],
+  inject: ['PausePreview'],
   data() {
     return {
       loaded: false,
@@ -136,7 +138,7 @@ export default {
       const ArtistPromise = axios(config_1).then((res) => {
         let data = res.data
         this.searchArtistsResponse = data.artists.items
-        console.log(this.searchArtistsResponse)
+        // console.log(this.searchArtistsResponse)
       })
       const PlaylistPromise = axios(config_2).then((res) => {
         let data = res.data
@@ -161,6 +163,10 @@ export default {
     },
     // 輸入的CallBack
     searchInputCallback() {
+      if (this.searchText == '') {
+        alert('搜尋不能為空')
+        return
+      }
       this.$router.push({
         path: '/Home/Search',
         query: { search: this.searchText }
@@ -169,8 +175,9 @@ export default {
     },
     ...mapActions(UserStatus, ['checkAuth'])
   },
-  mounted() {
+  created() {
     this.checkAuth()
+    this.PausePreview()
     let query = this.$route.query.search
     this.searchText = query
     if (!query) query = 'a'

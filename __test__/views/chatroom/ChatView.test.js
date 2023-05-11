@@ -1,7 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 import { mount } from "@vue/test-utils";
 import vuetify from "@/plugins/vuetify";
-import router from "@/router";
 import { createTestingPinia } from '@pinia/testing';
 import ChatView from "@/views/chatroom/ChatView.vue";
 
@@ -16,14 +15,16 @@ describe('ChatView.vue', () => {
         // https://pinia.vuejs.org/cookbook/testing.html#unit-testing-components
         wrapper = mount(ChatView, {
             global: {
-                plugins: [vuetify, router, createTestingPinia()],
+                plugins: [vuetify, createTestingPinia()],
             },
+            props:{
+                isTesting : true
+            }
         });
         it('wrapper 是否成功創建', () => {
             expect(wrapper.exists()).toBe(true);
         })
     })
-
     describe('ChatView method', () => {
 
         describe('checkTime method', () => {
@@ -69,7 +70,6 @@ describe('ChatView.vue', () => {
                 expect(result).toBe(false);
             })
         })
-
         describe('TimeStampToDataString method', () => {
 
             it('判斷是否呼叫 chatroom.getTimeString 方法', () => {
@@ -84,6 +84,7 @@ describe('ChatView.vue', () => {
             });
         });
 
+        console.log("In4")
         // TODO: 公告未完成，亦未測試，目前只有 isAnnounce = false 的部分
         describe('SendMessage method', () => {
 
