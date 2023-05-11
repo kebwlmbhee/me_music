@@ -18,7 +18,7 @@ class musicQueue {
     this.syncMusicPlayTimeStamp = ref(db, 'syncMusicQueue/musicPlayTimeStamp')
   }
 
-  async addMusic(id, artist, songName, url, picture, album) {
+  async addMusic(id, artist, songName, url, picture, album, timestamp) {
     const musicRef = push(this.musicQueueRef)
     const musicKey = musicRef.key
 
@@ -29,7 +29,8 @@ class musicQueue {
       picture: picture,
       id: id,
       album: album,
-      key: musicKey
+      key: musicKey,
+      timestamp: timestamp
     }
     await set(musicRef, newMusic)
   }
@@ -75,6 +76,15 @@ class musicQueue {
     })
   }
 
+  // // 手動切歌
+  // replaceMusic(firstMusic, targetMusic) {
+  //   targetMusic.key = firstMusic.key
+  //   console.log('手動切歌')
+  //   console.log(targetMusic.key)
+  //   update(ref(db, `/musicQueue/${firstMusic.key}`), targetMusic)
+  //   alert(targetMusic.key)
+  //   this.removeMusic(targetMusic)
+  // }
   // 手動切歌
   replaceMusic(firstMusic, targetMusic) {
     const toBeRemovedMusic = targetMusic
