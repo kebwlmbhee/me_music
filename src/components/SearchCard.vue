@@ -16,8 +16,21 @@
         未提供播放
       </div>
       <v-card-actions v-if="type === 'track'">
-        <v-btn icon="mdi-plus" @click.stop="clickAdd"></v-btn>
-        <v-btn icon="mdi-pause" @click.stop="PausePreview"></v-btn>
+        <v-btn icon @click.stop="clickAdd">
+          <v-icon>mdi-plus</v-icon>
+          <v-tooltip activator="parent" location="top"> 加入 Music Queue </v-tooltip>
+        </v-btn>
+
+        <v-btn border icon size="x-small" @click.stop="PausePreview">
+          <v-icon>mdi-pause</v-icon>
+          <v-tooltip activator="parent" location="top"> 暫停 Preview </v-tooltip>
+        </v-btn>
+
+        <!-- Spotify Web Playback  -->
+        <v-btn icon @click.stop="PausePreview" @click="startWebPlayback(id)">
+          <v-icon>mdi-access-point</v-icon>
+          <v-tooltip activator="parent" location="top"> 在 Spotify 聆聽 </v-tooltip>
+        </v-btn>
       </v-card-actions>
     </div>
   </v-card>
@@ -26,7 +39,9 @@
 <script>
 import { mapState, mapActions } from 'pinia'
 import UserStatus from '@/stores/UserStatus'
+import axios from 'axios'
 import AudioControl from '@/stores/AudioControl'
+
 export default {
   inject: ['PlayPreview', 'PausePreview'],
   props: {
@@ -39,7 +54,7 @@ export default {
     album: {}
   },
   computed: {
-    ...mapState(UserStatus, ['authCode'])
+    ...mapState(UserStatus, ['authCode', 'userProfile', 'my_device_id'])
   },
   methods: {
     clickPlayPreview() {
@@ -52,6 +67,31 @@ export default {
           query: { id: this.id, type: this.type }
         })
       }
+    },
+    AddToMusicQueue() {
+      console.log('test')
+    },
+
+    // 連接 Spotify WebPlayback
+    startWebPlayback(track_id) {
+      console.log(this.my_device_id)
+      let config = {
+        method: 'PUT',
+        url: 'https://api.spotify.com/v1/me/player/play',
+        data: {
+          uris: [`spotify:track:${track_id}`]
+        },
+        params: {
+          device_id: this.my_device_id
+        },
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${this.authCode.access_token}`
+        }
+      }
+      axios(config).then((res) => {
+        console.log(res)
+      })
     },
     clickAdd() {
       if (this.preview_url == null) {
