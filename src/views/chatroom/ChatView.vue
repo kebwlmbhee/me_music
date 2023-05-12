@@ -1,10 +1,17 @@
 <template>
-  <v-app>
+  <v-app v-if="isTesting" />
+
+  <div v-if="!isTesting">
     <v-list>
-      <div v-for="(message, index) in this.allMessages" :key="index" class="text-center">
+      <div
+        v-for="(message, index) in this.allMessages"
+        :key="index"
+        class="text-center"
+        id="chat-container"
+      >
         <v-label v-if="checkTime(index)">{{ TimeStampToDateString(message.time) }}</v-label>
         <v-list-item>
-          <template v-slot:prepend v-if="message.author">
+          <template v-slot:prepend>
             <v-avatar color="brown">{{ message.author[0] }}</v-avatar>
           </template>
           <v-list-item-subtitle class="text-left">{{ message.author }}</v-list-item-subtitle>
@@ -25,7 +32,7 @@
         @keydown.enter="SendMessage"
       ></v-text-field>
     </v-footer>
-  </v-app>
+  </div>
 </template>
 
 <script>
@@ -36,21 +43,33 @@ import Chatroom from './chatroom.js'
 const chatroom = new Chatroom()
 
 export default {
-  name: 'ChatRoom',
   data() {
     return {
-      currentTime: Date,
       text: '',
       allMessages: []
+    }
+  },
+  props: {
+    isTesting: {
+      type: Boolean,
+      default: false
     }
   },
   computed: {
     ...mapState(UserStatus, ['userProfile'])
   },
   created() {
+    this.chatroom = chatroom
     // 發送時間: messages[].time    發信人: messages[].author  內容: messages[].text
-    chatroom.onMessage((messages) => {
-      this.allMessages = messages
+    let CP = new Promise(() => {
+      this.chatroom.onMessage((messages) => {
+        this.allMessages = messages
+      })
+    })
+    CP.then(() => {
+      setTimeout(() => {
+        this.ScrollToBottom()
+      }, 300)
     })
   },
   methods: {
@@ -64,11 +83,15 @@ export default {
       else return false
     },
     TimeStampToDateString(timeStamp) {
-      return chatroom.getTimeString(timeStamp)
+      return this.chatroom.getTimeString(timeStamp)
     },
     SendMessage(isAnnounce = false) {
       if (!this.text) {
         alert('message is empty!')
+        return
+      }
+      if (this.userProfile.name == '') {
+        alert('沒有姓名, 可能需要重新登入')
         return
       }
       const newMessage = {
@@ -77,12 +100,14 @@ export default {
         isAnnounce: isAnnounce
       }
       this.allMessages.push(newMessage)
-      chatroom.sendMessage(this.userProfile.name, this.text, isAnnounce)
+      this.chatroom.sendMessage(this.userProfile.name, this.text, isAnnounce)
       this.text = ''
+    },
+    ScrollToBottom() {
+      var container = document.getElementById('chat-container')
+      if (container == null) return
+      container.scrollTop = container.scrollHeight
     }
-  },
-  mounted() {
-    this.chatroom = chatroom
   }
 }
 </script>
