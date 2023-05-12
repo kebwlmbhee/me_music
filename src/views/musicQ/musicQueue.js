@@ -151,7 +151,8 @@ class musicQueue {
       // currentData
       await runTransaction(this.syncMusicPlayTimeStamp, (currentData) => {
         // 如果 currentData 不為 null，且新時戳高於當前時戳 3 秒，更新時戳
-        if (!currentData || (timestamp - currentData.val()) / 1000 > 3) {
+        console.log(currentData)
+        if (!currentData || timestamp - currentData > 3 * 1000) {
           return timestamp
         }
         // 小於等於 3 秒視為延遲，保持原值
