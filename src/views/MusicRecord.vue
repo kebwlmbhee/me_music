@@ -191,19 +191,14 @@ export default {
       }
       // 如果沒有 preview url 先用search搜一遍
       // 在確定有沒有
-      if (data.preview_url == null) {
-        this.UseTrackIdStateUpdate(this.authCode.access_token, data.name, data.id).then((res) => {
-          if (res === null) return
+      this.UseTrackIdStateUpdate(this.authCode.access_token, data.name, data.id).then((res) => {
+        if (res === null) return
 
-          console.log('MusicRecord trigger_pop_up : 沒有Preview Url 但Search的到 Url ')
-          this.popUpHaveUrl = true
-          this.PlayPreview(res)
-        })
-      } else {
-        console.log('MusicRecord trigger_pop_up : 有Preview Url ')
+        console.log('MusicRecord trigger_pop_up : 沒有Preview Url 但Search的到 Url ')
         this.popUpHaveUrl = true
-        this.PlayPreview(data.preview_url)
-      }
+        this.PlayPreview(res)
+      })
+      // 
     },
     // 新增新的歌曲
     AddNewSong() {
