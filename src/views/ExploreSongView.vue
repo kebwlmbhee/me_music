@@ -87,17 +87,18 @@
                 <v-card-title class="font-weight-bold">{{ item.track.name }}</v-card-title>
                 <v-card-subtitle>{{ item.track.artists[0].name }}</v-card-subtitle>
                 <v-card-actions>
-                  <v-btn border icon size="x-small" @click="PlayPreview(item.track.preview_url)">
-                    <v-icon>mdi-play</v-icon>
-                    <v-tooltip activator="parent" location="top"> 在本地試聽 </v-tooltip>
-                  </v-btn>
-
-                  <v-btn border icon size="x-small" @click="clickOneSong(item.track.id)">
-                    <v-icon>mdi-plus</v-icon>
-                    <v-tooltip activator="parent" location="top"> 加入 Music Queue </v-tooltip>
+                  <v-btn border icon size="x-small" @click.stop="PausePreview">
+                    <v-icon>mdi-pause</v-icon>
+                    <v-tooltip activator="parent" location="top"> 暫停 Preview </v-tooltip>
                   </v-btn>
                   <!-- Spotify Web Playback  -->
-                  <v-btn border icon size="x-small" @click="startWebPlayback(item.track.id)">
+                  <v-btn
+                    border
+                    icon
+                    size="x-small"
+                    @click.stop="PausePreview"
+                    @click="startWebPlayback(item.track.id)"
+                  >
                     <v-icon>mdi-access-point</v-icon>
                     <v-tooltip activator="parent" location="top"> 在 Spotify 聆聽 </v-tooltip>
                   </v-btn>
@@ -176,18 +177,18 @@
                 <v-card-title class="font-weight-bold">{{ item.name }}</v-card-title>
                 <v-card-subtitle>{{ item.artists[0].name }}</v-card-subtitle>
                 <v-card-actions>
-                  <v-btn border icon size="x-small" @click="PlayPreview(item.preview_url)">
-                    <v-icon>mdi-play</v-icon>
-                    <v-tooltip activator="parent" location="top"> 在本地試聽 </v-tooltip>
+                  <v-btn border icon size="x-small" @click.stop="PausePreview">
+                    <v-icon>mdi-pause</v-icon>
+                    <v-tooltip activator="parent" location="top"> 暫停 Preview </v-tooltip>
                   </v-btn>
+                  <!-- Spotify Web Playback  -->
                   <v-btn
                     border
-                    icon="mdi-plus"
+                    icon
                     size="x-small"
-                    @click="clickOneSong(item.id)"
-                  ></v-btn>
-                  <!-- Spotify Web Playback  -->
-                  <v-btn border icon size="x-small" @click="startWebPlayback(item.id)">
+                    @click.stop="PausePreview"
+                    @click="startWebPlayback(item.id)"
+                  >
                     <v-icon>mdi-access-point</v-icon>
                     <v-tooltip activator="parent" location="top"> 在 Spotify 聆聽 </v-tooltip>
                   </v-btn>

@@ -16,18 +16,18 @@
         未提供播放
       </div>
       <v-card-actions v-if="type === 'track'">
-        <v-btn icon @click="clickPlayPreview">
-          <v-icon>mdi-play</v-icon>
-          <v-tooltip activator="parent" location="top"> 在本地試聽 </v-tooltip>
-        </v-btn>
-
-        <v-btn icon @click="AddToMusicQueue">
+        <v-btn icon @click.stop="clickAdd">
           <v-icon>mdi-plus</v-icon>
           <v-tooltip activator="parent" location="top"> 加入 Music Queue </v-tooltip>
         </v-btn>
 
+        <v-btn border icon size="x-small" @click.stop="PausePreview">
+          <v-icon>mdi-pause</v-icon>
+          <v-tooltip activator="parent" location="top"> 暫停 Preview </v-tooltip>
+        </v-btn>
+
         <!-- Spotify Web Playback  -->
-        <v-btn icon @click="startWebPlayback(id)">
+        <v-btn icon @click.stop="PausePreview" @click="startWebPlayback(id)">
           <v-icon>mdi-access-point</v-icon>
           <v-tooltip activator="parent" location="top"> 在 Spotify 聆聽 </v-tooltip>
         </v-btn>

@@ -261,8 +261,8 @@ export default {
         name: 'Web Playback SDK',
         getOAuthToken: (cb) => {
           cb(this.authCode.access_token)
-        }
-        // volume: 1
+        },
+        volume: 1
       })
 
       // Ready
