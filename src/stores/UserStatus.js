@@ -15,7 +15,8 @@ export default defineStore('UserStatus', {
       userProfile: {
         name: '',
         avatar: ''
-      }
+      },
+      my_device_id: ''
     }
   },
   // 等於 computed
@@ -57,6 +58,9 @@ export default defineStore('UserStatus', {
         this.load_authInfo()
         this.UpdateUser()
       }
+    },
+    update_device_id(device_id) {
+      this.my_device_id = device_id
     }
   }
 })

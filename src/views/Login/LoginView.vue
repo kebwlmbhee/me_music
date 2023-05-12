@@ -1,6 +1,27 @@
 <template>
-  <v-btn v-on:click="getToken" data-test="login-btn">Login</v-btn>
+  <div class="d-flex flex-column align-center justify-center" style="height: 100vh">
+    <div class="d-flex flex-column align-center">
+      <div class="d-flex flex-column align-center justify-center">
+        <h1 class="title-text">歡迎來到 政大迷音</h1>
+        <v-btn
+          class="ma-5"
+          size="x-large"
+          v-on:click="getToken"
+          data-test="login-btn"
+          color="secondary"
+          >Login with spotify</v-btn
+        >
+      </div>
+      <v-img :width="800" aspect-ratio="16/9" cover src="/src/assets/loginPage.avif"></v-img>
+    </div>
+  </div>
 </template>
+
+<style>
+.title-text {
+  font-size: 40pt;
+}
+</style>
 
 <script>
 export default {
