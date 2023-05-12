@@ -85,7 +85,7 @@ export default {
         state.first_timestamp = `${audio.musics[0].timestamp}`
       }
       // determine is first music diff
-      if (state.first_timestamp != audio.musics[0].timestamp && audio.musics.length != 0) {
+      if (audio.musics.length != 0 && state.first_timestamp != audio.musics[0].timestamp) {
         clearInterval(state.intervalId)
         state.first_timestamp = audio.musics[0].timestamp
         // if is switching, disable all button, not employee
