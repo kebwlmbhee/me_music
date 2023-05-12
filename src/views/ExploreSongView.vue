@@ -86,6 +86,23 @@
               <div>
                 <v-card-title class="font-weight-bold">{{ item.track.name }}</v-card-title>
                 <v-card-subtitle>{{ item.track.artists[0].name }}</v-card-subtitle>
+                <v-card-actions>
+                  <v-btn border icon size="x-small" @click.stop="PausePreview">
+                    <v-icon>mdi-pause</v-icon>
+                    <v-tooltip activator="parent" location="top"> 暫停 Preview </v-tooltip>
+                  </v-btn>
+                  <!-- Spotify Web Playback  -->
+                  <v-btn
+                    border
+                    icon
+                    size="x-small"
+                    @click.stop="PausePreview"
+                    @click="startWebPlayback(item.track.id)"
+                  >
+                    <v-icon>mdi-access-point</v-icon>
+                    <v-tooltip activator="parent" location="top"> 在 Spotify 聆聽 </v-tooltip>
+                  </v-btn>
+                </v-card-actions>
               </div>
             </div>
           </v-card>
@@ -160,18 +177,21 @@
                 <v-card-title class="font-weight-bold">{{ item.name }}</v-card-title>
                 <v-card-subtitle>{{ item.artists[0].name }}</v-card-subtitle>
                 <v-card-actions>
-                  <v-btn border icon="mdi-plus" size="x-small"></v-btn>
-                  <!-- @click.stop="
-                        AddMusic(
-                          item.id,
-                          item.artists[0].name,
-                          item.name,
-                          item.preview_url,
-                          item.album.images[0].url,
-                          item.album.name
-                        )
-                      " -->
-                  <v-btn icon="mdi-pause" @click.stop="PausePreview"></v-btn>
+                  <v-btn border icon size="x-small" @click.stop="PausePreview">
+                    <v-icon>mdi-pause</v-icon>
+                    <v-tooltip activator="parent" location="top"> 暫停 Preview </v-tooltip>
+                  </v-btn>
+                  <!-- Spotify Web Playback  -->
+                  <v-btn
+                    border
+                    icon
+                    size="x-small"
+                    @click.stop="PausePreview"
+                    @click="startWebPlayback(item.id)"
+                  >
+                    <v-icon>mdi-access-point</v-icon>
+                    <v-tooltip activator="parent" location="top"> 在 Spotify 聆聽 </v-tooltip>
+                  </v-btn>
                 </v-card-actions>
               </div>
             </div>
@@ -224,7 +244,7 @@ export default {
     }
   },
   computed: {
-    ...mapState(UserStatus, ['authCode', 'userProfile'])
+    ...mapState(UserStatus, ['authCode', 'userProfile', 'my_device_id'])
   },
   methods: {
     searchTypeRedirect(in_id, type) {
@@ -326,10 +346,33 @@ export default {
         this.PlayPreview(res)
       })
     },
+    // TODO : 單點歌曲
+
+    // 連接 Spotify WebPlayback
+    startWebPlayback(track_id) {
+      console.log(this.my_device_id)
+      let config = {
+        method: 'PUT',
+        url: 'https://api.spotify.com/v1/me/player/play',
+        data: {
+          uris: [`spotify:track:${track_id}`]
+        },
+        params: {
+          device_id: this.my_device_id
+        },
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${this.authCode.access_token}`
+        }
+      }
+      axios(config).then((res) => {
+        console.log(res)
+      })
+    },
     ...mapActions(UserStatus, ['checkAuth']),
     ...mapActions(AudioControl, ['addQue', 'UseTrackIdStateUpdate'])
   },
-  created() {
+  mounted() {
     this.checkAuth()
     this.PausePreview()
     this.type = this.$route.query.type
