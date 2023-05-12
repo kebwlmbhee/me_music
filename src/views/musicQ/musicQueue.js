@@ -71,8 +71,8 @@ class musicQueue {
         // 將 musics Object 轉成 entries key-value array
         let entries = Object.entries(musics)
 
-        // 當歌曲 id 相同時(後續大概會改成時戳相同時)
-        if (musics[music.key].id === music.id) {
+        // 當歌曲 timestamp 相同時
+        if (musics[music.key].timestamp === music.timestamp) {
           // 去除 entries 的首位元素
           entries.shift()
           // 將 entries key-value array 轉成 music Object
@@ -109,7 +109,6 @@ class musicQueue {
 
   // 手動切歌
   // 因為無法在頂端加入新歌，所以用比較 tricky 的方式
-  // 可能還會加入時戳判斷
   replaceMusic(firstMusic, targetMusic) {
     // targeMusic(點擊)先存起來
     const toBeRemovedMusic = targetMusic
@@ -151,7 +150,6 @@ class musicQueue {
       // currentData
       await runTransaction(this.syncMusicPlayTimeStamp, (currentData) => {
         // 如果 currentData 不為 null，且新時戳高於當前時戳 3 秒，更新時戳
-        console.log(currentData)
         if (!currentData || timestamp - currentData > 3 * 1000) {
           return timestamp
         }
