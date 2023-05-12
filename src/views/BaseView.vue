@@ -265,11 +265,10 @@ export default {
           this.playReplacedMusic(newVal[0])
         } else if (!newVal) {
           this.musicQueue.setTransactionMusicPlayTime(0)
-        } else if (!oldVal[0] && newVal) {
-          // 代表目前musicQueue為空
-          // 然後新增歌曲
-          console.log('目前沒歌, 然後新增歌, 故 播新的第一首')
+        } else if (!oldVal[0] && newVal[0]) {
           this.MainMusic_url = newVal[0].url
+        } else {
+          console.log('剛進入大廳 一首歌都沒有')
         }
       },
       // 初始化的變動不會響應 watch
