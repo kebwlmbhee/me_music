@@ -1,10 +1,17 @@
 <template>
   <html class="flexColumn outBox">
-  <div>
-    <div style="font-size: 2em">
+
+
+
+  <v-app-bar color="#FFF176" flat>
+    <v-spacer></v-spacer>
+    <div style="font-size: 2em;">
       <b>announcement</b>
     </div>
-  </div>
+    <v-spacer></v-spacer>
+  </v-app-bar>
+
+
   <!-- first part -->
   <div class="firstPart" v-for="item in songList" :key="item.ID">
     <div class="inBox">
@@ -231,5 +238,4 @@ html {
 ::-webkit-scrollbar-thumb:hover {
   background: #555;
 }
-
 </style>

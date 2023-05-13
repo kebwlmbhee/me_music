@@ -102,14 +102,11 @@ export default {
     }
   },
   mounted() {
-    setTimeout(() => {
-      this.ScrollToBottom()
-    }, 1000)
+    // setTimeout(() => {
+    //   this.ScrollToBottom()
+    // }, 1000)
 
     this.ScrollToBottom()
-
-
-
   },
 
 }
