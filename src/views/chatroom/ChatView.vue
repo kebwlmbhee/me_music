@@ -17,7 +17,7 @@
     <v-footer app height="60">
       <v-text-field data-test="chatroom-input" v-model="text" bg-color="grey-lighten-1"
         class="rounded-pill overflow-hidden" density="compact" hide-details variant="solo" clearable
-        @keydown.enter="SendMessage"></v-text-field>
+        @keydown.enter="SendMessage(this.isAnnounce)"></v-text-field>
       <input type="checkbox" v-model="isAnnounce" style="height: 100%; width: 10%;" />
       <v-btn class="ma-2" @click="this.ScrollToBottom" color="black" icon="mdi-wrench"
         style="position: fixed; right: 70px; bottom: 70px;">
@@ -32,6 +32,8 @@ import UserStatus from '@/stores/UserStatus'
 
 import Chatroom from './chatroom.js'
 const chatroom = new Chatroom()
+
+import AudioControl from '../../stores/AudioControl'
 
 export default {
   data() {
@@ -48,6 +50,7 @@ export default {
     }
   },
   computed: {
+    ...mapState(AudioControl, ['nowChecking']),
     ...mapState(UserStatus, ['userProfile'])
   },
   created() {
@@ -74,7 +77,7 @@ export default {
     TimeStampToDateString(timeStamp) {
       return this.chatroom.getTimeString(timeStamp)
     },
-    SendMessage(isAnnounce = false) {
+    SendMessage() {
       if (!this.text) {
         alert('message is empty!')
         return
@@ -86,10 +89,11 @@ export default {
       const newMessage = {
         author: this.userProfile.name,
         text: this.text,
-        isAnnounce: isAnnounce
+        isAnnounce: this.isAnnounce
       }
       this.allMessages.push(newMessage)
-      this.chatroom.sendMessage(this.userProfile.name, this.text, isAnnounce)
+      // SDJ : add AudioControl nowChecking
+      this.chatroom.sendMessage(this.userProfile.name, this.text, this.isAnnounce, this.nowChecking)
       this.text = ''
     },
     ScrollToBottom() {

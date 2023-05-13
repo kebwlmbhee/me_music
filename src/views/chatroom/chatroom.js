@@ -7,14 +7,16 @@ class Chatroom {
   }
 
   // 傳送聊天室訊息
-  sendMessage(author, text, isAnnounce) {
+  sendMessage(author, text, isAnnounce, nowChecking) {
     // 這裡設置的屬性會傳入 firebase，所以將參數給定 newMessage 的屬性值
     const newMessage = {
       author: author,
       text: text,
       time: Date.now(),
-      isAnnounce: isAnnounce
+      isAnnounce: isAnnounce,
+      musicInfo: nowChecking,
     }
+    alert (newMessage.musicInfo.picture)
     push(this.chatroomRef, newMessage)
     // 如果 isAnnounce(checkbox)為 true，則寫入公告
     if (isAnnounce) {
