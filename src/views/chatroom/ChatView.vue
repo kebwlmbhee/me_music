@@ -115,4 +115,26 @@ export default {
 }
 </script>
 
-<style></style>
+<style lang="scss" scoped>
+/* width */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: #e2e2e2;
+  //border-radius: 5px;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: rgb(133, 133, 133);
+  border-radius: 5px;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+</style>

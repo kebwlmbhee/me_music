@@ -149,10 +149,9 @@ html {
     align-items: center;
     justify-content: baseline;
     width: 100%;
-    height: auto;
-    overflow: auto;
+    height: 100%;
     padding: 2%;
-    overflow: hidden;
+
 
     .firstPart {
       width: 100%;
@@ -209,4 +208,28 @@ html {
   //   /* background-color: yellowgreen; */
   // }
 }
+
+
+/* width */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: #e2e2e2;
+  //border-radius: 5px;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: rgb(133, 133, 133);
+  border-radius: 5px;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
 </style>
