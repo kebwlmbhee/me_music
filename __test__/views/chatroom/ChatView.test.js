@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import { mount } from "@vue/test-utils";
+import { shallowMount } from "@vue/test-utils";
 import vuetify from "@/plugins/vuetify";
 import { createTestingPinia } from '@pinia/testing';
 import ChatView from "@/views/chatroom/ChatView.vue";
@@ -8,19 +8,14 @@ import ChatView from "@/views/chatroom/ChatView.vue";
 
 describe('ChatView.vue', () => {
 
-    let wrapper;
+    let wrapper = shallowMount(ChatView, {
+        global: {
+            plugins: [vuetify, createTestingPinia()]
+        }
+    })
 
     describe('ChatView 是否存在', () => {
 
-        // https://pinia.vuejs.org/cookbook/testing.html#unit-testing-components
-        wrapper = mount(ChatView, {
-            global: {
-                plugins: [vuetify, createTestingPinia()],
-            },
-            props:{
-                isTesting : true
-            }
-        });
         it('wrapper 是否成功創建', () => {
             expect(wrapper.exists()).toBe(true);
         })
@@ -98,7 +93,7 @@ describe('ChatView.vue', () => {
                 const alertSpy = vi.spyOn(window, 'alert');
 
                 // 訊息為空
-                wrapper.setData({ message: '' });
+                wrapper.setData({ text: '' });
                 wrapper.vm.SendMessage();
                 // 驗證是否有彈出 alert
                 expect(alertSpy).toHaveBeenCalled();
