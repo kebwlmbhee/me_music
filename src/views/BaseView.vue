@@ -69,7 +69,7 @@
     </v-navigation-drawer>
 
     <!-- 要放Page的地方  應該用Router Route  或是Component -->
-    <v-main>
+    <v-main style="height: 100vh;">
       <router-view></router-view>
     </v-main>
     <!-- 跳彈窗 -->
