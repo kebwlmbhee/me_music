@@ -5,34 +5,16 @@
     <v-navigation-drawer width="244" permanent>
       <!-- 左 放商標的? -->
       <!--  -->
-      <v-sheet
-        id="Lobby-Button"
-        color="grey-lighten-5"
-        height="128"
-        width="100%"
-        @click="clickLobby"
-      >
-        <v-img
-          src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRXGQDqS3rBb7GyPj87cxlKGJM1VC3CFIaUBg&usqp=CAU"
-          alt="Fake"
-        ></v-img>
+      <v-sheet id="Lobby-Button" color="grey-lighten-5" height="128" width="100%" @click="clickLobby">
+        <v-img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRXGQDqS3rBb7GyPj87cxlKGJM1VC3CFIaUBg&usqp=CAU"
+          alt="Fake"></v-img>
       </v-sheet>
       <!-- 底下的Item -->
       <v-list mandatory>
-        <v-list-item
-          v-for="(explore, index) in Explores"
-          :key="index"
-          :value="index"
-          link
-          :to="explore.to"
-          @click="
-            () => {
-              SelectedPage = explore.title
-            }
-          "
-          :data-test="explore.title"
-          border
-        >
+        <v-list-item v-for="(explore, index) in Explores" :key="index" :value="index" link :to="explore.to" @click="() => {
+            SelectedPage = explore.title
+          }
+          " :data-test="explore.title" border>
           <v-list-item-title class="text-left font-weight-black">{{
             explore.title
           }}</v-list-item-title>
@@ -47,23 +29,15 @@
       <v-btn class="ma-3 font-weight-bold" border @click="MuteButtonControl">{{
         MuteButton
       }}</v-btn>
-      <user-profile-button
-        :userName="userProfile.name"
-        :userImg="userProfile.avatar"
-      ></user-profile-button>
+      <user-profile-button :userName="userProfile.name" :userImg="userProfile.avatar"></user-profile-button>
     </v-app-bar>
 
     <!-- 右邊的東東 -->
     <v-navigation-drawer location="right" permanent color="grey-lighten-3   ">
-      <music-que />
+      <music-que style="height: 70%;" />
+      <nowPlaying style="height: 30%;" />
       <div>
-        <audio
-          :src="MainMusic_url"
-          autoplay
-          id="mainAudio"
-          controls
-          @ended="whenMusicEnded"
-        ></audio>
+        <audio :src="MainMusic_url" autoplay id="mainAudio" controls @ended="whenMusicEnded"></audio>
         <audio :src="SecondMusic_url" id="secondAudio" autoplay controls></audio>
       </div>
     </v-navigation-drawer>
@@ -90,6 +64,8 @@ import musicQueue from '/src/views/musicQ/musicQueue.js'
 
 import UserProfileButton from '../components/UserProfileButton.vue'
 import musicQue from '../components/SDJ/musicQue.vue'
+
+import nowPlaying from '/src/components/SDJ/nowPlaying.vue'
 
 export default {
   data() {
@@ -131,7 +107,8 @@ export default {
   },
   components: {
     UserProfileButton,
-    musicQue
+    musicQue,
+    nowPlaying,
   },
   methods: {
     // 點擊大廳
@@ -332,9 +309,9 @@ export default {
         } else if (!newVal) {
           this.musicQueue.setTransactionMusicPlayTime(0)
         } else if (!oldVal[0] && newVal[0]) {
-          this.MainMusic_url = newVal[0].url
+          this.playReplacedMusic(newVal[0])
         } else {
-          console.log('剛進入大廳 一首歌都沒有')
+          this.MainMusic_url = ""
         }
       },
       // 初始化的變動不會響應 watch
