@@ -3,19 +3,18 @@
     <!-- 最上方搜尋按鈕處 -->
     <v-app-bar flat>
       <v-tabs v-model="searchTab" align-tabs="title" data-test="select-type-btn">
-        <v-tab value="0">歌曲</v-tab>
-        <v-tab value="1">歌手</v-tab>
-        <v-tab value="2">播放清單</v-tab>
-        <v-tab value="3">專輯</v-tab>
+        <v-tab value="歌曲">歌曲</v-tab>
+        <v-tab value="歌手">歌手</v-tab>
+        <v-tab value="播放清單">播放清單</v-tab>
+        <v-tab value="專輯">專輯</v-tab>
       </v-tabs>
-      <v-btn @click="TestClick">testBTN</v-btn>
     </v-app-bar>
     <v-divider color="black" class="border-opacity-70"></v-divider>
     <!-- Title 跟 排序按鈕處 -->
     <v-card flat class="sortCard">
       <v-card-title class="font-weight-bold text-h3">
         {{ searchTab }}
-        <v-icon class="text-h6" color="lightgray" @click="Reload">mdi-reload</v-icon>
+        <v-icon class="text-h6" color="lightgray">mdi-reload</v-icon>
       </v-card-title>
       <v-card-actions>
         <v-btn>Last Month</v-btn>
@@ -41,7 +40,7 @@
     </v-window>
     <!-- 彈出視窗 -->
     <div v-if="popUpWindow" class="TestFooter">
-      <v-card class="TestCard" color="white" width="100%" height="100%" rounded="0">
+      <v-card class="TestCard" color="white" width="100%" height="100%" border rounded="0">
         <div class="d-flex flex-no-wrap align-center">
           <v-avatar class="ma-3" size="100" rounded="0">
             <v-img :src="checkSong.image"></v-img>
@@ -59,9 +58,9 @@
             <!-- 點播按鈕 -->
             <v-card-actions>
               <v-spacer></v-spacer>
-              <v-btn color="white" size="small" style="background-color: green" @click="AddNewSong"
-                >點播</v-btn
-              >
+              <v-btn color="white" size="small" style="background-color: green" @click="AddNewSong">
+                點播
+              </v-btn>
             </v-card-actions>
           </div>
           <!-- 關閉按鈕 -->
@@ -76,12 +75,13 @@
 
 <script>
 import UserStatus from '@/stores/UserStatus'
+import AudioControl from '@/stores/AudioControl'
 import AllTypeMusicContainer from '../components/AllTypeMusicContainer.vue'
 import { mapState, mapActions } from 'pinia'
 import axios from 'axios'
 
 export default {
-  inject: ['Reload', 'AddMusic', 'PlayPreview', 'PausePreview'],
+  inject: ['PlayPreview', 'PausePreview'],
   data() {
     return {
       loaded: false,
@@ -93,6 +93,7 @@ export default {
       searchPlaylistsResponse: [],
       searchAlbumsResponse: [],
       popUpWindow: false,
+      popUpHaveUrl: false,
       checkSong: { name: '', image: '', artists: [], mp3_url: '' }
     }
   },
@@ -100,7 +101,8 @@ export default {
     AllTypeMusicContainer
   },
   computed: {
-    ...mapState(UserStatus, ['authCode'])
+    ...mapState(UserStatus, ['authCode']),
+    ...mapState(AudioControl, ['searchPreview'])
   },
   methods: {
     // TODO : 如果 query 是空值  要怎麼辦ㄋ
@@ -167,8 +169,8 @@ export default {
         this.loaded = false
       })
     },
+    // 觸發彈窗
     trigger_pop_up(up_or_down, data = null) {
-      // console.log(data) //data.album.images 圖片  data.artists[] 歌手 data.name 名稱
       if (!up_or_down) {
         // 不觸發 或是 取消觸發
         // 還要取消Preview 的播歌
@@ -176,48 +178,43 @@ export default {
         this.PausePreview()
         return
       }
+
       // 要觸發
       // 還要開始Preview播歌
       this.popUpWindow = true
+      this.popUpHaveUrl = false
+
       this.checkSong = {
         name: data.name,
         image: data.album.images[0].url,
         artists: data.artists
-        // mp3_url: data.preview_url
       }
-      //this.PlayPreview(this.checkSong.mp3_url)
-    },
-    // 新增新的歌曲
-    // TODO : 串點播API
-    AddNewSong() {
-      console.log('Add New Song to Start')
-      console.log(this.checkSong)
-      this.trigger_pop_up(false)
-    },
-    // 測試
-    TestClick() {
-      let config = {
-        method: 'GET',
-        url: `https://api.spotify.com/v1/search?query=a&type=album&limit=5`,
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${this.authCode.access_token}`
-        }
-      }
-      axios(config).then((res) => {
-        let data = res.data
-        console.log(data)
+      // 如果沒有 preview url 先用search搜一遍
+      // 在確定有沒有
+      this.UseTrackIdStateUpdate(this.authCode.access_token, data.name, data.id).then((res) => {
+        if (res === null) return
+
+        console.log('MusicRecord trigger_pop_up : 沒有Preview Url 但Search的到 Url ')
+        this.popUpHaveUrl = true
+        this.PlayPreview(res)
       })
     },
-    ...mapActions(UserStatus, ['checkAuth'])
+    // 新增新的歌曲
+    AddNewSong() {
+      this.addQue()
+      this.trigger_pop_up(false)
+    },
+    ...mapActions(UserStatus, ['checkAuth']),
+    ...mapActions(AudioControl, ['addQue', 'UseTrackIdStateUpdate'])
   },
   provide() {
     return {
       Trigger_Popup: this.trigger_pop_up
     }
   },
-  mounted() {
+  created() {
     this.checkAuth()
+    this.PausePreview()
     this.searchUserItem()
   }
 }
@@ -228,6 +225,7 @@ export default {
   width: 100%;
   height: 100%;
   position: relative;
+  overflow: hidden;
 }
 
 .directionButton {
@@ -245,7 +243,7 @@ export default {
 
 .TestFooter {
   width: 100%;
-  height: 150px;
+  height: 140px;
   position: absolute;
   bottom: 0;
 

@@ -1,10 +1,12 @@
 <template>
-  <v-app>
+  <v-app v-if="isTesting" />
+
+  <div v-if="!isTesting" ref="chatMessages" style="height: 100%; overflow: auto;">
     <v-list>
-      <div v-for="(message, index) in this.allMessages" :key="index" class="text-center">
+      <div v-for="(message, index) in this.allMessages" :key="index" class="text-center" id="chat-container">
         <v-label v-if="checkTime(index)">{{ TimeStampToDateString(message.time) }}</v-label>
         <v-list-item>
-          <template v-slot:prepend v-if="message.author">
+          <template v-slot:prepend>
             <v-avatar color="brown">{{ message.author[0] }}</v-avatar>
           </template>
           <v-list-item-subtitle class="text-left">{{ message.author }}</v-list-item-subtitle>
@@ -13,19 +15,15 @@
       </div>
     </v-list>
     <v-footer app height="60">
-      <v-text-field
-        data-test="chatroom-input"
-        v-model="text"
-        bg-color="grey-lighten-1"
-        class="rounded-pill overflow-hidden"
-        density="compact"
-        hide-details
-        variant="solo"
-        clearable
-        @keydown.enter="SendMessage"
-      ></v-text-field>
+      <v-text-field data-test="chatroom-input" v-model="text" bg-color="grey-lighten-1"
+        class="rounded-pill overflow-hidden" density="compact" hide-details variant="solo" clearable
+        @keydown.enter="SendMessage"></v-text-field>
+      <input type="checkbox" v-model="isAnnounce" style="height: 100%; width: 10%;" />
+      <v-btn class="ma-2" @click="this.ScrollToBottom" color="black" icon="mdi-wrench"
+        style="position: fixed; right: 70px; bottom: 70px;">
+        <v-icon icon="mdi-arrow-down"></v-icon></v-btn>
     </v-footer>
-  </v-app>
+  </div>
 </template>
 
 <script>
@@ -36,22 +34,32 @@ import Chatroom from './chatroom.js'
 const chatroom = new Chatroom()
 
 export default {
-  name: 'ChatRoom',
   data() {
     return {
-      currentTime: Date,
       text: '',
-      allMessages: []
+      allMessages: [],
+      isAnnounce: false,
+    }
+  },
+  props: {
+    isTesting: {
+      type: Boolean,
+      default: false
     }
   },
   computed: {
     ...mapState(UserStatus, ['userProfile'])
   },
   created() {
+    this.chatroom = chatroom
     // 發送時間: messages[].time    發信人: messages[].author  內容: messages[].text
-    chatroom.onMessage((messages) => {
-      this.allMessages = messages
+    let CP = new Promise(() => {
+      this.chatroom.onMessage((messages) => {
+        this.allMessages = messages
+      })
     })
+    CP
+
   },
   methods: {
     checkTime(currentIndex) {
@@ -64,11 +72,15 @@ export default {
       else return false
     },
     TimeStampToDateString(timeStamp) {
-      return chatroom.getTimeString(timeStamp)
+      return this.chatroom.getTimeString(timeStamp)
     },
     SendMessage(isAnnounce = false) {
       if (!this.text) {
         alert('message is empty!')
+        return
+      }
+      if (this.userProfile.name == '') {
+        alert('沒有姓名, 可能需要重新登入')
         return
       }
       const newMessage = {
@@ -77,13 +89,25 @@ export default {
         isAnnounce: isAnnounce
       }
       this.allMessages.push(newMessage)
-      chatroom.sendMessage(this.userProfile.name, this.text, isAnnounce)
+      this.chatroom.sendMessage(this.userProfile.name, this.text, isAnnounce)
       this.text = ''
+    },
+    ScrollToBottom() {
+      const chatMessages = this.$refs.chatMessages
+      chatMessages.scrollTop = chatMessages.scrollHeight
     }
   },
   mounted() {
-    this.chatroom = chatroom
-  }
+    setTimeout(() => {
+      this.ScrollToBottom()
+    }, 1000)
+
+    this.ScrollToBottom()
+
+
+
+  },
+
 }
 </script>
 

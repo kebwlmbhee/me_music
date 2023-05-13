@@ -1,5 +1,5 @@
 <template>
-  <v-card variant="outlined">
+  <v-card variant="outlined" @click="clickPlayPreview">
     <div class="d-flex flex-no-wrap justify-start">
       <v-avatar rounded="0" size="72">
         <v-img :src="imgSrc"></v-img>
@@ -16,29 +16,50 @@
         未提供播放
       </div>
       <v-card-actions v-if="type === 'track'">
-        <v-btn icon="mdi-play" @click="clickPlayPreview"> </v-btn>
-        <v-btn icon="mdi-plus" @click="AddToMusicQueue"> </v-btn>
+        <v-btn icon @click.stop="clickAdd">
+          <v-icon>mdi-plus</v-icon>
+          <v-tooltip activator="parent" location="top"> 加入 Music Queue </v-tooltip>
+        </v-btn>
+
+        <v-btn border icon size="x-small" @click.stop="PausePreview">
+          <v-icon>mdi-pause</v-icon>
+          <v-tooltip activator="parent" location="top"> 暫停 Preview </v-tooltip>
+        </v-btn>
+
+        <!-- Spotify Web Playback  -->
+        <v-btn icon @click.stop="PausePreview" @click="startWebPlayback(id)">
+          <v-icon>mdi-access-point</v-icon>
+          <v-tooltip activator="parent" location="top"> 在 Spotify 聆聽 </v-tooltip>
+        </v-btn>
       </v-card-actions>
     </div>
   </v-card>
 </template>
 
 <script>
+import { mapState, mapActions } from 'pinia'
+import UserStatus from '@/stores/UserStatus'
+import axios from 'axios'
+import AudioControl from '@/stores/AudioControl'
+
 export default {
-  inject: ['PlayPreview'],
+  inject: ['PlayPreview', 'PausePreview'],
   props: {
     Name: String,
     imgSrc: String,
     artist: String,
     id: String,
     type: String,
-    preview_url: String
+    preview_url: String,
+    album: {}
+  },
+  computed: {
+    ...mapState(UserStatus, ['authCode', 'userProfile', 'my_device_id'])
   },
   methods: {
     clickPlayPreview() {
       if (this.type === 'track') {
-        if (this.preview_url == null) return
-
+        if (this.preview_url == null) alert('沒有提供這首歌')
         this.PlayPreview(this.preview_url)
       } else {
         this.$router.push({
@@ -49,7 +70,45 @@ export default {
     },
     AddToMusicQueue() {
       console.log('test')
-    }
+    },
+
+    // 連接 Spotify WebPlayback
+    startWebPlayback(track_id) {
+      console.log(this.my_device_id)
+      let config = {
+        method: 'PUT',
+        url: 'https://api.spotify.com/v1/me/player/play',
+        data: {
+          uris: [`spotify:track:${track_id}`]
+        },
+        params: {
+          device_id: this.my_device_id
+        },
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${this.authCode.access_token}`
+        }
+      }
+      axios(config).then((res) => {
+        console.log(res)
+      })
+    },
+    clickAdd() {
+      if (this.preview_url == null) {
+        alert('沒有提供這首歌')
+        return
+      }
+      this.stateUpdateWithData(
+        this.id,
+        this.artist,
+        this.Name,
+        this.preview_url,
+        this.imgSrc,
+        this.album
+      )
+      this.addQue()
+    },
+    ...mapActions(AudioControl, ['addQue', 'UseTrackIdStateUpdate', 'stateUpdateWithData'])
   }
 }
 </script>
