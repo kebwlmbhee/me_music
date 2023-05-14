@@ -28,13 +28,11 @@ function generateRandomKey(length) {
 
 let mockKey = generateRandomKey(20);
 
-let musics = [
-    { id: '1', songName: 'Song 1', key: '1' },
-    { id: '2', songName: 'Song 2', key: '2' },
-    { id: '3', songName: 'Song 3', key: '3' }
-];
+let musics;
 
 let musicToRemove;
+
+let firstMusic;
 
 describe('musicQueue.js', () => {
     let queue;
@@ -43,6 +41,12 @@ describe('musicQueue.js', () => {
     beforeEach(() => {
 
         queue = new musicQueue();
+
+        musics = [
+            { id: '1', songName: 'Song 1', artist: 'Artist 1', album: 'Album 1', key: '1', timestamp: '1' },
+            { id: '2', songName: 'Song 2', artist: 'Artist 2', album: 'Album 2', key: '2', timestamp: '2' },
+            { id: '3', songName: 'Song 3', artist: 'Artist 3', album: 'Album 3', key: '3', timestamp: '3' }
+        ];
 
         // mock firebase function
         vi.mock('/src/firebaseConf.js', () => {
@@ -55,6 +59,21 @@ describe('musicQueue.js', () => {
                 })),
                 ref: vi.fn(),
                 onValue: vi.fn(),
+                /*
+                onValue: vi.fn((ref, callback) => {
+                    const snapshot = {
+                        forEach: (forEachCallback) => {
+                            // 模擬資料快照的遍歷操作
+                            const childSnapshot1 = { val: () => 'song1' };
+                            const childSnapshot2 = { val: () => 'song2' };
+                            forEachCallback(childSnapshot1);
+                            forEachCallback(childSnapshot2);
+                        }
+                    };
+                    // onValue 的 callback 被調用，回傳正確數據
+                    callback(snapshot);
+                }),
+                */
                 remove: vi.fn((reference) => {
                     // 驗證傳入 remove 的參數是否正確
                     expect(reference).toEqual(ref(db, `/musicQueue/${musicToRemove.key}`));
@@ -66,8 +85,19 @@ describe('musicQueue.js', () => {
                         }
                     }
                 }),
-                update: vi.fn(),
-                runTransaction: vi.fn(),
+                update: vi.fn((reference, targetMusic) => {
+                    expect(reference).toEqual(ref(db, `/musicQueue/${firstMusic.key}`));
+                    // 找同 key
+                    const index = musics.findIndex((music) => music.key === firstMusic.key);
+                    if (index !== -1) {
+                        musics[index] = targetMusic;
+                    }
+                }),
+                runTransaction: vi.fn((reference, callback) => {
+                    // 替換music queue
+                    musics = callback(musics);
+                    return Promise.resolve();
+                }),
                 get: vi.fn(),
                 db: vi.fn(),
             }
@@ -98,7 +128,7 @@ describe('musicQueue.js', () => {
     })
 
     describe('addMusic method', () => {
-        it('should add music to the music queue', async () => {
+        it('增加歌曲', async () => {
             const id = '1234';
             const artist = 'Test Artists';
             const songName = 'Test Song';
@@ -132,7 +162,7 @@ describe('musicQueue.js', () => {
     });
 
     describe('removeMusic method', () => {
-        it('should remove music from the music queue', async () => {
+        it('移除歌曲', async () => {
             musicToRemove = musics[1];
             await queue.removeMusic(musicToRemove);
 
@@ -142,12 +172,98 @@ describe('musicQueue.js', () => {
             // 驗證傳入的參數是否正確
             expect(ref).toHaveBeenCalledWith(db, `/musicQueue/${musicToRemove.key}`);
 
-            // 移除驗證
+            // 驗證移除歌曲 (此js檔的musics陣列)
             expect(musics).toEqual([
-                { id: '1', songName: 'Song 1', key: '1' },
-                { id: '3', songName: 'Song 3', key: '3' }
+                { id: '1', songName: 'Song 1', artist: 'Artist 1', album: 'Album 1', key: '1', timestamp: '1' },
+                { id: '3', songName: 'Song 3', artist: 'Artist 3', album: 'Album 3', key: '3', timestamp: '3' }
             ]);
         })
     })
+
+    describe('removeMusicTransaction method', () => {
+        it('移除歌曲 transaction', async () => {
+            await queue.removeMusicTransaction(musics[0]);
+
+            // 檢查runTransaction是否被呼叫
+            expect(runTransaction).toHaveBeenCalled();
+
+            // 驗證移除歌曲 (此js檔的musics陣列)
+            //expect(musics).toEqual([
+            //    { id: '3', songName: 'Song 3', artist: 'Artist 3', album: 'Album 3', key: '3', timestamp: '3' }
+            //]);
+        });
+    });
+
+    describe('onMusic function', () => {
+        it('實時獲取Music Queue變更', () => {
+            let receivedMusics;
+
+            queue.onMusic((musics) => {
+                receivedMusics = musics
+            })
+
+            // onValue 被調用
+            expect(onValue).toHaveBeenCalled();
+            // ref 指向music Queue
+            expect(ref).toHaveBeenCalledWith(db, 'musicQueue');
+            // 驗證
+            //expect(receivedMusics).toStrictEqual(['song1', 'song2']);
+        });
+    });
+
+    describe('replaceMusic method', () => {
+        it('手動切歌', () => {
+            queue.removeMusic = vi.fn();
+            firstMusic = musics[0];
+            const musicToReplace = {
+                id: '10',
+                songName: 'Replaced Song',
+                artist: 'Replaced Artist',
+                album: 'Replaced Album',
+                key: '123456',
+                timestamp: '10',
+            };
+
+            queue.replaceMusic(firstMusic, musicToReplace);
+
+            // 檢查update是否被呼叫
+            expect(update).toHaveBeenCalledWith(
+                ref(db, `/musicQueue/${firstMusic.key}`),
+                musicToReplace
+            );
+
+            // 驗證取代歌曲 (此js檔的musics陣列)
+            expect(musics).toEqual([
+                { id: '10', songName: 'Replaced Song', artist: 'Replaced Artist', album: 'Replaced Album', key: '1', timestamp: '10' },
+                { id: '2', songName: 'Song 2', artist: 'Artist 2', album: 'Album 2', key: '2', timestamp: '2' },
+                { id: '3', songName: 'Song 3', artist: 'Artist 3', album: 'Album 3', key: '3', timestamp: '3' }
+            ]);
+        });
+    });
+
+    describe('setterSwitchMusicNotification method', () => {
+        it('手動切歌的公告寫入', () => {
+            const msg = 'message'
+            queue.setterSwitchMusicNotification(msg);
+
+            // 檢查set是否被呼叫
+            expect(set).toHaveBeenCalled();
+        });
+    });
+
+    describe('onSwitchMusicNotification function', () => {
+        it('監聽下一首歌的訊息', () => {
+            let message;
+            queue.onSwitchMusicNotification((messages) => {
+                message = messages;
+            })
+
+            // onValue 被調用
+            expect(onValue).toHaveBeenCalled();
+            // ref 指向switchMusicNotification
+            expect(ref).toHaveBeenCalledWith(db, 'syncMusicQueue/switchMusicNotification');
+
+        });
+    });
 
 })
