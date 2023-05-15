@@ -1,3 +1,5 @@
+// author: aratus573 趙子翔
+
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import musicQueue from "@/views/musicQ/musicQueue.js";
 import {
@@ -59,21 +61,6 @@ describe('musicQueue.js', () => {
                 })),
                 ref: vi.fn(),
                 onValue: vi.fn(),
-                /*
-                onValue: vi.fn((ref, callback) => {
-                    const snapshot = {
-                        forEach: (forEachCallback) => {
-                            // 模擬資料快照的遍歷操作
-                            const childSnapshot1 = { val: () => 'song1' };
-                            const childSnapshot2 = { val: () => 'song2' };
-                            forEachCallback(childSnapshot1);
-                            forEachCallback(childSnapshot2);
-                        }
-                    };
-                    // onValue 的 callback 被調用，回傳正確數據
-                    callback(snapshot);
-                }),
-                */
                 remove: vi.fn((reference) => {
                     // 驗證傳入 remove 的參數是否正確
                     expect(reference).toEqual(ref(db, `/musicQueue/${musicToRemove.key}`));
@@ -196,18 +183,14 @@ describe('musicQueue.js', () => {
 
     describe('onMusic function', () => {
         it('實時獲取Music Queue變更', () => {
-            let receivedMusics;
-
             queue.onMusic((musics) => {
-                receivedMusics = musics
+                this.musics = musics
             })
 
             // onValue 被調用
             expect(onValue).toHaveBeenCalled();
             // ref 指向music Queue
             expect(ref).toHaveBeenCalledWith(db, 'musicQueue');
-            // 驗證
-            //expect(receivedMusics).toStrictEqual(['song1', 'song2']);
         });
     });
 
@@ -253,16 +236,25 @@ describe('musicQueue.js', () => {
 
     describe('onSwitchMusicNotification function', () => {
         it('監聽下一首歌的訊息', () => {
-            let message;
             queue.onSwitchMusicNotification((messages) => {
-                message = messages;
+                this.messages = messages
             })
 
             // onValue 被調用
             expect(onValue).toHaveBeenCalled();
             // ref 指向switchMusicNotification
             expect(ref).toHaveBeenCalledWith(db, 'syncMusicQueue/switchMusicNotification');
+        });
+    });
 
+    describe('setTransactionMusicPlayTime method', () => {
+        it('setTransactionMusicPlayTime', async () => {
+            await queue.setTransactionMusicPlayTime((messages) => {
+                this.messages = messages
+            })
+
+            // 檢查runTransaction是否被呼叫
+            expect(runTransaction).toHaveBeenCalled();
         });
     });
 
