@@ -144,9 +144,12 @@ describe('announcementLikes.js', () => {
                 // 驗證 callback function 是否被調用
                 expect(callbackMock).toHaveBeenCalledTimes(2);
 
-                // 驗證 callback function 傳入的參數是否正確
-                expect(callbackMock).toHaveBeenCalledWith('announcement1', 2);
-                expect(callbackMock).toHaveBeenCalledWith('announcement2', 1);
+                // 取得 callbackMock 調用參數
+                const calls = callbackMock.mock.calls;
+
+                // 驗證 callback function 傳入的參數及調用順序是否正確
+                expect(calls[0]).toEqual(['announcement1', 2]);
+                expect(calls[1]).toEqual(['announcement2', 1]);
             })
 
             it('讚數為 0 的情況', async () => {
