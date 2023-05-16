@@ -44,6 +44,7 @@ export default defineStore('UserStatus', {
         }
       }
       axios.get(url, config).then((res) => {
+        this.userProfile.id = res.data.id
         this.userProfile.name = res.data.display_name
         this.userProfile.avatar = res.data.images[0].url
       })

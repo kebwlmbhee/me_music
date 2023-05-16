@@ -51,7 +51,7 @@ const router = createRouter({
     {
       path: '/homepage',
       name: 'homepage',
-      component: () => import('/src/views/chatroom/HomepageView.vue')
+      component: () => import('/src/views/announcement/HomepageView.vue')
     },
     {
       path: '/musicQueue',
