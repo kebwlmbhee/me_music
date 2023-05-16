@@ -1,7 +1,7 @@
 // author: kebwlmbhee
 
 import { describe, expect, it, vi } from "vitest";
-import { mount } from "@vue/test-utils";
+import { shallowMount } from "@vue/test-utils";
 import vuetify from "@/plugins/vuetify";
 import { createTestingPinia } from '@pinia/testing';
 import ChatView from "@/views/chatroom/ChatView.vue";
@@ -15,12 +15,9 @@ describe('ChatView.vue', () => {
     describe('ChatView 是否存在', () => {
 
         // https://pinia.vuejs.org/cookbook/testing.html#unit-testing-components
-        wrapper = mount(ChatView, {
+        wrapper = shallowMount(ChatView, {
             global: {
                 plugins: [vuetify, createTestingPinia()],
-            },
-            props:{
-                isTesting : true
             }
         });
         it('wrapper 是否成功創建', () => {

@@ -54,8 +54,8 @@ describe('announcementLikes.js', () => {
                 ['如果快照存在', 'testAnnouncement', 'testUser', true],
                 ['如果快照不存在', 'test2Announcement', 'test2User', false],
                 // _ for unimportant variable
-              ])('%s', async (_, announcementId, userId, snapshotExists) => {
-                
+            ])('%s', async (_, announcementId, userId, snapshotExists) => {
+
                 // mock path
                 const chosenAnnouncementLikesRef = {
                     path: `announcement/${announcementId}/likes/${userId}`,
@@ -86,6 +86,159 @@ describe('announcementLikes.js', () => {
                     expect(set).toHaveBeenCalledWith(chosenAnnouncementLikesRef, true);
                 }
             });
+        })
+
+
+        describe('getAnnouncementLikes function', () => {
+            it('公告讚數不為 0 的情況', async () => {
+
+                // fake data
+                const snapshotMock = {
+                    val: () => ({
+                        announcement1: {
+                            likes: {
+                                like1: true,
+                                like2: true,
+                            },
+                        },
+                        announcement2: {
+                            likes: {
+                                like3: true,
+                            },
+                        },
+                    }),
+                };
+
+                const likesSnapshotMock = {
+                    val: vi.fn(() => {
+                        return {
+                            like1: true,
+                            like2: true
+                        }
+                    }),
+                };
+
+                const likesSnapshotMock2 = {
+                    val: vi.fn(() => {
+                        return {
+                            like3: true
+                        }
+                    })
+                }
+
+                // mockResolvedValueOnce 會依程式執行調用該方法的順序回傳返回值
+                // mockResolvedValue 會一直使該方法調用時回傳相同返回值
+                // 模擬 get 方法調用 this.announcementRef
+                get.mockResolvedValueOnce(snapshotMock);
+                // 模擬 get 方法調用 likesRef, for 迴圈第一次
+                get.mockResolvedValueOnce(likesSnapshotMock);
+                // 模擬 get 方法調用 likesRef, for 迴圈第二次
+                get.mockResolvedValueOnce(likesSnapshotMock2);
+
+                // 創建模擬的回調函數
+                const callbackMock = vi.fn();
+
+                // Call the method being tested
+                await announcementLikes.getAnnouncementLikes(callbackMock);
+
+                // 驗證 callback function 是否被調用
+                expect(callbackMock).toHaveBeenCalledTimes(2);
+
+                // 驗證 callback function 傳入的參數是否正確
+                expect(callbackMock).toHaveBeenCalledWith('announcement1', 2);
+                expect(callbackMock).toHaveBeenCalledWith('announcement2', 1);
+            })
+
+            it('讚數為 0 的情況', async () => {
+
+                // fake data
+                const snapshotMock = {
+                    val: vi.fn(() => ({
+                        announcement1: {
+                            likes: null
+                        }
+                    }))
+                };
+
+                const likesSnapshotMock = {
+                    val: vi.fn(() => {
+                    }),
+                };
+
+                // 模擬 get 方法調用 this.announcementRef
+                get.mockResolvedValueOnce(snapshotMock);
+                // 模擬 get 方法調用 likesRef, for 迴圈第一次
+                get.mockResolvedValueOnce(likesSnapshotMock);
+
+                // 創建模擬的回調函數
+                const callbackMock = vi.fn();
+
+                // Call the method being tested
+                await announcementLikes.getAnnouncementLikes(callbackMock);
+
+                // 驗證 callback function 是否正確調用
+                expect(callbackMock).toHaveBeenCalledTimes(1);
+                expect(callbackMock).toHaveBeenCalledWith('announcement1', 0);
+            })
+
+            it('獲取 likes 失敗', async () => {
+
+                // fake data
+                const snapshotMock = {
+                    val: vi.fn(() => ({
+                        announcement1: {
+                            likes: {
+                                like1: true
+                            }
+                        }
+                    }))
+                };
+
+                const error = new Error('911');
+
+                // 第一次 get 正常返回 snapshotMock
+                get.mockResolvedValueOnce(snapshotMock);
+                // 第二次 get 返回 error
+                get.mockRejectedValueOnce(error);
+
+                // 創建模擬的回調函數
+                const callbackMock = vi.fn();
+
+                // mock console.error
+                vi.spyOn(console, 'error').mockImplementation(() => { });
+
+                // Call the method being tested
+                await announcementLikes.getAnnouncementLikes(callbackMock);
+
+                // console.error 被呼叫一次
+                expect(console.error).toHaveBeenCalledTimes(1)
+                // console.error 以正確參數傳入
+                expect(console.error).toHaveBeenCalledWith('Error getting likes: ', error);
+                // callback function 沒有被呼叫
+                expect(callbackMock).not.toHaveBeenCalled();
+            })
+
+            it('獲取 announcements 失敗', async () => {
+
+                // fake data
+                const error = new Error('110');
+
+                // 第一次 get 返回 error
+                get.mockRejectedValueOnce(error);
+
+                // 創建模擬的回調函數
+                const callbackMock = vi.fn();
+
+                // 調用被測試的函數
+                await announcementLikes.getAnnouncementLikes(callbackMock);
+
+                // console.error 被呼叫一次
+                expect(console.error).toHaveBeenCalledTimes(1)
+                // console.error 以正確參數傳入
+                expect(console.error).toHaveBeenCalledWith('Error getting announcements: ', error);
+                // callback function 沒有被呼叫
+                expect(callbackMock).not.toHaveBeenCalled();
+            })
         })
     })
 })
