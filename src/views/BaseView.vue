@@ -5,16 +5,31 @@
     <v-navigation-drawer width="244" permanent>
       <!-- 左 放商標的? -->
       <!--  -->
-      <v-sheet id="Lobby-Button" color="grey-lighten-5" height="128" width="100%" @click="clickLobby">
-        <v-img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRXGQDqS3rBb7GyPj87cxlKGJM1VC3CFIaUBg&usqp=CAU"
-          alt="Fake"></v-img>
+      <v-sheet
+        id="Lobby-Button"
+        color="grey-lighten-5"
+        height="128"
+        width="100%"
+        @click="clickLobby"
+      >
+        <v-img src="@assets/logo.png" alt="Fake"></v-img>
       </v-sheet>
       <!-- 底下的Item -->
       <v-list mandatory>
-        <v-list-item v-for="(explore, index) in Explores" :key="index" :value="index" link :to="explore.to" @click="() => {
-            SelectedPage = explore.title
-          }
-          " :data-test="explore.title" border>
+        <v-list-item
+          v-for="(explore, index) in Explores"
+          :key="index"
+          :value="index"
+          link
+          :to="explore.to"
+          @click="
+            () => {
+              SelectedPage = explore.title
+            }
+          "
+          :data-test="explore.title"
+          border
+        >
           <v-list-item-title class="text-left font-weight-black">{{
             explore.title
           }}</v-list-item-title>
@@ -26,24 +41,25 @@
     <v-app-bar class="px-2" color="grey-lighten-3" flat height="72">
       <v-app-bar-title class="font-weight-bold">#{{ SelectedPage }}</v-app-bar-title>
       <v-spacer></v-spacer>
+      <audio :src="MainMusic_url" autoplay id="mainAudio" controls @ended="whenMusicEnded"></audio>
+      <audio :src="SecondMusic_url" id="secondAudio" autoplay controls></audio>
       <v-btn class="ma-3 font-weight-bold" border @click="MuteButtonControl">{{
         MuteButton
       }}</v-btn>
-      <user-profile-button :userName="userProfile.name" :userImg="userProfile.avatar"></user-profile-button>
+      <user-profile-button
+        :userName="userProfile.name"
+        :userImg="userProfile.avatar"
+      ></user-profile-button>
     </v-app-bar>
 
     <!-- 右邊的東東 -->
     <v-navigation-drawer location="right" permanent color="grey-lighten-3   ">
-      <music-que style="height: 70%;" />
-      <nowPlaying style="height: 30%;" />
-      <div>
-        <audio :src="MainMusic_url" autoplay id="mainAudio" controls @ended="whenMusicEnded"></audio>
-        <audio :src="SecondMusic_url" id="secondAudio" autoplay controls></audio>
-      </div>
+      <music-que style="height: 70%" />
+      <nowPlaying style="height: 30%" />
     </v-navigation-drawer>
 
     <!-- 要放Page的地方  應該用Router Route  或是Component -->
-    <v-main style="height: 100vh;">
+    <v-main style="height: 100vh">
       <router-view></router-view>
     </v-main>
     <!-- 跳彈窗 -->
@@ -75,15 +91,6 @@ export default {
         { title: '我的音樂記錄', to: '/Home/MusicRecord' },
         { title: '聊天室', to: '/Home/Chat' }
       ],
-      FakeData: {
-        ChatroomMembers: [
-          { ava: '', Name: 'member1', alt: 'M1' },
-          { ava: '', Name: 'member2', alt: 'M2' },
-          { ava: '', Name: 'member3', alt: 'M3' },
-          { ava: '', Name: 'member4', alt: 'M4' },
-          { ava: '', Name: 'member5', alt: 'M5' }
-        ]
-      },
       message: '',
       SelectedPage: '大廳',
       MainMusic_url: '',
@@ -95,6 +102,7 @@ export default {
       // Music Queue
       musics: [],
       dialog: true,
+      isInitial: true,
       delayedMessage: '',
       playMusicTime: '',
       currentMusic: {},
@@ -108,7 +116,7 @@ export default {
   components: {
     UserProfileButton,
     musicQue,
-    nowPlaying,
+    nowPlaying
   },
   methods: {
     // 點擊大廳
@@ -129,8 +137,10 @@ export default {
       console.log('Play Second Audio' + url)
       var secondAudio = document.getElementById('secondAudio')
       //if(!secondAudio.paused) secondAudio.pause();
-      secondAudio.load()
-      secondAudio.src = url
+      if (secondAudio) {
+        secondAudio.load()
+        secondAudio.src = url
+      }
     },
     // 暫停Second Audio 預覽音樂
     PausePreviewAudio() {
@@ -139,7 +149,7 @@ export default {
       this.isPreview = false
       console.log('Pause Second Audio')
       var secondAudio = document.getElementById('secondAudio')
-      secondAudio.pause()
+      if (secondAudio) secondAudio.pause()
 
       if (!this.isMuted) this.UnmuteMainAudio()
       else this.MuteMainAudio()
@@ -159,13 +169,13 @@ export default {
     MuteMainAudio() {
       if (this.isPreview) return
       var mainAudio = document.getElementById('mainAudio')
-      mainAudio.volume = 0.0
+      if (mainAudio) mainAudio.volume = 0.0
     },
     // 解除靜音 Main Audio
     UnmuteMainAudio() {
       if (this.isPreview) return
       var mainAudio = document.getElementById('mainAudio')
-      mainAudio.volume = 1.0
+      if (mainAudio) mainAudio.volume = 1.0
     },
     // 當音樂播放結束
     whenMusicEnded() {
@@ -183,7 +193,7 @@ export default {
       }
     },
     // TODO(前端): 實作切歌後的播放歌曲
-    playReplacedMusic(newMusic) {
+    playReplacedMusic(newMusic, waitTime = 3000) {
       setTimeout(() => {
         // 確定當前歌曲沒有被切掉，切掉要 return
         if (newMusic !== this.musics[0]) return
@@ -194,7 +204,7 @@ export default {
         mainAudio.load()
         // 歌曲播放時記錄播放時戳
         this.musicQueue.setTransactionMusicPlayTime(Date.now())
-      }, 3000)
+      }, waitTime)
     },
     DialogCallback() {
       // music Queue
@@ -202,7 +212,7 @@ export default {
       // 取得時間使音樂同步
       this.musicQueue.getMusicPlayTime((startTime) => {
         var mainAudio = document.getElementById('mainAudio')
-        this.playMusicTime = startTime
+        this.playMusicTime = startTime + 3
         mainAudio.currentTime = this.playMusicTime
       })
 
@@ -309,9 +319,10 @@ export default {
         } else if (!newVal) {
           this.musicQueue.setTransactionMusicPlayTime(0)
         } else if (!oldVal[0] && newVal[0]) {
-          this.playReplacedMusic(newVal[0])
-        } else {
-          this.MainMusic_url = ""
+          if (this.isInitial) {
+            this.MainMusic_url = this.playReplacedMusic(newVal[0], 0)
+            this.isInitial = false
+          } else this.playReplacedMusic(newVal[0])
         }
       },
       // 初始化的變動不會響應 watch
