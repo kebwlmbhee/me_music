@@ -55,6 +55,40 @@ describe("Test ExploreView.vue", () => {
         await expect(wrapper.vm.loaded).toBe(false);
     })
 
+    it('clickPlaylist', async () => {
+        // Define the test data
+        const listId = '123';
+        const type = 'playlist';
+
+        wrapper.vm.$router.push = vi.fn()
+
+        wrapper.vm.clickPlaylist(listId, type);
+        expect(wrapper.vm.$router.push).toHaveBeenCalledWith({
+            path: '/Home/ExploreSong',
+            query: { id: listId, type: type }
+        });
+    })
+
+    it('searchCallback', () => {
+        // You can also assert that alert is called when search is empty
+        // For example, using Jest's spy functionality:
+        const originalAlert = window.alert;
+        window.alert = vi.fn();
+        wrapper.setData({ search: '' });
+        wrapper.vm.searchCallback();
+        expect(window.alert).toHaveBeenCalledWith('搜尋不能為空');
+        window.alert = originalAlert;
+
+        wrapper.vm.search = "example search"
+        wrapper.vm.$router.push = vi.fn()
+        wrapper.vm.searchCallback();
+
+        expect(wrapper.vm.$router.push).toHaveBeenCalledWith({
+            path: '/Home/Search',
+            query: { search: 'example search' }
+        });
+    })
+
     it('searchPlayList()', async () => {
         let mock = new MockAdapter(axios);
         let url = "https://api.spotify.com/v1/search?query=t&type=playlist&limit=20"
