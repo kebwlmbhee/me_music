@@ -1,4 +1,6 @@
 // Test written by jordan990301
+// 用 `npm run test:unit -t ExploreView.test.js --silent=false` 就可以查看 console.log 的內容
+
 import { describe, expect, it, vi } from "vitest";
 import { mount } from "@vue/test-utils";
 import vuetify from "@/plugins/vuetify";
@@ -13,13 +15,16 @@ describe("Test ExploreView.vue", () => {
     let wrapper;
 
     beforeEach(() => {
+        // wrapper 就是假元件
         wrapper = mount(ExploreView, {
             global: {
                 plugins: [vuetify, router, createTestingPinia()],
+                // 只要是沒用到的函式都可以先用 vi.fn() spy 起來讓他變成假函式，測試就不會被卡住
                 provide: {
                     PausePreview: vi.fn()
                 }
             },
+            // 用假的 data() 取代原先 ExploreView.vue 的 data(), data() 跟 methods 都可以用 wrapper.vm.xxx 呼叫
             data() {
                 return {
                     loaded: false,
@@ -36,18 +41,23 @@ describe("Test ExploreView.vue", () => {
             expect(wrapper.exists()).toBe(true);
         })
     })
-
+    
+    // async await 只是為了避免非同步問題、應該是沒有副作用，可以用爆
     it('runSearch()', async () => {
         // Mock the searchPlayList and searchArtist methods
+        // 因為原先 runSearch() 內有用到這兩個會 Promise 函式，測試沒有用到，這邊先 spy 起來不要讓他影響測試 
         wrapper.vm.searchPlayList = vi.fn(() => Promise.resolve());
         wrapper.vm.searchArtist = vi.fn(() => Promise.resolve());
 
         // Call the runSearch method
+        // 可以用以下方法呼叫 methods
         await wrapper.vm.runSearch();
         await wrapper.vm.$nextTick();
 
         // Verify that the loaded state is initially true
+        // Promise 還沒完成，loaded 應該還不會被改成 false
         await expect(wrapper.vm.loaded).toBe(true);
+        
         // Wait for the Promises to resolve
         await Promise.all([wrapper.vm.searchPlayList(), wrapper.vm.searchArtist()]);
 
@@ -60,6 +70,7 @@ describe("Test ExploreView.vue", () => {
         const listId = '123';
         const type = 'playlist';
 
+        // 把 router 函式 spy 起來，避免他真的導向新頁面。spy 只是要檢查傳入 router 的參數有沒有正常運作
         wrapper.vm.$router.push = vi.fn()
 
         wrapper.vm.clickPlaylist(listId, type);
@@ -90,7 +101,12 @@ describe("Test ExploreView.vue", () => {
     })
 
     it('searchPlayList()', async () => {
+        // 用第三方套件 axios-mock-adapter 解決 axios 問題，axios(config) 這種寫法的 API 呼叫也可以處理
+        // 不過這個不能放在 beforeEach, afterEach 使用，蠻怪的
         let mock = new MockAdapter(axios);
+
+        // 需要去查真實元件 ExploreView.vue 的 searchPlayList，看他到底 axios 需要傳入、回傳哪種參數格式
+        // 必須依照傳入、回傳的參數格式給予假資料，模擬 API 呼叫、回傳的行為
         let url = "https://api.spotify.com/v1/search?query=t&type=playlist&limit=20"
         let mock_data = {
             "playlists": {
@@ -140,16 +156,20 @@ describe("Test ExploreView.vue", () => {
                 "total": 716
             }
         }
-
+        
+        // 可以模擬 axios(config), config 設定為 get 的 API 呼叫
         mock.onGet(url).reply(200, mock_data);
 
+        // 等 wrapper.vm.searchPlayList() 內部完成呼叫 axios 的行為
         await wrapper.vm.searchPlayList()
         await wrapper.vm.$nextTick();
         // console.log("wrapper.vm.playlists")
         // console.log(wrapper.vm.playlists)
 
+        // 預計假元件 wrapper 內的 playlists 資料會被修改
         expect(wrapper.vm.playlists).toEqual((mock_data["playlists"])["items"])
 
+        // 重置 mock，不然會跳警告
         mock.restore();
     });
 
