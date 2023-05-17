@@ -1,8 +1,5 @@
 <template>
-  <v-app v-if="isTesting" />
-
-  <div v-if="!isTesting" ref="chatMessages" style="height: 100%; overflow: auto">
-    <!-- 訊息欄 -->
+  <div ref="chatMessages" style="height: 100%; overflow: auto">
     <v-list>
       <div
         v-for="(message, index) in this.allMessages"
@@ -115,12 +112,12 @@ export default {
       isSendMusic: false
     }
   },
-  props: {
-    isTesting: {
-      type: Boolean,
-      default: false
-    }
-  },
+  // props: {
+  //   isTesting: {
+  //     type: Boolean,
+  //     default: false
+  //   }
+  // },
   computed: {
     ...mapState(AudioControl, ['nowChecking']),
     ...mapState(UserStatus, ['userProfile'])
