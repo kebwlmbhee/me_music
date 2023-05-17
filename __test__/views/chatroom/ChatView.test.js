@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import { mount } from "@vue/test-utils";
+import { shallowMount } from "@vue/test-utils";
 import vuetify from "@/plugins/vuetify";
 import { createTestingPinia } from '@pinia/testing';
 import ChatView from "@/views/chatroom/ChatView.vue";
@@ -8,19 +8,14 @@ import ChatView from "@/views/chatroom/ChatView.vue";
 
 describe('ChatView.vue', () => {
 
-    let wrapper;
+    let wrapper = shallowMount(ChatView, {
+        global: {
+            plugins: [vuetify, createTestingPinia()]
+        }
+    })
 
     describe('ChatView 是否存在', () => {
 
-        // https://pinia.vuejs.org/cookbook/testing.html#unit-testing-components
-        wrapper = mount(ChatView, {
-            global: {
-                plugins: [vuetify, createTestingPinia()],
-            },
-            props:{
-                isTesting : true
-            }
-        });
         it('wrapper 是否成功創建', () => {
             expect(wrapper.exists()).toBe(true);
         })
@@ -84,7 +79,6 @@ describe('ChatView.vue', () => {
             });
         });
 
-        console.log("In4")
         // TODO: 公告未完成，亦未測試，目前只有 isAnnounce = false 的部分
         describe('SendMessage method', () => {
 
@@ -98,7 +92,7 @@ describe('ChatView.vue', () => {
                 const alertSpy = vi.spyOn(window, 'alert');
 
                 // 訊息為空
-                wrapper.setData({ message: '' });
+                wrapper.setData({ text: '' });
                 wrapper.vm.SendMessage();
                 // 驗證是否有彈出 alert
                 expect(alertSpy).toHaveBeenCalled();
@@ -125,23 +119,36 @@ describe('ChatView.vue', () => {
                 // monitor chatroom.sendMessage
                 const mockSendMessage = vi.spyOn(wrapper.vm.chatroom, 'sendMessage');
 
+                // add nowChecking fake data
+                const obj = {
+                    album: {
+                    },
+                    artist: "",
+                    id: "",
+                    picture: "",
+                    songName: "",
+                    timestamp: "",
+                    url: "",
+                }
+
                 // 更新測試資料
                 wrapper.setData({
                     // 使用 getNameSpy 取得 userProfile name
                     author: getNameSpy(),
                     text: text,
-                    isAnnounce: isAnnounce
+                    isAnnounce: isAnnounce,
+                    musicInfo: obj
                 });
 
                 // 呼叫 SendMessage 方法
                 wrapper.vm.SendMessage(false);
 
                 // 驗證 chatroom.sendMessage 是否正確傳參及呼叫
-
                 expect(mockSendMessage).toHaveBeenCalledWith(
                     userProfile.name,
                     text,
-                    isAnnounce
+                    isAnnounce,
+                    obj
                 );
 
                 // 驗證 this.text 最後是否設為空值，以待使用者重新輸入
