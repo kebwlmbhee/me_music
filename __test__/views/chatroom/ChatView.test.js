@@ -1,3 +1,5 @@
+// author: kebwlmbhee
+
 import { describe, expect, it, vi } from "vitest";
 import { shallowMount } from "@vue/test-utils";
 import vuetify from "@/plugins/vuetify";
@@ -16,6 +18,12 @@ describe('ChatView.vue', () => {
 
     describe('ChatView 是否存在', () => {
 
+        // https://pinia.vuejs.org/cookbook/testing.html#unit-testing-components
+        wrapper = shallowMount(ChatView, {
+            global: {
+                plugins: [vuetify, createTestingPinia()],
+            }
+        });
         it('wrapper 是否成功創建', () => {
             expect(wrapper.exists()).toBe(true);
         })
