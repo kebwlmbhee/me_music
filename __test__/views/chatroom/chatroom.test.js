@@ -101,13 +101,26 @@ describe('chatroom.js', () => {
 
         describe('sendMessage function', () => {
 
-            it('聊天室傳入訊息', () => {
+            // add musicInfo fake data
+            const musicInfo = {
+                artist: 'test',
+                id: '123',
+                picture: 'https://example.com/test.jpg',
+                songName: 'Hello',
+                url: 'https://example.com/test.mp3'
+            }
 
+            // mock window alert
+            window.alert = vi.fn();
+
+
+            it('聊天室傳入訊息', () => {
+        
                 const author = 'John';
                 const text = 'Hello, world!';
                 const isAnnounce = true;
-
-                chatroom.sendMessage(author, text, isAnnounce);
+                
+                chatroom.sendMessage(author, text, isAnnounce, musicInfo);
 
                 // 檢查 push 方法是否被呼叫，並檢查傳入的引數是否正確
                 expect(push).toHaveBeenCalled();
@@ -124,7 +137,7 @@ describe('chatroom.js', () => {
 
             it('正常發送公告', () => {
 
-                chatroom.sendMessage('John', 'Hello', true);
+                chatroom.sendMessage('John', 'Hello', true, musicInfo);
 
                 // 模擬 push 方法的返回值
                 const announcement = { key: mockKey }; 
@@ -158,10 +171,10 @@ describe('chatroom.js', () => {
 
             it('不發送公告', () => {
 
-                chatroom.sendMessage('John', 'Hello', false);
+                chatroom.sendMessage('John', 'Hello', false, musicInfo);
                 // push 方法不應該被呼叫
                 expect(push).not.toHaveBeenCalledWith(chatroom.announcementRef);
-
+                
                 // set 方法不應該被呼叫
                 expect(set).not.toHaveBeenCalled();
             })

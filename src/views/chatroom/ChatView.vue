@@ -1,9 +1,12 @@
 <template>
-  <v-app v-if="isTesting" />
-
-  <div v-if="!isTesting" ref="chatMessages" style="height: 100%; overflow: auto;">
+  <div ref="chatMessages" style="height: 100%; overflow: auto">
     <v-list>
-      <div v-for="(message, index) in this.allMessages" :key="index" class="text-center" id="chat-container">
+      <div
+        v-for="(message, index) in this.allMessages"
+        :key="index"
+        class="text-center"
+        id="chat-container"
+      >
         <v-label v-if="checkTime(index)">{{ TimeStampToDateString(message.time) }}</v-label>
         <v-list-item>
           <template v-slot:prepend>
@@ -15,13 +18,27 @@
       </div>
     </v-list>
     <v-footer app height="60">
-      <v-text-field data-test="chatroom-input" v-model="text" bg-color="grey-lighten-1"
-        class="rounded-pill overflow-hidden" density="compact" hide-details variant="solo" clearable
-        @keydown.enter="SendMessage"></v-text-field>
-      <input type="checkbox" v-model="isAnnounce" style="height: 100%; width: 10%;" />
-      <v-btn class="ma-2" @click="this.ScrollToBottom" color="black" icon="mdi-wrench"
-        style="position: fixed; right: 70px; bottom: 70px;">
-        <v-icon icon="mdi-arrow-down"></v-icon></v-btn>
+      <v-text-field
+        data-test="chatroom-input"
+        v-model="text"
+        bg-color="grey-lighten-1"
+        class="rounded-pill overflow-hidden"
+        density="compact"
+        hide-details
+        variant="solo"
+        clearable
+        @keydown.enter="SendMessage(this.isAnnounce)"
+      ></v-text-field>
+      <input type="checkbox" v-model="isAnnounce" style="height: 100%; width: 10%" />
+      <v-btn
+        class="ma-2"
+        @click="this.ScrollToBottom"
+        color="black"
+        icon="mdi-wrench"
+        style="position: fixed; right: 70px; bottom: 70px"
+      >
+        <v-icon icon="mdi-arrow-down"></v-icon
+      ></v-btn>
     </v-footer>
   </div>
 </template>
@@ -33,21 +50,24 @@ import UserStatus from '@/stores/UserStatus'
 import Chatroom from './chatroom.js'
 const chatroom = new Chatroom()
 
+import AudioControl from '../../stores/AudioControl'
+
 export default {
   data() {
     return {
       text: '',
       allMessages: [],
-      isAnnounce: false,
+      isAnnounce: false
     }
   },
-  props: {
-    isTesting: {
-      type: Boolean,
-      default: false
-    }
-  },
+  // props: {
+  //   isTesting: {
+  //     type: Boolean,
+  //     default: false
+  //   }
+  // },
   computed: {
+    ...mapState(AudioControl, ['nowChecking']),
     ...mapState(UserStatus, ['userProfile'])
   },
   created() {
@@ -59,7 +79,6 @@ export default {
       })
     })
     CP
-
   },
   methods: {
     checkTime(currentIndex) {
@@ -74,7 +93,7 @@ export default {
     TimeStampToDateString(timeStamp) {
       return this.chatroom.getTimeString(timeStamp)
     },
-    SendMessage(isAnnounce = false) {
+    SendMessage() {
       if (!this.text) {
         alert('message is empty!')
         return
@@ -86,10 +105,11 @@ export default {
       const newMessage = {
         author: this.userProfile.name,
         text: this.text,
-        isAnnounce: isAnnounce
+        isAnnounce: this.isAnnounce
       }
       this.allMessages.push(newMessage)
-      this.chatroom.sendMessage(this.userProfile.name, this.text, isAnnounce)
+      // SDJ : add AudioControl nowChecking
+      this.chatroom.sendMessage(this.userProfile.name, this.text, this.isAnnounce, this.nowChecking)
       this.text = ''
     },
     ScrollToBottom() {
@@ -98,17 +118,35 @@ export default {
     }
   },
   mounted() {
-    setTimeout(() => {
-      this.ScrollToBottom()
-    }, 1000)
+    // setTimeout(() => {
+    //   this.ScrollToBottom()
+    // }, 1000)
 
     this.ScrollToBottom()
-
-
-
-  },
-
+  }
 }
 </script>
 
-<style></style>
+<style lang="scss" scoped>
+/* width */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: #e2e2e2;
+  //border-radius: 5px;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: rgb(133, 133, 133);
+  border-radius: 5px;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+</style>
