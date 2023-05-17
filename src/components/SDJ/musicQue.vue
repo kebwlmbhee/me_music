@@ -82,7 +82,7 @@ export default {
     musicQue.onMusic((musics) => {
       //  store "musics"  intto pinia/AudioControl
       audio.musics = musics
-      if (state.first_timestamp === '') {
+      if (audio.musics[0] && state.first_timestamp === '') {
         // record First_timestamp
         state.first_timestamp = `${audio.musics[0].timestamp}`
       }
