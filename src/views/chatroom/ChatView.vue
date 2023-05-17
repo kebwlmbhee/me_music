@@ -1,9 +1,12 @@
 <template>
-  <v-app v-if="isTesting" />
-
-  <div v-if="!isTesting" ref="chatMessages" style="height: 100%; overflow: auto;">
+  <div ref="chatMessages" style="height: 100%; overflow: auto">
     <v-list>
-      <div v-for="(message, index) in this.allMessages" :key="index" class="text-center" id="chat-container">
+      <div
+        v-for="(message, index) in this.allMessages"
+        :key="index"
+        class="text-center"
+        id="chat-container"
+      >
         <v-label v-if="checkTime(index)">{{ TimeStampToDateString(message.time) }}</v-label>
         <v-list-item>
           <template v-slot:prepend>
@@ -15,13 +18,27 @@
       </div>
     </v-list>
     <v-footer app height="60">
-      <v-text-field data-test="chatroom-input" v-model="text" bg-color="grey-lighten-1"
-        class="rounded-pill overflow-hidden" density="compact" hide-details variant="solo" clearable
-        @keydown.enter="SendMessage(this.isAnnounce)"></v-text-field>
-      <input type="checkbox" v-model="isAnnounce" style="height: 100%; width: 10%;" />
-      <v-btn class="ma-2" @click="this.ScrollToBottom" color="black" icon="mdi-wrench"
-        style="position: fixed; right: 70px; bottom: 70px;">
-        <v-icon icon="mdi-arrow-down"></v-icon></v-btn>
+      <v-text-field
+        data-test="chatroom-input"
+        v-model="text"
+        bg-color="grey-lighten-1"
+        class="rounded-pill overflow-hidden"
+        density="compact"
+        hide-details
+        variant="solo"
+        clearable
+        @keydown.enter="SendMessage(this.isAnnounce)"
+      ></v-text-field>
+      <input type="checkbox" v-model="isAnnounce" style="height: 100%; width: 10%" />
+      <v-btn
+        class="ma-2"
+        @click="this.ScrollToBottom"
+        color="black"
+        icon="mdi-wrench"
+        style="position: fixed; right: 70px; bottom: 70px"
+      >
+        <v-icon icon="mdi-arrow-down"></v-icon
+      ></v-btn>
     </v-footer>
   </div>
 </template>
@@ -40,15 +57,15 @@ export default {
     return {
       text: '',
       allMessages: [],
-      isAnnounce: false,
+      isAnnounce: false
     }
   },
-  props: {
-    isTesting: {
-      type: Boolean,
-      default: false
-    }
-  },
+  // props: {
+  //   isTesting: {
+  //     type: Boolean,
+  //     default: false
+  //   }
+  // },
   computed: {
     ...mapState(AudioControl, ['nowChecking']),
     ...mapState(UserStatus, ['userProfile'])
@@ -62,7 +79,6 @@ export default {
       })
     })
     CP
-
   },
   methods: {
     checkTime(currentIndex) {
@@ -107,8 +123,7 @@ export default {
     // }, 1000)
 
     this.ScrollToBottom()
-  },
-
+  }
 }
 </script>
 
