@@ -16,9 +16,11 @@
         >
           <div class="d-flex" id="listItem">
             <!-- Music Image -->
-            <v-list-item-avatar>
-              <v-img :src="item.picture" :width="50"></v-img
-            ></v-list-item-avatar>
+            <!-- <v-list-item-avatar> -->
+            <v-avatar>
+              <v-img :src="item.picture" :width="50"></v-img>
+            </v-avatar>
+            <!-- </v-list-item-avatar> -->
             <!-- Music Title -->
             <div class="d-flex flex-column pl-5">
               <v-list-item-title> {{ item.songName }}</v-list-item-title>
@@ -80,7 +82,7 @@ export default {
     musicQue.onMusic((musics) => {
       //  store "musics"  intto pinia/AudioControl
       audio.musics = musics
-      if (state.first_timestamp === '') {
+      if (audio.musics[0] && state.first_timestamp === '') {
         // record First_timestamp
         state.first_timestamp = `${audio.musics[0].timestamp}`
       }
