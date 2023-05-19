@@ -2,7 +2,7 @@
 // 用 `npm run test:unit -t ExploreView.test.js --silent=false` 就可以查看 console.log 的內容
 
 import { describe, expect, it, vi } from "vitest";
-import { mount } from "@vue/test-utils";
+import { shallowMount } from "@vue/test-utils";
 import vuetify from "@/plugins/vuetify";
 import router from "@/router";
 import { createTestingPinia } from '@pinia/testing'
@@ -16,12 +16,23 @@ describe("Test ExploreView.vue", () => {
 
     beforeEach(() => {
         // wrapper 就是假元件
-        wrapper = mount(ExploreView, {
+        wrapper = shallowMount(ExploreView, {
             global: {
                 plugins: [vuetify, router, createTestingPinia()],
                 // 只要是沒用到的函式都可以先用 vi.fn() spy 起來讓他變成假函式，測試就不會被卡住
                 provide: {
                     PausePreview: vi.fn()
+                },
+                // 通過 stubs 將 v-text-field 換成自定義組件，
+                // 讓測試環境不會碰到真正的 v-text-field
+                // 可以模擬其被有效使用，且避免真正使用而造成的相依性及複雜性
+                stubs: {
+                    'v-text-field': {
+                        // 定義假的 props 模擬其 prefix 屬性
+                        props: ['fakePrefix'],
+                        // 進行存取
+                        template: '<div>{{ fakePrefix }}</div>'
+                    }
                 }
             },
             // 用假的 data() 取代原先 ExploreView.vue 的 data(), data() 跟 methods 都可以用 wrapper.vm.xxx 呼叫
@@ -41,7 +52,7 @@ describe("Test ExploreView.vue", () => {
             expect(wrapper.exists()).toBe(true);
         })
     })
-    
+
     // async await 只是為了避免非同步問題、應該是沒有副作用，可以用爆
     it('runSearch()', async () => {
         // Mock the searchPlayList and searchArtist methods
@@ -57,7 +68,7 @@ describe("Test ExploreView.vue", () => {
         // Verify that the loaded state is initially true
         // Promise 還沒完成，loaded 應該還不會被改成 false
         await expect(wrapper.vm.loaded).toBe(true);
-        
+
         // Wait for the Promises to resolve
         await Promise.all([wrapper.vm.searchPlayList(), wrapper.vm.searchArtist()]);
 
@@ -156,7 +167,7 @@ describe("Test ExploreView.vue", () => {
                 "total": 716
             }
         }
-        
+
         // 可以模擬 axios(config), config 設定為 get 的 API 呼叫
         mock.onGet(url).reply(200, mock_data);
 
