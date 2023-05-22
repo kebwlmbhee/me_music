@@ -2,7 +2,7 @@
   <div class="base">
     <!-- Queue Title -->
     <div class="queTitle">
-      <h1>Music Que</h1>
+      <h1>Music Queue</h1>
     </div>
     <!-- Queue List -->
     <div class="queList">

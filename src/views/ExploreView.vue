@@ -83,6 +83,10 @@ export default {
         this.loaded = false
       })
     },
+    // 當點擊時 會觸發的Callback
+    // 導向ExploreSong 頁面, 而ID跟Type為其query
+    // id : 就ID
+    // type : playlist, artist, album
     clickPlaylist(list_id, type) {
       console.log(type + ', id=' + list_id)
       this.$router.push({
@@ -90,6 +94,7 @@ export default {
         query: { id: list_id, type: type }
       })
     },
+    //上方搜尋欄的Callback
     searchCallback() {
       if (this.search == '') {
         alert('搜尋不能為空')

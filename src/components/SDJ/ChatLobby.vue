@@ -3,7 +3,7 @@
     <v-app-bar color="#FFF176" flat>
       <v-spacer></v-spacer>
       <div style="font-size: 2em">
-        <b>announcement</b>
+        <b>Announcement</b>
       </div>
       <v-spacer></v-spacer>
     </v-app-bar>
