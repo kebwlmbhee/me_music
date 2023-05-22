@@ -85,7 +85,9 @@ describe('musicQueue.js', () => {
                     musics = callback(musics);
                     return Promise.resolve();
                 }),
-                get: vi.fn(),
+                get: vi.fn((reference) =>
+                    Promise.resolve({ val: () => 'mockedValue' })
+                ),
                 db: vi.fn(),
             }
         });
@@ -255,6 +257,17 @@ describe('musicQueue.js', () => {
 
             // 檢查runTransaction是否被呼叫
             expect(runTransaction).toHaveBeenCalled();
+        });
+    });
+
+    describe('getMusicPlayTime method', () => {
+        it('getMusicPlayTime', async () => {
+            const callback = vi.fn();
+            queue.getMusicPlayTime(callback);
+            await Promise.resolve();
+
+            // 檢查get呼叫
+            expect(get).toHaveBeenCalled();
         });
     });
 
