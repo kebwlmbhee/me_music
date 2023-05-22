@@ -58,13 +58,13 @@
         @keydown.enter="SendMessage()"
       ></v-text-field>
       <!-- 公告按鈕 -->
-      <v-tooltip text="公告" location="top">
+      <v-tooltip text="公告(必須傳送音樂)" location="top">
         <template v-slot:activator="{ props }">
           <input
             v-bind="props"
             type="checkbox"
-            v-model="isAnnounce"
             style="height: 100%; width: 10%"
+            @click="AnnounceCallback"
           />
         </template>
       </v-tooltip>
@@ -112,12 +112,6 @@ export default {
       isSendMusic: false
     }
   },
-  // props: {
-  //   isTesting: {
-  //     type: Boolean,
-  //     default: false
-  //   }
-  // },
   computed: {
     ...mapState(AudioControl, ['nowChecking']),
     ...mapState(UserStatus, ['userProfile'])
@@ -179,6 +173,11 @@ export default {
     ScrollToBottom() {
       const chatMessages = this.$refs.chatMessages
       chatMessages.scrollTop = chatMessages.scrollHeight
+    },
+    // 原本使用雙向締結v-model控制, 改成click去控制
+    AnnounceCallback() {
+      this.isAnnounce = !this.isAnnounce
+      if (this.isAnnounce) this.isSendMusic = true
     },
     AddToQueueButtonCallback(data) {
       this.stateUpdateWithData(
