@@ -147,14 +147,17 @@ export default {
         alert('message is empty!')
         return
       }
+
       if (this.userProfile.name == '') {
         alert('沒有姓名, 可能需要重新登入')
         return
       }
+
       if (this.isAnnounce && !this.isSendMusic) {
         alert('如果希望公告, 則請勾選傳送音樂')
         return
       }
+
       // 判斷是否要傳送音樂
       let currentMusic = null
       if (this.isSendMusic) {

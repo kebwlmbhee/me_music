@@ -22,40 +22,37 @@ class AnnouncementLikes {
     }
   }
 
-  // 回調函數作為參數
-  getAnnouncementLikes(callback) {
-    // 取得 announcementRef 下的所有公告
-    get(this.announcementRef)
-      .then((snapshot) => {
-        // 挑出裡面儲存的數據
-        const announcements = snapshot.val()
-        // 使用 id 遍歷公告資料
-        for (const announcementId in announcements) {
-          // 取得其 id 下的 likes reference
-          const likesRef = ref(db, `announcement/${announcementId}/likes`)
-          // 取得 likes ref 下的所有資料
-          get(likesRef)
-            .then((likesSnapshot) => {
-              // 挑出裡面儲存的數據
-              const likes = likesSnapshot.val()
-              // 判定個數，即按讚數
-              const likeCount = likes ? Object.keys(likes).length : 0
-
-              // 回傳 callback function
-              if (typeof callback === 'function') {
-                callback(announcementId, likeCount)
-              }
-              // 獲取 likes 失敗
-            })
-            .catch((error) => {
-              console.error('Error getting likes: ', error)
-            })
+  // // 回調函數作為參數
+  async getAnnouncementLikes(callback) {
+    try {
+      // 取得 announcementRef 下的所有公告
+      const snapshot = await get(this.announcementRef)
+      // 挑出裡面儲存的數據
+      const announcements = snapshot.val()
+      // 使用 id 遍歷公告資料
+      for (const announcementId in announcements) {
+        // 取得其 id 下的 likes reference
+        const likesRef = ref(db, `announcement/${announcementId}/likes`)
+        // 取得 likes ref 下的所有資料
+        try {
+          const likesSnapshot = await get(likesRef)
+          // 挑出裡面儲存的數據
+          const likes = likesSnapshot.val()
+          // 判定個數，即按讚數
+          const likeCount = likes ? Object.keys(likes).length : 0
+          // 回傳 callback function
+          if (typeof callback === 'function') {
+            callback(announcementId, likeCount)
+          }
+          // 獲取 likes 失敗
+        } catch (error) {
+          console.error('Error getting likes: ', error)
         }
-        // 獲取 announcements 失敗
-      })
-      .catch((error) => {
-        console.error('Error getting announcements: ', error)
-      })
+      }
+      // 獲取 announcements 失敗
+    } catch (error) {
+      console.error('Error getting announcements: ', error)
+    }
   }
 }
 
