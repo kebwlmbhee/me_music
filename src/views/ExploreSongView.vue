@@ -10,11 +10,13 @@
         <v-avatar rounded="0" size="125" class="ma-5">
           <v-img :src="allData.images[0].url" alt="Not Found"></v-img>
         </v-avatar>
-        <div>
+        <div class="Title-Container">
           <v-card-item>{{ allData.type }}</v-card-item>
           <v-card-title class="font-weight-bold text-h5">{{ allData.name }}</v-card-title>
           <v-card-text>
-            {{ allData.description }}
+            <div class="CardText">
+              {{ allData.description }}
+            </div>
           </v-card-text>
         </div>
       </div>
@@ -25,11 +27,13 @@
         <v-avatar rounded="0" size="125" class="ma-5">
           <v-img :src="allData.images[0].url" alt="Not Found"></v-img>
         </v-avatar>
-        <div>
+        <div class="Title-Container">
           <v-card-item>{{ allData.type }}</v-card-item>
           <v-card-title class="font-weight-bold text-h4">{{ allData.name }}</v-card-title>
           <v-card-text>
-            {{ allData.description }}
+            <div class="CardText">
+              {{ allData.description }}
+            </div>
           </v-card-text>
         </div>
       </div>
@@ -40,7 +44,7 @@
         <v-avatar rounded="0" size="125" class="ma-5">
           <v-img :src="artistData.images[0].url" alt="Not Found"></v-img>
         </v-avatar>
-        <div>
+        <div class="Title-Container">
           <v-card-item>{{ artistData.type }}</v-card-item>
           <v-card-title class="font-weight-bold text-h4">{{ artistData.name }}</v-card-title>
           <v-card-text>
@@ -214,7 +218,7 @@
         </div>
         <div v-if="noMusic" class="text-red text-center text-h3">未提供音樂</div>
         <div class="text-center">
-          <v-btn size="large" class="mx-5" @click="addQue">Add To Queue</v-btn>
+          <v-btn v-if="!noMusic" size="large" class="mx-5" @click="addQue">Add To Queue</v-btn>
           <v-btn color="error" size="large" class="mx-5" @click="PausePreview">Stop Preview</v-btn>
         </div>
       </div>
@@ -247,6 +251,7 @@ export default {
     ...mapState(UserStatus, ['authCode', 'userProfile', 'my_device_id'])
   },
   methods: {
+    // 根據ID, Type 來去查詢需要的資料
     searchTypeRedirect(in_id, type) {
       this.loaded = true
       switch (type) {
@@ -309,6 +314,7 @@ export default {
       let return_data = await axios(config)
       return return_data.data
     },
+    // 搜尋當前要查詢的Artist的Track
     async searchArtistTracks(id) {
       let config = {
         method: 'GET',
@@ -321,6 +327,8 @@ export default {
       let return_data = await axios(config)
       return return_data.data
     },
+    // 搜尋當前要查詢的Artist的資料
+    // 因為查Artist本身，不會給予其資料
     async searchArtistsData(id) {
       let config = {
         method: 'GET',
@@ -334,6 +342,11 @@ export default {
       return return_data.data
     },
     // 當點擊某首歌  彈出視窗
+    // track_name : 歌曲名稱
+    // track_id : 歌曲ID
+    // artist_name : 歌曲主唱
+    // album_name : 專輯名稱
+    // img : 圖片url
     clickOneSong(track_name, track_id, artist_name, album_name, img) {
       this.currentClickSong.name = track_name
       this.currentClickSong.artist = artist_name
@@ -346,8 +359,6 @@ export default {
         this.PlayPreview(res)
       })
     },
-    // TODO : 單點歌曲
-
     // 連接 Spotify WebPlayback
     startWebPlayback(track_id) {
       console.log(this.my_device_id)
@@ -374,8 +385,8 @@ export default {
   },
   mounted() {
     this.checkAuth()
-    this.PausePreview()
-    this.type = this.$route.query.type
+    this.PausePreview() // 切換頁面時暫停Preview
+    this.type = this.$route.query.type // 根據url或去當前type(playlist, album, artist)
     this.searchTypeRedirect(this.$route.query.id, this.type)
   }
 }
@@ -384,5 +395,14 @@ export default {
 <style scoped>
 .songList::-webkit-scrollbar {
   display: none;
+}
+.Title-Container {
+  overflow: hidden;
+  white-space: wrap;
+  text-overflow: ellipsis;
+}
+.CardText {
+  word-break: break-all;
+  word-wrap: break-word;
 }
 </style>

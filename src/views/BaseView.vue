@@ -12,7 +12,7 @@
         width="100%"
         @click="clickLobby"
       >
-        <v-img src="@assets/logo.png" alt="Fake"></v-img>
+        <v-img src="/src/assets/logo.png" alt="Fake"></v-img>
       </v-sheet>
       <!-- 底下的Item -->
       <v-list mandatory>
@@ -35,17 +35,19 @@
           }}</v-list-item-title>
         </v-list-item>
       </v-list>
+      <v-spacer></v-spacer>
+      <nowPlaying style="height: 30%; position: absolute; bottom: 0; width: 100%" />
     </v-navigation-drawer>
 
     <!-- 右中-上 -->
     <v-app-bar class="px-2" color="grey-lighten-3" flat height="72">
       <v-app-bar-title class="font-weight-bold">#{{ SelectedPage }}</v-app-bar-title>
       <v-spacer></v-spacer>
-      <audio :src="MainMusic_url" autoplay id="mainAudio" controls @ended="whenMusicEnded"></audio>
+      <audio :src="MainMusic_url" autoplay id="mainAudio" @ended="whenMusicEnded"></audio>
       <audio :src="SecondMusic_url" id="secondAudio" autoplay controls></audio>
-      <v-btn class="ma-3 font-weight-bold" border @click="MuteButtonControl">{{
-        MuteButton
-      }}</v-btn>
+      <v-btn class="ma-3 font-weight-bold" border @click="MuteButtonControl">
+        Queue {{ MuteButton }}
+      </v-btn>
       <user-profile-button
         :userName="userProfile.name"
         :userImg="userProfile.avatar"
@@ -54,8 +56,7 @@
 
     <!-- 右邊的東東 -->
     <v-navigation-drawer location="right" permanent color="grey-lighten-3   ">
-      <music-que style="height: 70%" />
-      <nowPlaying style="height: 30%" />
+      <music-que style="height: 100%" />
     </v-navigation-drawer>
 
     <!-- 要放Page的地方  應該用Router Route  或是Component -->
@@ -142,7 +143,16 @@ export default {
         secondAudio.src = url
       }
     },
+    // 繼續播放Preview
+    PreviewResume() {
+      this.MuteMainAudio()
+      this.isPreview = true
+      var secondAudio = document.getElementById('secondAudio')
+      if (secondAudio.ended) secondAudio.load()
+      else secondAudio.play()
+    },
     // 暫停Second Audio 預覽音樂
+    // MainAudio 靜音會根據當前是否處於靜音去調整
     PausePreviewAudio() {
       // 當暫停時 使MainAudio靜音取消
       // 暫停播放 Second Audio
@@ -192,13 +202,13 @@ export default {
           })
       }
     },
-    // TODO(前端): 實作切歌後的播放歌曲
+    // 切歌後的播放歌曲
+    // newMusic : 要播放的歌的URL
+    // waitTime : 等待時間
     playReplacedMusic(newMusic, waitTime = 3000) {
       setTimeout(() => {
         // 確定當前歌曲沒有被切掉，切掉要 return
         if (newMusic !== this.musics[0]) return
-        // TODO(前端): console.log() 應替換為播放歌曲的 code
-        console.log(`playReplacedMusic`)
         this.MainMusic_url = this.musics[0].url
         var mainAudio = document.getElementById('mainAudio')
         mainAudio.load()
@@ -206,6 +216,10 @@ export default {
         this.musicQueue.setTransactionMusicPlayTime(Date.now())
       }, waitTime)
     },
+    // 進入頁面會處於畫面正中央彈窗的CallBack
+    // 這裡點擊後才會開始獲取音樂的資訊
+    // 原因 : 因為Google要求 需要用戶使用真實方式點擊頁面\
+    //        才能使用自動播放的功能
     DialogCallback() {
       // music Queue
       this.musicQueue = new musicQueue()
@@ -233,6 +247,8 @@ export default {
     ...mapActions(UserStatus, ['checkAuth', 'update_device_id'])
   },
   mounted() {
+    // 這個是因為一開始無法直接使用$route
+    // 所以過0.1s 後再去更改其值
     setTimeout(() => {
       this.SelectedPage = this.$route.name
     }, 100)
@@ -305,7 +321,8 @@ export default {
   provide() {
     return {
       PlayPreview: this.PlayPreviewAudio,
-      PausePreview: this.PausePreviewAudio
+      PausePreview: this.PausePreviewAudio,
+      PreviewResume: this.PreviewResume
     }
   },
   watch: {
@@ -317,10 +334,14 @@ export default {
           // 偵測到變動，不用註明是歌曲結束還是被切歌，處理相同的問題
           this.playReplacedMusic(newVal[0])
         } else if (!newVal) {
+          // 如果不存在新的歌?
           this.musicQueue.setTransactionMusicPlayTime(0)
         } else if (!oldVal[0] && newVal[0]) {
+          // 當有現有MusicQueue為空 且 新的不為空時
+          // 然後會判斷是否為剛開始的初始化
+          // 因為有可能是播到沒歌了
           if (this.isInitial) {
-            this.MainMusic_url = this.playReplacedMusic(newVal[0], 0)
+            this.playReplacedMusic(newVal[0], 0)
             this.isInitial = false
           } else this.playReplacedMusic(newVal[0])
         }
