@@ -248,7 +248,7 @@ export default {
     // 這個是因為一開始無法直接使用$route
     // 所以過0.1s 後再去更改其值
     setTimeout(() => {
-      this.SelectedPage = this.$route.name
+      if (this.$route && this.$route.name) this.SelectedPage = this.$route.name
     }, 100)
     this.checkAuth()
     /// TODO : 要先獲取當前的 MusicQueue 存儲 於FireBase

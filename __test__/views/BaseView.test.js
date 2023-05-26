@@ -1,6 +1,6 @@
 // author: kebwlmbhee
 
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { shallowMount } from "@vue/test-utils";
 import vuetify from "@/plugins/vuetify";
 import { createTestingPinia } from '@pinia/testing';
@@ -15,7 +15,6 @@ describe('MusicQueueView.vue', () => {
     let mockMainAudio, mockSecondAudio;
     let getElementByIdSpy, muteMainAudioSpy, unmuteMainAudioSpy;
     let playReplacedMusicSpy, removeMusicTransactionMock, setTransactionMusicPlayTimeMock, getMusicPlayTimeMock;
-    let musicQueueMock;
 
     // using vi.fn() to create a mock push method in router
     const mockRouter = {
@@ -111,6 +110,8 @@ describe('MusicQueueView.vue', () => {
         vi.clearAllMocks();
         // restore all mock function to original implementation
         vi.restoreAllMocks();
+        // clear all timer
+        vi.clearAllTimers();
     })
 
     describe('BaseView 是否存在', () => {
