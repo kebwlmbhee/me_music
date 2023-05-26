@@ -14,13 +14,8 @@ describe('MusicQueueView.vue', () => {
 
     let mockMainAudio, mockSecondAudio;
     let getElementByIdSpy, muteMainAudioSpy, unmuteMainAudioSpy;
-    let playReplacedMusicSpy;
+    let playReplacedMusicSpy, removeMusicTransactionMock, setTransactionMusicPlayTimeMock, getMusicPlayTimeMock;
     let musicQueueMock;
-    const removeMusicTransactionMock = vi.fn().mockResolvedValue();
-    const setTransactionMusicPlayTimeMock = vi.fn().mockResolvedValue();
-    const getMusicPlayTimeMock = vi.fn().mockImplementation((callback) => {
-        callback(10);
-    })
 
     // using vi.fn() to create a mock push method in router
     const mockRouter = {
@@ -45,6 +40,7 @@ describe('MusicQueueView.vue', () => {
         }
     })
 
+    // executed before each individual test
     beforeEach(() => {
         // initial value
         wrapper.vm.Explores = [
@@ -69,8 +65,14 @@ describe('MusicQueueView.vue', () => {
         wrapper.vm.currentMusic = {};
         wrapper.vm.currentIndex = 0;
 
-        // mock musicQueue function implementation
-        musicQueueMock = {
+        // mock musicQueue function
+        removeMusicTransactionMock = vi.fn().mockResolvedValue();
+        setTransactionMusicPlayTimeMock = vi.fn().mockResolvedValue();
+        getMusicPlayTimeMock = vi.fn().mockImplementation((callback) => {
+            callback(10);
+        })
+
+        wrapper.vm.musicQueue = {
             getMusicPlayTime: getMusicPlayTimeMock,
             onMusic: vi.fn(),
             onSwitchMusicNotification: vi.fn(),
@@ -78,16 +80,13 @@ describe('MusicQueueView.vue', () => {
             setTransactionMusicPlayTime: setTransactionMusicPlayTimeMock
         }
 
-        wrapper.vm.musicQueue = musicQueueMock;
-
-        // mock mainAudio function and value
+        // mock mainAudio and secondAudio function and value
         mockMainAudio = {
             load: vi.fn(),
             currentTime: 0,
             volume: 1.0
         }
 
-        // mock secondAudio function and value
         mockSecondAudio = {
             play: vi.fn(),
             load: vi.fn(),
@@ -102,16 +101,16 @@ describe('MusicQueueView.vue', () => {
         muteMainAudioSpy = vi.spyOn(wrapper.vm, 'MuteMainAudio');
         // spyOn UnmuteMainAudio
         unmuteMainAudioSpy = vi.spyOn(wrapper.vm, 'UnmuteMainAudio');
-
-        // spyOn setTransactionMusicPlayTime
         // spyOn playReplacedMusic
         playReplacedMusicSpy = vi.spyOn(wrapper.vm, 'playReplacedMusic');
     })
 
-    // 每個單一測試後呼叫
+    // executed after each individual test
     afterEach(() => {
-        // 清除所有 mock 功能
+        // clear all mock function(including call times and parameter)
         vi.clearAllMocks();
+        // restore all mock function to original implementation
+        vi.restoreAllMocks();
     })
 
     describe('BaseView 是否存在', () => {
@@ -523,8 +522,6 @@ describe('MusicQueueView.vue', () => {
 
                 // expect window.alert is never to be called
                 expect(alertMock).not.toHaveBeenCalled();
-
-
             });
 
             it('第一首歌曲已被他人移除', () => {
