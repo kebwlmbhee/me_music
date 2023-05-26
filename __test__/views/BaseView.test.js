@@ -588,7 +588,6 @@ describe('MusicQueueView.vue', () => {
                 vi.useFakeTimers();
             });
 
-
             it('當前歌曲被別人切掉', () => {
 
                 // set initial value
@@ -669,7 +668,7 @@ describe('MusicQueueView.vue', () => {
             expect(playReplacedMusicSpy).toHaveBeenCalledWith(newVal[0]);
         });
 
-        it('如果是舊值為空，但新值非空，要判斷是否是初始化導致 musics[0] 的變動，', () => {
+        it('如果舊值為空，但新值非空，但是是初始化導致 musics[0] 的變動的情況', () => {
 
             // mock oldVal and newVal
             const newVal = [{ timestamp: 12345 }];
@@ -689,7 +688,7 @@ describe('MusicQueueView.vue', () => {
             expect(playReplacedMusicSpy).toHaveBeenCalledWith(newVal[0], 0);
         });
 
-        it('如果是舊值為空，但新值非空，初始化導致 musics[0] 的變動，', () => {
+        it('如果舊值為空，但新值非空，非初始化導致 musics[0] 的變動的情況', () => {
 
             // mock oldVal and newVal
             const newVal = [{ timestamp: 12345 }];
