@@ -109,7 +109,7 @@ describe('ChatView.vue', () => {
                 wrapper.setData({ text: '' });
                 wrapper.vm.SendMessage();
                 // 驗證是否有彈出 alert
-                expect(alertSpy).toHaveBeenCalled();
+                expect(alertSpy).toHaveBeenCalledWith('message is empty!');
                 // 恢復原始的 alert
                 window.alert = originalAlert;
             })
