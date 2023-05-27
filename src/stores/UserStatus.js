@@ -36,6 +36,7 @@ export default defineStore('UserStatus', {
       this.authCode.token_type = authCode.token_type
     },
     UpdateUser() {
+      let self = this
       let url = 'https://api.spotify.com/v1/me'
       let config = {
         headers: {
@@ -43,11 +44,18 @@ export default defineStore('UserStatus', {
           Authorization: `Bearer ${this.authCode.access_token}`
         }
       }
-      axios.get(url, config).then((res) => {
-        this.userProfile.id = res.data.id
-        this.userProfile.name = res.data.display_name
-        this.userProfile.avatar = res.data.images[0].url
-      })
+      axios
+        .get(url, config)
+        .then((res) => {
+          this.userProfile.id = res.data.id
+          this.userProfile.name = res.data.display_name
+          this.userProfile.avatar = res.data.images[0].url
+        })
+        // 401 Bad or expired token
+        .catch((err) => {
+          console.log(err)
+          self.logout()
+        })
     },
     checkAuth() {
       if (
