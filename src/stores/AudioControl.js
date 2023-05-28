@@ -17,7 +17,8 @@ export default defineStore('AudioControl ', {
       },
       musics: [],
       snackbarMsg: '',
-      searchPreview: ''
+      searchPreview: '',
+      isPreview: false
     }
   },
   actions: {
@@ -43,7 +44,6 @@ export default defineStore('AudioControl ', {
         temp.timestamp
       )
     },
-
     // 更新nowChecking的data
     stateUpdate(data) {
       let temp = {
@@ -109,6 +109,10 @@ export default defineStore('AudioControl ', {
       }
       // console.log(temp)
       this.nowChecking = temp
+    },
+    isPreviewStateChacnge(isPlaying) {
+      console.log(`current this.isPreview = ${this.isPreview} , isPlaying = ${isPlaying}`)
+      this.isPreview = isPlaying
     }
   }
 })

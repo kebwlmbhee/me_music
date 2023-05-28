@@ -31,7 +31,9 @@
                     <v-card-title>{{ message.musicInfo.songName }}</v-card-title>
                     <v-card-subtitle>{{ message.musicInfo.artist }}</v-card-subtitle>
                     <v-card-actions>
-                      <v-btn color="black" @click="PlayPreview(message.musicInfo.url)">Play</v-btn>
+                      <v-btn color="black" @click="PlayButtonCallback(message.musicInfo)"
+                        >Play</v-btn
+                      >
                       <v-spacer></v-spacer>
                       <v-btn color="red" @click="PausePreview">Stop</v-btn>
                       <v-btn @click="AddToQueueButtonCallback(message.musicInfo)">Add</v-btn>
@@ -176,6 +178,17 @@ export default {
     ScrollToBottom() {
       const chatMessages = this.$refs.chatMessages
       chatMessages.scrollTop = chatMessages.scrollHeight
+    },
+    PlayButtonCallback(data) {
+      this.stateUpdateWithData(
+        data.id,
+        data.artist,
+        data.songName,
+        data.url,
+        data.picture,
+        data.album
+      )
+      this.PlayPreview(data.url)
     },
     // 原本使用雙向締結v-model控制, 改成click去控制
     AnnounceCallback() {
