@@ -12,7 +12,7 @@
         width="100%"
         @click="clickLobby"
       >
-        <v-img src="/src/assets/logo.png" alt="Fake"></v-img>
+        <v-img src="/logo.png" alt="Fake"></v-img>
       </v-sheet>
       <!-- 底下的Item -->
       <v-list mandatory>
