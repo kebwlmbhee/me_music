@@ -253,7 +253,6 @@ export default {
       this.SelectedPage = this.$route.name
     }, 100)
     this.checkAuth()
-    /// TODO : 要先獲取當前的 MusicQueue 存儲 於FireBase
 
     // Web Playback SDK
     const script = document.createElement('script')
