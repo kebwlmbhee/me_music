@@ -14,9 +14,8 @@ class Chatroom {
       text: text,
       time: Date.now(),
       isAnnounce: isAnnounce,
-      musicInfo: nowChecking,
+      musicInfo: nowChecking
     }
-    alert (newMessage.musicInfo.picture)
     push(this.chatroomRef, newMessage)
     // 如果 isAnnounce(checkbox)為 true，則寫入公告
     if (isAnnounce) {

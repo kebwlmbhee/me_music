@@ -105,7 +105,7 @@ export default {
     ...mapState(AudioControl, ['searchPreview'])
   },
   methods: {
-    // TODO : 如果 query 是空值  要怎麼辦ㄋ
+    // 這裡為搜尋User所收藏的歌曲 歌單 藝人 專輯
     searchUserItem() {
       this.loaded = true
       // user tracks
@@ -189,12 +189,10 @@ export default {
         image: data.album.images[0].url,
         artists: data.artists
       }
-      // 如果沒有 preview url 先用search搜一遍
-      // 在確定有沒有
+      // 直接重新搜尋
       this.UseTrackIdStateUpdate(this.authCode.access_token, data.name, data.id).then((res) => {
         if (res === null) return
 
-        console.log('MusicRecord trigger_pop_up : 沒有Preview Url 但Search的到 Url ')
         this.popUpHaveUrl = true
         this.PlayPreview(res)
       })

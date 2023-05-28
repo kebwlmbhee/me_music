@@ -1,100 +1,119 @@
 <template>
   <html class="flexColumn outBox">
-  <v-app-bar color="#FFF176" flat>
-    <v-spacer></v-spacer>
-    <div style="font-size: 2em">
-      <b>Announcement</b>
-    </div>
-    <v-spacer></v-spacer>
-  </v-app-bar>
-
-  <!-- first part -->
-  <div class="firstPart" v-for="item in songList" :key="item.ID">
-    <div class="inBox">
-      <!-- left div -->
-      <div class="leftDiv" style="background-color: aqua">
-        <img :src="item.songImage" alt="songImgage" style="width: 100%; max-height: 100%" />
+    <v-app-bar color="#FFF176" flat>
+      <v-spacer></v-spacer>
+      <div style="font-size: 2em">
+        <b>Announcement</b>
       </div>
+      <v-spacer></v-spacer>
+    </v-app-bar>
 
-      <!-- mid div -->
-      <div class="flexColumn midDiv">
-        <span>
-          <h2>{{ item.songTitle }}</h2>
-          <h5>{{ item.songInfo }}</h5>
-        </span>
-        <span class="playButton" style="
+    <!-- first part -->
+    <div class="firstPart" v-for="item in songList" :key="item.ID">
+      <div class="inBox">
+        <!-- left div -->
+        <div class="leftDiv" style="background-color: aqua">
+          <img :src="item.songImage" alt="songImgage" style="width: 100%; max-height: 100%" />
+        </div>
+
+        <!-- mid div -->
+        <div class="flexColumn midDiv">
+          <span>
+            <h2>{{ item.songTitle }}</h2>
+            <h5>{{ item.songInfo }}</h5>
+          </span>
+          <span
+            class="playButton"
+            style="
               display: flex;
               justify-content: space-around;
               height: 20%;
               width: 100%;
               font-size: 1em;
-            ">
-          <v-btn class="bg-green" style="width: 30%; height: 80%; font-size: 0.8em">播放</v-btn>
-        </span>
-      </div>
+            "
+          >
+            <v-btn class="bg-green" style="width: 30%; height: 80%; font-size: 0.8em">播放</v-btn>
+          </span>
+        </div>
 
-      <!-- right div -->
-      <div class="flexColumn rightDiv">
-        <span class="topSpan" style="
+        <!-- right div -->
+        <div class="flexColumn rightDiv">
+          <span
+            class="topSpan"
+            style="
               display: flex;
               justify-content: space-between;
               align-items: center;
               height: 20%;
               margin-bottom: 10px;
               font-size: 1em;
-            ">
-          <span style="display: flex; align-items: center; height: 100%">
-            <span style="font-size: 0.8em"><b>來自 <span class="text-blue">{{ item.musicPlayer.name }}</span> 的廣播</b>
+            "
+          >
+            <span style="display: flex; align-items: center; height: 100%">
+              <span style="font-size: 0.8em"
+                ><b
+                  >來自 <span class="text-blue">{{ item.musicPlayer.name }}</span> 的廣播</b
+                >
+              </span>
+              <span class="gjButton" style="height: 100%; font-size: 1em">
+                <v-btn
+                  @click="likesButton(item)"
+                  :class="{ 'bg-green': !item.liked, test: item.liked }"
+                  style="width: auto; height: 80%; font-size: 0.8em; margin-left: 10px"
+                >
+                  <span class="material-symbols-outlined" style="font-size: 1em"> thumb_up </span>
+                  <span style="font-size: 1em; margin-left: 10%">
+                    {{ item.liked ? '已按讚' : '按讚' }}
+                    {{ item.likeCount ? item.likeCount : 0 }}
+                  </span>
+                </v-btn>
+              </span>
             </span>
-            <span class="gjButton" style="height: 100%; font-size: 1em">
-              <v-btn @click="likesButton(item)" :class="{ 'bg-green': !item.liked, 'test': item.liked }"
-                style="width: auto; height: 80%; font-size: 0.8em; margin-left: 10px">
-                <span class="material-symbols-outlined" style="font-size: 1em"> thumb_up </span>
-                <span style="font-size: 1em; margin-left: 10%">
-                  {{ item.liked ? '已按讚' : '按讚' }}
-                  {{ item.likeCount ? item.likeCount : 0 }}
-                </span>
-              </v-btn>
-            </span>
+            <span style="font-size: 0.8em">{{ item.time }}</span>
           </span>
-          <span style="font-size: 0.8em">{{ item.time }}</span>
-        </span>
 
-        <div style="
+          <div
+            style="
               display: flex;
               justify-content: space-between;
               align-items: center;
               width: 100%;
               height: 20%;
               margin-bottom: 10px;
-            ">
-          <div style="display: flex; justify-content: center; height: 100%">
-            <img :src="item.musicPlayer.avatar" alt="test" style="width: auto; height: 100%; max-height: 100%" />
-          </div>
+            "
+          >
+            <div style="display: flex; justify-content: center; height: 100%">
+              <img
+                :src="item.musicPlayer.avatar"
+                alt="test"
+                style="width: auto; height: 100%; max-height: 100%"
+              />
+            </div>
 
-          <div style="
+            <div
+              style="
                 width: 100%;
                 height: 100%;
                 background-color: white;
                 font-size: 1em;
                 margin-left: 10px;
-              ">
-            {{ item.something }}
+              "
+            >
+              {{ item.something }}
+            </div>
           </div>
-        </div>
 
-        <div style="width: 100%; background-color: white; flex: 1">
-          <span style="color: black">
-            <!-- <v-btn @click="test">test</v-btn>
+          <div style="width: 100%; background-color: white; flex: 1">
+            <span style="color: black">
+              <!-- <v-btn @click="test">test</v-btn>
                             <Test :name="X"></Test>
                             <Test v-for="item in test1" :key="item.id" :name="`${item.name}`"></Test> -->
-            <Test></Test>
-          </span>
+              <Test></Test>
+            </span>
+          </div>
         </div>
       </div>
     </div>
-  </div>
-
   </html>
 </template>
 
@@ -111,9 +130,6 @@ export default {
     var chatroom = new Chatroom()
     var announcementLikes = new AnnouncementLikes()
     var userid = userStatus.userProfile.id
-
-
-
 
     chatroom.onAnnouncement((messages) => {
       const announcements = messages.map((ParamAnnouncement) => {
@@ -141,9 +157,6 @@ export default {
         chatroom.removeAnnouncement(announcement)
       }
 
-
-
-
       // like update
       async function test() {
         await announcementLikes.getAnnouncementLikes((announcementId, likeCount) => {
@@ -168,8 +181,6 @@ export default {
           }
         })
 
-
-
         // clean songList
         songList.splice(0, songList.length)
 
@@ -188,18 +199,13 @@ export default {
             something: element.text,
             others: '訪客留言',
             liked: element.liked,
-            likeCount: element.likeCount,
+            likeCount: element.likeCount
           })
         })
-
-
-
       }
 
       test()
     })
-
-
 
     const likesButton = async (announcement) => {
       try {
@@ -221,7 +227,7 @@ export default {
 
     return {
       songList,
-      likesButton,
+      likesButton
     }
   }
 }
@@ -231,7 +237,7 @@ export default {
 /* default => max-width: 1400px */
 /* wrong */
 
-.test{
+.test {
   background-color: grey;
 }
 
