@@ -121,13 +121,15 @@
 import { reactive } from 'vue'
 import Chatroom from '/src/views/chatroom/chatroom.js'
 import AnnouncementLikes from '/src/views/announcement/announcementLikes.js'
+import UserStatus from '/src/stores/UserStatus.js'
 
 export default {
   setup() {
+    const userStatus = reactive(UserStatus())
     let songList = reactive([])
     var chatroom = new Chatroom()
     var announcementLikes = new AnnouncementLikes()
-    var userid = '456'
+    var userid = userStatus.userProfile.id
 
     chatroom.onAnnouncement((messages) => {
       const announcements = messages.map((ParamAnnouncement) => {
