@@ -12,7 +12,7 @@
         width="100%"
         @click="clickLobby"
       >
-        <v-img src="/src/assets/logo.png" alt="Fake"></v-img>
+        <v-img src="/logo.png" alt="Fake"></v-img>
       </v-sheet>
       <!-- 底下的Item -->
       <v-list mandatory>
@@ -255,7 +255,6 @@ export default {
       this.SelectedPage = this.$route.name
     }, 100)
     this.checkAuth()
-    /// TODO : 要先獲取當前的 MusicQueue 存儲 於FireBase
 
     // Web Playback SDK
     const script = document.createElement('script')
