@@ -111,7 +111,10 @@ export default defineStore('AudioControl ', {
       this.nowChecking = temp
     },
     isPreviewStateChacnge(isPlaying) {
-      console.log(`current this.isPreview = ${this.isPreview} , isPlaying = ${isPlaying}`)
+      if (this.nowChecking.id == '') {
+        this.isPreview = false
+        return
+      }
       this.isPreview = isPlaying
     }
   }
