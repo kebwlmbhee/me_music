@@ -110,7 +110,7 @@ export default defineStore('AudioControl ', {
       // console.log(temp)
       this.nowChecking = temp
     },
-    isPreviewStateChacnge(isPlaying) {
+    isPreviewStateChange(isPlaying) {
       console.log(`current this.isPreview = ${this.isPreview} , isPlaying = ${isPlaying}`)
       this.isPreview = isPlaying
     }

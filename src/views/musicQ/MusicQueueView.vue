@@ -97,8 +97,6 @@ export default {
         if (oldVal[0] && newVal[0] && newVal[0].id !== oldVal[0].id) {
           // 偵測到變動，不用註明是歌曲結束還是被切歌，處理相同的問題
           this.playReplacedMusic(newVal[0])
-        } else if (!newVal) {
-          this.musicQueue.setTransactionMusicPlayTime(0)
         }
       },
       // 初始化的變動不會響應 watch

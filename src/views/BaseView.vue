@@ -135,8 +135,7 @@ export default {
       // 當開始播放時 靜音MainAudio
       // 開始播放 Second Audio
       this.MuteMainAudio()
-      this.isPreviewStateChacnge(true)
-      console.log('Play Second Audio' + url)
+      this.isPreviewStateChange(true)
       var secondAudio = document.getElementById('secondAudio')
       //if(!secondAudio.paused) secondAudio.pause();
       if (secondAudio) {
@@ -147,7 +146,7 @@ export default {
     // 繼續播放Preview
     PreviewResume() {
       this.MuteMainAudio()
-      this.isPreviewStateChacnge(true)
+      this.isPreviewStateChange(true)
       var secondAudio = document.getElementById('secondAudio')
       if (secondAudio.ended) secondAudio.load()
       else secondAudio.play()
@@ -157,8 +156,7 @@ export default {
     PausePreviewAudio() {
       // 當暫停時 使MainAudio靜音取消
       // 暫停播放 Second Audio
-      this.isPreviewStateChacnge(false)
-      console.log('Pause Second Audio')
+      this.isPreviewStateChange(false)
       var secondAudio = document.getElementById('secondAudio')
       if (secondAudio) secondAudio.pause()
 
@@ -246,13 +244,13 @@ export default {
       this.dialog = false
     },
     ...mapActions(UserStatus, ['checkAuth', 'update_device_id']),
-    ...mapActions(AudioControl, ['isPreviewStateChacnge'])
+    ...mapActions(AudioControl, ['isPreviewStateChange'])
   },
   mounted() {
     // 這個是因為一開始無法直接使用$route
     // 所以過0.1s 後再去更改其值
     setTimeout(() => {
-      this.SelectedPage = this.$route.name
+      if (this.$route && this.$route.name) this.SelectedPage = this.$route.name
     }, 100)
     this.checkAuth()
 
@@ -334,9 +332,6 @@ export default {
         if (oldVal[0] && newVal[0] && newVal[0].timestamp !== oldVal[0].timestamp) {
           // 偵測到變動，不用註明是歌曲結束還是被切歌，處理相同的問題
           this.playReplacedMusic(newVal[0])
-        } else if (!newVal) {
-          // 如果不存在新的歌?
-          this.musicQueue.setTransactionMusicPlayTime(0)
         } else if (!oldVal[0] && newVal[0]) {
           // 當有現有MusicQueue為空 且 新的不為空時
           // 然後會判斷是否為剛開始的初始化
