@@ -6,14 +6,15 @@ import vuetify from "@/plugins/vuetify";
 import { createTestingPinia } from '@pinia/testing';
 import musicQueue from '@/views/musicQ/musicQueue.js'
 import BaseView from '@/views/BaseView.vue'
-
+import AudioControl from '@/stores/AudioControl.js'
 
 // Test MusicQueueView.vue
 
 describe('MusicQueueView.vue', () => {
 
+    let store, wrapper;
     let mockMainAudio, mockSecondAudio;
-    let getElementByIdSpy, muteMainAudioSpy, unmuteMainAudioSpy;
+    let getElementByIdSpy, muteMainAudioSpy, unmuteMainAudioSpy, isPreviewStateChangeSpy;
     let playReplacedMusicSpy, removeMusicTransactionMock, setTransactionMusicPlayTimeMock, getMusicPlayTimeMock;
 
     // using vi.fn() to create a mock push method in router
@@ -22,25 +23,37 @@ describe('MusicQueueView.vue', () => {
         name: '123'
     };
 
-    // https://pinia.vuejs.org/cookbook/testing.html#unit-testing-components
-    const wrapper = shallowMount(BaseView, {
-        global: {
-            plugins: [vuetify, createTestingPinia()],
-            mocks: {
-                // inject mock $router to test component
-                $router: mockRouter,
-            },
-            // stubs router-view to avoid Error
-            stubs: {
-                'router-view': {
-                    template: '<div>{{ }}</div>'
-                }
-            }
-        }
-    })
+
 
     // executed before each individual test
     beforeEach(() => {
+
+        // https://pinia.vuejs.org/cookbook/testing.html#unit-testing-components
+        wrapper = shallowMount(BaseView, {
+            global: {
+                plugins: [
+                    vuetify,
+                    createTestingPinia({
+                        AudioControl: {
+                            isPreview: true
+                        }
+                    })],
+                mocks: {
+                    // inject mock $router to test component
+                    $router: mockRouter,
+                },
+                // stubs router-view to avoid Error
+                stubs: {
+                    'router-view': {
+                        template: '<div>{{ }}</div>'
+                    }
+                }
+            }
+        });
+
+        // access pinia AudioControl
+        store = AudioControl();
+
         // initial value
         wrapper.vm.Explores = [
             { title: '探索', to: '/Home/Explore' },
@@ -53,7 +66,6 @@ describe('MusicQueueView.vue', () => {
         wrapper.vm.SecondMusic_url = '';
         // 靜音控制
         wrapper.vm.isMuted = false;
-        wrapper.vm.isPreview = false;
         wrapper.vm.MuteButton = '靜音';
         // Music Queue
         wrapper.vm.musics = [];
@@ -102,6 +114,8 @@ describe('MusicQueueView.vue', () => {
         unmuteMainAudioSpy = vi.spyOn(wrapper.vm, 'UnmuteMainAudio');
         // spyOn playReplacedMusic
         playReplacedMusicSpy = vi.spyOn(wrapper.vm, 'playReplacedMusic');
+        // spyOn isPreviewStateChange
+        isPreviewStateChangeSpy = vi.spyOn(wrapper.vm, 'isPreviewStateChange');
     })
 
     // executed after each individual test
@@ -142,10 +156,10 @@ describe('MusicQueueView.vue', () => {
             it('傳入的 url 為 null 時', () => {
 
                 // Call the method being tested
-                const result = wrapper.vm.PlayPreviewAudio(null);
+                wrapper.vm.PlayPreviewAudio(null);
 
-                // expect return without value
-                expect(result).toBeUndefined();
+                // expect muteMainAudio not to have been called
+                expect(muteMainAudioSpy).not.toHaveBeenCalled();
             })
 
             it('傳入的 url 不為 null 且 secondAudio 不為 null 時', () => {
@@ -161,8 +175,8 @@ describe('MusicQueueView.vue', () => {
                 // expect getElementById to be called with secondAudio
                 expect(getElementByIdSpy).toHaveBeenCalledWith('secondAudio');
 
-                // expect isPreview to be true
-                expect(wrapper.vm.isPreview).toBe(true);
+                // expect isPreviewStateChange to be called with true
+                expect(isPreviewStateChangeSpy).toHaveBeenCalledWith(true);
                 // expect secondAudio load to be called once
                 expect(mockSecondAudio.load).toHaveBeenCalledTimes(1);
                 // expect secondAudio src to be right value
@@ -183,9 +197,9 @@ describe('MusicQueueView.vue', () => {
                 // expect getElementById to be called with secondAudio
                 expect(getElementByIdSpy).toHaveBeenCalledWith('secondAudio');
 
-                // expect isPreview to be true
-                expect(wrapper.vm.isPreview).toBe(true);
-                // expect secondAudio.load to never to be called
+                // expect isPreviewStateChange to be called with true
+                expect(isPreviewStateChangeSpy).toHaveBeenCalledWith(true);
+                // expect secondAudio.load not to have been called
                 expect(mockSecondAudio.load).not.toHaveBeenCalled();
                 // expect secondAudio src to be empty
                 expect(mockSecondAudio.src).toEqual('');
@@ -206,8 +220,8 @@ describe('MusicQueueView.vue', () => {
 
                 // expect MuteMainAudio to be called once
                 expect(muteMainAudioSpy).toHaveBeenCalledTimes(1);
-                // expect isPreview to be true
-                expect(wrapper.vm.isPreview).toBe(true);
+                // expect isPreviewStateChange to be called with true
+                expect(isPreviewStateChangeSpy).toHaveBeenCalledWith(true);
                 // expect getElementById to be called with secondAudio
                 expect(getElementByIdSpy).toHaveBeenCalledWith('secondAudio');
                 // expect secondAudio load to be called once
@@ -226,8 +240,8 @@ describe('MusicQueueView.vue', () => {
 
                 // expect MuteMainAudio to be called once
                 expect(muteMainAudioSpy).toHaveBeenCalledTimes(1);
-                // expect isPreview to be true
-                expect(wrapper.vm.isPreview).toBe(true);
+                // expect isPreviewStateChange to be called with true
+                expect(isPreviewStateChangeSpy).toHaveBeenCalledWith(true);
                 // expect getElementById to be called with secondAudio
                 expect(getElementByIdSpy).toHaveBeenCalledWith('secondAudio');
                 // expect secondAudio play to be called once
@@ -245,8 +259,8 @@ describe('MusicQueueView.vue', () => {
                 // Call the method being tested
                 wrapper.vm.PausePreviewAudio();
 
-                // expect isPreview to be false
-                expect(wrapper.vm.isPreview).toBe(false);
+                // expect isPreviewStateChange to be called with false
+                expect(isPreviewStateChangeSpy).toHaveBeenCalledWith(false);
                 // expect getElementById to be called with secondAudio
                 expect(getElementByIdSpy).toHaveBeenCalledWith('secondAudio');
                 // expect secondAudio pause to be called once
@@ -262,11 +276,11 @@ describe('MusicQueueView.vue', () => {
                 // Call the method being tested
                 wrapper.vm.PausePreviewAudio();
 
-                // expect isPreview to be false
-                expect(wrapper.vm.isPreview).toBe(false);
+                // expect isPreviewStateChange to be called with false
+                expect(isPreviewStateChangeSpy).toHaveBeenCalledWith(false);
                 // expect getElementById to be called with secondAudio
                 expect(getElementByIdSpy).toHaveBeenCalledWith('secondAudio');
-                // expect secondAudio pause never to be called
+                // expect secondAudio pause not to have been called
                 expect(mockSecondAudio.pause).not.toHaveBeenCalled();
             })
 
@@ -280,7 +294,7 @@ describe('MusicQueueView.vue', () => {
 
                 // expect unmuteMainAudio to be called once
                 expect(unmuteMainAudioSpy).toHaveBeenCalledTimes(1);
-                // expect muteMainAudio never to be called
+                // expect muteMainAudio not to have been called
                 expect(muteMainAudioSpy).not.toHaveBeenCalled();
             })
 
@@ -292,7 +306,7 @@ describe('MusicQueueView.vue', () => {
                 // Call the method being tested
                 wrapper.vm.PausePreviewAudio();
 
-                // expect unmuteMainAudio never to be called
+                // expect unmuteMainAudio not to have been called
                 expect(unmuteMainAudioSpy).not.toHaveBeenCalled();
                 // expect muteMainAudio to be called once
                 expect(muteMainAudioSpy).toHaveBeenCalledTimes(1);
@@ -356,19 +370,19 @@ describe('MusicQueueView.vue', () => {
             it('正在播放 Preview 歌曲', () => {
 
                 // mock isPreview return value is true
-                wrapper.vm.isPreview = true;
+                store.isPreview = true;
 
                 // Call the method being tested
-                const result = wrapper.vm.MuteMainAudio();
+                wrapper.vm.MuteMainAudio();
 
-                // expect return without value
-                expect(result).toBeUndefined();
+                // expect getElementById not to have been called
+                expect(getElementByIdSpy).not.toHaveBeenCalled();
             })
 
             it('當前未播放 Preview 歌曲', () => {
 
                 // mock isPreview return value is false
-                wrapper.vm.isPreview = false;
+                store.isPreview = false;
                 // mock getElementById return value
                 getElementByIdSpy.mockReturnValue(mockMainAudio);
 
@@ -382,7 +396,7 @@ describe('MusicQueueView.vue', () => {
             it('當前未播放 Preview 歌曲且 musicQueue 有歌曲(mainAudio 存在)', () => {
 
                 // mock isPreview return value is false
-                wrapper.vm.isPreview = false;
+                store.isPreview = false;
                 // mock getElementById return value
                 getElementByIdSpy.mockReturnValue(mockMainAudio);
 
@@ -396,7 +410,7 @@ describe('MusicQueueView.vue', () => {
             it('當前未播放 Preview 歌曲且 musicQueue 沒有歌曲(mainAudio 不存在)', () => {
 
                 // mock isPreview return value is false
-                wrapper.vm.isPreview = false;
+                store.isPreview = false;
                 // mock getElementById return null
                 getElementByIdSpy.mockReturnValue(null);
 
@@ -417,19 +431,19 @@ describe('MusicQueueView.vue', () => {
             it('正在播放 Preview 歌曲', () => {
 
                 // mock isPreview return value is true
-                wrapper.vm.isPreview = true;
+                store.isPreview = true;
 
                 // Call the method being tested
-                const result = wrapper.vm.UnmuteMainAudio();
+                wrapper.vm.UnmuteMainAudio();
 
-                // expect return without value
-                expect(result).toBeUndefined();
+                // expect getElementById not to have been called
+                expect(getElementByIdSpy).not.toHaveBeenCalled();
             });
 
             it('當前未播放 Preview 歌曲', () => {
 
                 // mock isPreview return value is false
-                wrapper.vm.isPreview = false;
+                store.isPreview = false;
                 // mock getElementById return value
                 getElementByIdSpy.mockReturnValue(mockMainAudio);
 
@@ -443,7 +457,7 @@ describe('MusicQueueView.vue', () => {
             it('當前未播放 Preview 歌曲且 musicQueue 有歌曲 (mainAudio 存在)', () => {
 
                 // mock isPreview return value is false
-                wrapper.vm.isPreview = false;
+                store.isPreview = false;
                 // mock getElementById return value
                 getElementByIdSpy.mockReturnValue(mockMainAudio);
 
@@ -457,7 +471,7 @@ describe('MusicQueueView.vue', () => {
             it('當前未播放 Preview 歌曲且 musicQueue 沒有歌曲 (mainAudio 不存在)', () => {
 
                 // mock isPreview return value is false
-                wrapper.vm.isPreview = false;
+                store.isPreview = false;
                 // mock getElementById return null
                 getElementByIdSpy.mockReturnValue(null);
 
@@ -538,7 +552,7 @@ describe('MusicQueueView.vue', () => {
                 // Expect removeMusicTransaction not to have been called
                 expect(removeMusicTransactionMock).not.toHaveBeenCalled();
 
-                // expect window.alert is never to be called
+                // expect window.alert not to have been called
                 expect(alertMock).not.toHaveBeenCalled();
             });
 
@@ -599,10 +613,10 @@ describe('MusicQueueView.vue', () => {
                 }
 
                 // Call the method being tested
-                const result = wrapper.vm.playReplacedMusic(newMusic);
+                wrapper.vm.playReplacedMusic(newMusic);
 
-                // expect return without value
-                expect(result).toBeUndefined();
+                // expect getElementById not to have been called
+                expect(getElementByIdSpy).not.toHaveBeenCalled();
             })
 
             it('當前歌曲沒有被別人切掉', () => {
@@ -707,4 +721,5 @@ describe('MusicQueueView.vue', () => {
         });
 
     })
+
 })

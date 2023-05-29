@@ -12,7 +12,7 @@
         width="100%"
         @click="clickLobby"
       >
-        <v-img src="/src/assets/logo.png" alt="Fake"></v-img>
+        <v-img src="/logo.png" alt="Fake"></v-img>
       </v-sheet>
       <!-- 底下的Item -->
       <v-list mandatory>
@@ -77,6 +77,7 @@
 <script>
 import { mapState, mapActions } from 'pinia'
 import UserStatus from '@/stores/UserStatus'
+import AudioControl from '@/stores/AudioControl'
 import musicQueue from '/src/views/musicQ/musicQueue.js'
 
 import UserProfileButton from '../components/UserProfileButton.vue'
@@ -98,7 +99,6 @@ export default {
       SecondMusic_url: '',
       // 靜音控制
       isMuted: false,
-      isPreview: false,
       MuteButton: '靜音',
       // Music Queue
       musics: [],
@@ -112,7 +112,8 @@ export default {
     }
   },
   computed: {
-    ...mapState(UserStatus, ['authCode', 'userProfile', 'my_device_id'])
+    ...mapState(UserStatus, ['authCode', 'userProfile', 'my_device_id']),
+    ...mapState(AudioControl, ['isPreview'])
   },
   components: {
     UserProfileButton,
@@ -134,7 +135,7 @@ export default {
       // 當開始播放時 靜音MainAudio
       // 開始播放 Second Audio
       this.MuteMainAudio()
-      this.isPreview = true
+      this.isPreviewStateChange(true)
       var secondAudio = document.getElementById('secondAudio')
       //if(!secondAudio.paused) secondAudio.pause();
       if (secondAudio) {
@@ -145,7 +146,7 @@ export default {
     // 繼續播放Preview
     PreviewResume() {
       this.MuteMainAudio()
-      this.isPreview = true
+      this.isPreviewStateChange(true)
       var secondAudio = document.getElementById('secondAudio')
       if (secondAudio.ended) secondAudio.load()
       else secondAudio.play()
@@ -155,7 +156,7 @@ export default {
     PausePreviewAudio() {
       // 當暫停時 使MainAudio靜音取消
       // 暫停播放 Second Audio
-      this.isPreview = false
+      this.isPreviewStateChange(false)
       var secondAudio = document.getElementById('secondAudio')
       if (secondAudio) secondAudio.pause()
 
@@ -242,7 +243,8 @@ export default {
 
       this.dialog = false
     },
-    ...mapActions(UserStatus, ['checkAuth', 'update_device_id'])
+    ...mapActions(UserStatus, ['checkAuth', 'update_device_id']),
+    ...mapActions(AudioControl, ['isPreviewStateChange'])
   },
   mounted() {
     // 這個是因為一開始無法直接使用$route
@@ -251,7 +253,6 @@ export default {
       if (this.$route && this.$route.name) this.SelectedPage = this.$route.name
     }, 100)
     this.checkAuth()
-    /// TODO : 要先獲取當前的 MusicQueue 存儲 於FireBase
 
     // Web Playback SDK
     const script = document.createElement('script')

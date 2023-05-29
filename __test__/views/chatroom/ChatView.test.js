@@ -114,6 +114,45 @@ describe('ChatView.vue', () => {
                 window.alert = originalAlert;
             })
 
+            it('姓名為空時,要跳出alert message', () => {
+                // 把原始的 window.alert 存起來
+                const originalAlert = window.alert;
+                // 將 window.alert 設為空實現
+                window.alert = vi.fn();
+                // 監控 window.alert
+                const alertSpy = vi.spyOn(window, 'alert');
+
+                const text = 'Hello World!';
+                const isAnnounce = false
+                const isSendMusic = true
+
+                // fake userProfile data
+                const userProfile = {
+                    id: '123456',
+                    name: '',
+                    avatar: 'https://i.imgur.com/1HrK2iu.jpg',
+                };
+
+                //設定測試資料
+                wrapper.setData({
+                    text: text,
+                    isAnnounce: isAnnounce,
+                    isSendMusic: isSendMusic
+                });
+
+                // mock chatroom.sendMessage
+                wrapper.vm.chatroom.sendMessage = vi.fn();
+
+                // 呼叫 SendMessage 方法
+                wrapper.vm.SendMessage();
+                
+
+                // 驗證是否有彈出 alert
+                expect(alertSpy).toHaveBeenCalledWith('沒有姓名, 可能需要重新登入');
+                // 恢復原始的 alert
+                window.alert = originalAlert;
+            })
+
             it('單純發送訊息，未發送公告', () => {
 
                 // mock alert

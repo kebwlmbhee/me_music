@@ -10,8 +10,7 @@
           class="align-center justify-center"
         >
           <div class="d-flex flex-column">
-            <v-btn flat class="ma-3" @click="PausePreview">Stop</v-btn>
-            <v-btn flat class="ma-3" @click="PreviewResume">Resume</v-btn>
+            <v-btn flat class="ma-3" @click="PreviewControl">{{ buttonName }}</v-btn>
           </div>
         </v-overlay>
       </v-card>
@@ -26,7 +25,8 @@
 
 <script>
 import AudioControl from '@/stores/AudioControl'
-import { reactive, onMounted, nextTick } from 'vue'
+import { ref, reactive, onMounted, inject, nextTick } from 'vue'
+import { storeToRefs } from 'pinia'
 import { MarqueeConstant } from '/src/assets/js/Marquee.js'
 
 export default {
@@ -34,6 +34,11 @@ export default {
   // 現在右下角的圖片
   setup() {
     const state = reactive(AudioControl())
+    const { isPreview } = storeToRefs(state)
+    const PausePreview = inject('PausePreview')
+    const PreviewResume = inject('PreviewResume')
+    let buttonName = ref(`${isPreview.value ? 'Stop' : 'Resume'}`)
+
     onMounted(() => {
       nextTick(() => {
         const DIV = document.getElementById('LongText')
@@ -42,7 +47,22 @@ export default {
       })
     })
 
-    return { state }
+    function PreviewControl() {
+      console.log(isPreview.value)
+      if (isPreview.value) {
+        // 正在播放 所以取消播放
+        console.log('正在播放 我想暫停')
+        buttonName.value = 'Resume'
+        PausePreview()
+      } else {
+        // 暫停中 所以繼續播放
+        console.log('暫停中 我想繼續')
+        buttonName.value = 'Stop'
+        PreviewResume()
+      }
+    }
+
+    return { state, buttonName, PreviewControl }
   }
 }
 </script>
