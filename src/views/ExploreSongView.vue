@@ -385,7 +385,6 @@ export default {
   },
   mounted() {
     this.checkAuth()
-    this.PausePreview() // 切換頁面時暫停Preview
     this.type = this.$route.query.type // 根據url或去當前type(playlist, album, artist)
     this.searchTypeRedirect(this.$route.query.id, this.type)
   }

@@ -4,10 +4,12 @@
     <v-app-bar scroll-behavior="hide" scroll-threshold="0" flat height="100">
       <v-text-field
         prepend-icon="mdi-magnify"
+        append-inner-icon="mdi-send"
         v-model="searchText"
         label="Search"
         variant="outlined"
         @click:prepend="searchInputCallback"
+        @click:append-inner="searchInputCallback"
         @keydown.enter="searchInputCallback"
       >
       </v-text-field>
@@ -177,7 +179,6 @@ export default {
   },
   created() {
     this.checkAuth()
-    this.PausePreview()
     let query = this.$route.query.search
     this.searchText = query
     if (!query) query = 'a'
