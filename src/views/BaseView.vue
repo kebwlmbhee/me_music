@@ -136,7 +136,7 @@ export default {
       // 當開始播放時 靜音MainAudio
       // 開始播放 Second Audio
       this.MuteMainAudio()
-      this.isPreviewStateChacnge(true)
+      this.isPreviewStateChange(true)
       console.log('Play Second Audio' + url)
       var secondAudio = document.getElementById('secondAudio')
       //if(!secondAudio.paused) secondAudio.pause();
@@ -148,7 +148,7 @@ export default {
     // 繼續播放Preview
     PreviewResume() {
       this.MuteMainAudio()
-      this.isPreviewStateChacnge(true)
+      this.isPreviewStateChange(true)
       var secondAudio = document.getElementById('secondAudio')
       if (secondAudio.ended) secondAudio.load()
       else secondAudio.play()
@@ -158,7 +158,7 @@ export default {
     PausePreviewAudio() {
       // 當暫停時 使MainAudio靜音取消
       // 暫停播放 Second Audio
-      this.isPreviewStateChacnge(false)
+      this.isPreviewStateChange(false)
       var secondAudio = document.getElementById('secondAudio')
       if (secondAudio) secondAudio.pause()
 
@@ -252,7 +252,7 @@ export default {
       this.dialog = false
     },
     ...mapActions(UserStatus, ['checkAuth', 'update_device_id']),
-    ...mapActions(AudioControl, ['isPreviewStateChacnge'])
+    ...mapActions(AudioControl, ['isPreviewStateChange'])
   },
   mounted() {
     // 這個是因為一開始無法直接使用$route
