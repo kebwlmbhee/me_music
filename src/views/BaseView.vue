@@ -123,12 +123,7 @@ export default {
   },
   methods: {
     // 點擊大廳
-    clickLobby() {
-      this.SelectedPage = '大廳'
-      this.$router.push({
-        path: '/Home'
-      })
-    },
+
     // 使用Second Audio 預覽音樂
     PlayPreviewAudio(url) {
       if (url == null) return
