@@ -2,7 +2,7 @@ image: node:latest
 
 test_unit:
   variables:
-    SECURE_FILES_DOWNLOAD_PATH: '/.firebase/firebaseInfo.js'
+    SECURE_FILES_DOWNLOAD_PATH: '/.firebase/'
   script:
     - curl --silent "https://gitlab.com/gitlab-org/incubation-engineering/mobile-devops/download-secure-files/-/raw/main/installer" | bash
     - npm install
