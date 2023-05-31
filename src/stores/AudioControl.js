@@ -88,9 +88,29 @@ export default defineStore('AudioControl ', {
       this.searchPreview = null
       let Axios_data = await axios(config)
       let data = Axios_data.data.tracks.items
-
       for (var i = 0; i < 5; i++) {
         if (data[i].id == id && data[i].preview_url != null) {
+          this.stateUpdate(data[i])
+          this.searchPreview = data[i].preview_url
+          return data[i].preview_url
+        }
+      }
+      return null
+    },
+    async UseTrackNameAndArtistStateUpdate(access_token, name, artist) {
+      let config = {
+        method: 'GET',
+        url: `https://api.spotify.com/v1/search/?q=${name}&type=track&limit=5`,
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${access_token}`
+        }
+      }
+      this.searchPreview = null
+      let Axios_data = await axios(config)
+      let data = Axios_data.data.tracks.items
+      for (var i = 0; i < 5; i++) {
+        if (data[i].artists[0].name == artist && data[i].preview_url != null) {
           this.stateUpdate(data[i])
           this.searchPreview = data[i].preview_url
           return data[i].preview_url
