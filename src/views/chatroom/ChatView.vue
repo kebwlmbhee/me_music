@@ -50,6 +50,7 @@
     <v-footer app height="60">
       <v-text-field
         data-test="chatroom-input"
+        append-inner-icon="mdi-send"
         v-model="text"
         bg-color="grey-lighten-1"
         class="rounded-pill overflow-hidden"
@@ -58,6 +59,7 @@
         variant="solo"
         clearable
         @keydown.enter="SendMessage()"
+        @click:append-inner="SendMessage()"
       ></v-text-field>
       <!-- 公告按鈕 -->
       <v-tooltip text="公告(必須傳送音樂)" location="top">
@@ -205,6 +207,8 @@ export default {
         data.album
       )
       this.addQue()
+      this.PlayPreview(data.url)
+      this.PausePreview()
     },
     ...mapActions(AudioControl, ['addQue', 'stateUpdateWithData'])
   },

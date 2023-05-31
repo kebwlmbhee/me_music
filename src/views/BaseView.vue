@@ -44,10 +44,9 @@
       <v-app-bar-title class="font-weight-bold">#{{ SelectedPage }}</v-app-bar-title>
       <v-spacer></v-spacer>
       <audio :src="MainMusic_url" autoplay id="mainAudio" @ended="whenMusicEnded"></audio>
-      <audio :src="SecondMusic_url" id="secondAudio" autoplay controls></audio>
-      <v-btn class="ma-3 font-weight-bold" border @click="MuteButtonControl">
-        Queue {{ MuteButton }}
-      </v-btn>
+      <audio :src="SecondMusic_url" id="secondAudio" autoplay></audio>
+      <v-slider class="mt-5 mx-3" v-model="volume" min="0" max="1"> </v-slider>
+      <v-btn :icon="volume_icon" @click="MuteButtonControl"></v-btn>
       <user-profile-button
         :userName="userProfile.name"
         :userImg="userProfile.avatar"
@@ -100,6 +99,8 @@ export default {
       // 靜音控制
       isMuted: false,
       MuteButton: '靜音',
+      volume_icon: 'mdi-volume-high',
+      volume: '',
       // Music Queue
       musics: [],
       dialog: true,
@@ -136,6 +137,7 @@ export default {
       // 開始播放 Second Audio
       this.MuteMainAudio()
       this.isPreviewStateChange(true)
+      console.log('Play Second Audio' + url)
       var secondAudio = document.getElementById('secondAudio')
       //if(!secondAudio.paused) secondAudio.pause();
       if (secondAudio) {
@@ -161,30 +163,36 @@ export default {
       if (secondAudio) secondAudio.pause()
 
       if (!this.isMuted) this.UnmuteMainAudio()
-      else this.MuteMainAudio()
     },
     // 靜音按鈕的控制
+    // 控制Preview 跟 MainAudio 的 靜音狀態
     MuteButtonControl() {
+      console.log('mute')
       this.isMuted = !this.isMuted
+      var mainAudio = document.getElementById('mainAudio')
+      var secondAudio = document.getElementById('secondAudio')
       if (this.isMuted) {
-        this.MuteButton = '取消靜音'
-        this.MuteMainAudio()
+        this.volume_icon = 'mdi-volume-off'
+        if (mainAudio) mainAudio.muted = true
+        if (secondAudio) secondAudio.muted = true
       } else {
-        this.UnmuteMainAudio()
-        this.MuteButton = '靜音'
+        this.volume_icon = 'mdi-volume-high'
+        if (mainAudio && !this.isPreview) mainAudio.muted = false
+        if (secondAudio) secondAudio.muted = false
       }
     },
     // 靜音 Main Audio
     MuteMainAudio() {
       if (this.isPreview) return
       var mainAudio = document.getElementById('mainAudio')
-      if (mainAudio) mainAudio.volume = 0.0
+      if (mainAudio) mainAudio.muted = true
     },
     // 解除靜音 Main Audio
     UnmuteMainAudio() {
+      if (this.isMuted) return
       if (this.isPreview) return
       var mainAudio = document.getElementById('mainAudio')
-      if (mainAudio) mainAudio.volume = 1.0
+      if (mainAudio) mainAudio.muted = false
     },
     // 當音樂播放結束
     whenMusicEnded() {
@@ -220,11 +228,11 @@ export default {
     // 原因 : 因為Google要求 需要用戶使用真實方式點擊頁面\
     //        才能使用自動播放的功能
     DialogCallback() {
+      var mainAudio = document.getElementById('mainAudio')
       // music Queue
       this.musicQueue = new musicQueue()
       // 取得時間使音樂同步
       this.musicQueue.getMusicPlayTime((startTime) => {
-        var mainAudio = document.getElementById('mainAudio')
         this.playMusicTime = startTime + 3
         mainAudio.currentTime = this.playMusicTime
       })
@@ -240,7 +248,7 @@ export default {
       this.musicQueue.onSwitchMusicNotification((message) => {
         this.delayedMessage = message
       })
-
+      mainAudio.volume = 0.5
       this.dialog = false
     },
     ...mapActions(UserStatus, ['checkAuth', 'update_device_id']),
@@ -254,6 +262,7 @@ export default {
     }, 100)
     this.checkAuth()
 
+    this.volume = 0.5
     // Web Playback SDK
     const script = document.createElement('script')
     script.src = 'https://sdk.scdn.co/spotify-player.js'
@@ -344,6 +353,13 @@ export default {
       },
       // 初始化的變動不會響應 watch
       immediate: false
+    },
+    volume: function (newVal) {
+      var mainAudio = document.getElementById('mainAudio')
+      var secondAudio = document.getElementById('secondAudio')
+
+      mainAudio.volume = newVal
+      secondAudio.volume = newVal
     }
   }
 }

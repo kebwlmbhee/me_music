@@ -2,10 +2,12 @@
   <div v-if="!loaded" class="ExploreContainer ma-3">
     <v-text-field
       prepend-icon="mdi-magnify"
+      append-inner-icon="mdi-send"
       v-model="search"
       label="Search"
       variant="underlined"
       @click:prepend="searchCallback"
+      @click:append-inner="searchCallback"
       @keydown.enter="searchCallback"
     >
     </v-text-field>
@@ -33,17 +35,6 @@
         />
       </div>
     </div>
-
-    <!-- <h2>瀏覽全部</h2>
-    <div class="w-100 d-flex flex-row flex-wrap justify-space-evenly overflow-auto">
-      <span class="ma-2 text-white text-center" v-for="n in 15" :key="n">
-        <v-img :src="imgsrc" alt="Not Found" width="150">
-          <div class="bg-primary">
-            {{ 'listName' }}
-          </div>
-        </v-img>
-      </span>
-    </div> -->
   </div>
 </template>
 
@@ -141,15 +132,9 @@ export default {
     }
   },
   created() {
-    this.PausePreview()
     this.runSearch()
   }
 }
 </script>
 
-<style scoped>
-.ExploreContainer {
-  width: 100%;
-  height: 100%;
-}
-</style>
+<style scoped></style>
