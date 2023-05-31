@@ -1,0 +1,8 @@
+image: node:latest
+
+test_unit:
+  script:
+    - npm install
+    - npm run test:unit
+
+

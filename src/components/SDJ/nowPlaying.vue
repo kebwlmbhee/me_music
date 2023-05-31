@@ -25,7 +25,7 @@
 
 <script>
 import AudioControl from '@/stores/AudioControl'
-import { ref, reactive, onMounted, inject, nextTick } from 'vue'
+import { ref, reactive, inject, watch } from 'vue'
 import { storeToRefs } from 'pinia'
 import { MarqueeConstant } from '/src/assets/js/Marquee.js'
 
@@ -34,17 +34,21 @@ export default {
   // 現在右下角的圖片
   setup() {
     const state = reactive(AudioControl())
-    const { isPreview } = storeToRefs(state)
+    const { isPreview, nowChecking } = storeToRefs(state)
     const PausePreview = inject('PausePreview')
     const PreviewResume = inject('PreviewResume')
-    let buttonName = ref(`${isPreview.value ? 'Stop' : 'Resume'}`)
+    let buttonName = ref('Resume')
 
-    onMounted(() => {
-      nextTick(() => {
+    watch(nowChecking, () => {
+      setTimeout(() => {
         const DIV = document.getElementById('LongText')
         const SPAN = document.querySelector('#myText')
         MarqueeConstant(DIV, SPAN)
-      })
+      }, 100)
+    })
+
+    watch(isPreview, (newVal) => {
+      buttonName.value = newVal ? 'Stop' : 'Resume'
     })
 
     function PreviewControl() {

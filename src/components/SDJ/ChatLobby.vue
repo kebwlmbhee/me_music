@@ -32,7 +32,12 @@
               font-size: 1em;
             "
           >
-            <v-btn class="bg-green" style="width: 30%; height: 80%; font-size: 0.8em">播放</v-btn>
+            <v-btn
+              class="bg-green"
+              style="width: 30%; height: 80%; font-size: 0.8em"
+              @click="PlayButtonCallback(item)"
+              >播放</v-btn
+            >
           </span>
         </div>
 
@@ -121,11 +126,14 @@
 import { reactive } from 'vue'
 import Chatroom from '/src/views/chatroom/chatroom.js'
 import AnnouncementLikes from '/src/views/announcement/announcementLikes.js'
+
 import UserStatus from '/src/stores/UserStatus.js'
+import AudioControl from '../../stores/AudioControl'
 
 export default {
   setup() {
     const userStatus = reactive(UserStatus())
+    const audioControl = reactive(AudioControl())
     let songList = reactive([])
     var chatroom = new Chatroom()
     var announcementLikes = new AnnouncementLikes()
@@ -225,9 +233,23 @@ export default {
       }
     }
 
+    // 點播按鈕觸發
+    function PlayButtonCallback(data) {
+      audioControl
+        .UseTrackNameAndArtistStateUpdate(
+          userStatus.authCode.access_token,
+          data.songTitle,
+          data.songInfo
+        )
+        .then(() => {
+          audioControl.addQue()
+        })
+    }
+
     return {
       songList,
-      likesButton
+      likesButton,
+      PlayButtonCallback
     }
   }
 }

@@ -60,6 +60,14 @@ export default {
     clickPlayPreview() {
       if (this.type === 'track') {
         if (this.preview_url == null) alert('沒有提供這首歌')
+        this.stateUpdateWithData(
+          this.id,
+          this.artist,
+          this.Name,
+          this.preview_url,
+          this.imgSrc,
+          this.album
+        )
         this.PlayPreview(this.preview_url)
       } else {
         this.$router.push({
