@@ -2,7 +2,7 @@
   <div class="d-flex flex-column align-center justify-center" style="height: 100vh">
     <div class="d-flex flex-column align-center">
       <h1 class="title-text">歡迎來到 政大迷音</h1>
-      <v-img :width="800" aspect-ratio="16/9" cover src="/src/assets/loginPage.jpg"></v-img>
+      <v-img :width="800" aspect-ratio="16/9" cover src="/loginPage.jpg"></v-img>
       <v-btn
         class="ma-5"
         size="x-large"
