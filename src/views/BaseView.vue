@@ -183,7 +183,6 @@ export default {
     },
     // 靜音 Main Audio
     MuteMainAudio() {
-      if (this.isPreview) return
       var mainAudio = document.getElementById('mainAudio')
       if (mainAudio) mainAudio.muted = true
     },
@@ -191,6 +190,7 @@ export default {
     UnmuteMainAudio() {
       if (this.isMuted) return
       if (this.isPreview) return
+
       var mainAudio = document.getElementById('mainAudio')
       if (mainAudio) mainAudio.muted = false
     },
@@ -259,10 +259,10 @@ export default {
     // 所以過0.1s 後再去更改其值
     setTimeout(() => {
       if (this.$route && this.$route.name) this.SelectedPage = this.$route.name
+      this.volume = 0.5
     }, 100)
     this.checkAuth()
 
-    this.volume = 0.5
     // Web Playback SDK
     const script = document.createElement('script')
     script.src = 'https://sdk.scdn.co/spotify-player.js'
@@ -358,8 +358,8 @@ export default {
       var mainAudio = document.getElementById('mainAudio')
       var secondAudio = document.getElementById('secondAudio')
 
-      mainAudio.volume = newVal
-      secondAudio.volume = newVal
+      if (mainAudio) mainAudio.volume = newVal
+      if (secondAudio) secondAudio.volume = newVal
     }
   }
 }
