@@ -137,7 +137,6 @@ export default {
       // 開始播放 Second Audio
       this.MuteMainAudio()
       this.isPreviewStateChange(true)
-      console.log('Play Second Audio' + url)
       var secondAudio = document.getElementById('secondAudio')
       //if(!secondAudio.paused) secondAudio.pause();
       if (secondAudio) {
@@ -167,7 +166,6 @@ export default {
     // 靜音按鈕的控制
     // 控制Preview 跟 MainAudio 的 靜音狀態
     MuteButtonControl() {
-      console.log('mute')
       this.isMuted = !this.isMuted
       var mainAudio = document.getElementById('mainAudio')
       var secondAudio = document.getElementById('secondAudio')
