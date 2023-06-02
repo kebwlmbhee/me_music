@@ -49,7 +49,11 @@ export default defineStore('UserStatus', {
         .then((res) => {
           this.userProfile.id = res.data.id
           this.userProfile.name = res.data.display_name
-          this.userProfile.avatar = res.data.images[0].url
+          if (res.data.images.length > 0) {
+            this.userProfile.avatar = res.data.images[0].url
+          } else {
+            this.userProfile.avatar = '/src/assets/anonymous_user.jpg'
+          }
         })
         // 401 Bad or expired token
         .catch((err) => {
