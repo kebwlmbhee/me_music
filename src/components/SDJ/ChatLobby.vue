@@ -49,18 +49,18 @@
               display: flex;
               justify-content: space-between;
               align-items: center;
-              height: 20%;
+              height: 30%;
               margin-bottom: 10px;
               font-size: 1em;
             "
           >
             <span style="display: flex; align-items: center; height: 100%">
-              <span style="font-size: 0.8em"
+              <span style="font-size: 1.0em"
                 ><b
                   >來自 <span class="text-blue">{{ item.musicPlayer.name }}</span> 的廣播</b
                 >
               </span>
-              <span class="gjButton" style="height: 100%; font-size: 1em">
+              <span class="gjButton" style="height: 75%; font-size: 1em">
                 <v-btn
                   @click="likesButton(item)"
                   :class="{ 'bg-green': !item.liked, test: item.liked }"
@@ -77,30 +77,33 @@
             <span style="font-size: 0.8em">{{ item.time }}</span>
           </span>
 
-          <div
+          <div  
             style="
               display: flex;
               justify-content: space-between;
               align-items: center;
               width: 100%;
-              height: 20%;
+              height: 60%;
               margin-bottom: 10px;
             "
           >
             <div style="display: flex; justify-content: center; height: 100%">
-              <img
+
+              <v-avatar :image="item.musicPlayer.avatar" size="80"></v-avatar>
+
+              <!-- <img
                 :src="item.musicPlayer.avatar"
                 alt="test"
                 style="width: auto; height: 100%; max-height: 100%"
-              />
+              /> -->
             </div>
 
             <div
               style="
                 width: 100%;
-                height: 100%;
+                height: 40%;
                 background-color: white;
-                font-size: 1em;
+                font-size: 1.2em;
                 margin-left: 10px;
               "
             >
@@ -108,14 +111,7 @@
             </div>
           </div>
 
-          <div style="width: 100%; background-color: white; flex: 1">
-            <span style="color: black">
-              <!-- <v-btn @click="test">test</v-btn>
-                            <Test :name="X"></Test>
-                            <Test v-for="item in test1" :key="item.id" :name="`${item.name}`"></Test> -->
-              <Test></Test>
-            </span>
-          </div>
+          
         </div>
       </div>
     </div>
@@ -140,6 +136,7 @@ export default {
     var userid = userStatus.userProfile.id
 
     chatroom.onAnnouncement((messages) => {
+      userid = userStatus.userProfile.id
       const announcements = messages.map((ParamAnnouncement) => {
         // 確認回傳的型態正確
         if (typeof ParamAnnouncement === 'object') {
@@ -197,6 +194,13 @@ export default {
           console.log(element.id)
           console.log(element.likeCount)
           console.log(element.liked)
+
+          let max_str = 18
+          if(element.text.length > max_str){
+            element.text = element.text.substring(0, max_str) + ' ...'
+          }
+
+
           songList.push({
             id: reactive(element.id),
             songImage: element.musicInfo.picture,
@@ -218,7 +222,7 @@ export default {
     const likesButton = async (announcement) => {
       try {
         // alert(announcement.id)
-        console.log(songList)
+        //console.log(songList)
         // userProfile.id 為空時會出錯，若獲取不到 userId 時，應該 alert 後 return
         if (!userid) {
           alert('請重新登入')
