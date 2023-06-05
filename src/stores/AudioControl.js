@@ -33,7 +33,6 @@ export default defineStore('AudioControl ', {
         album: this.nowChecking.album,
         timestamp: Date.now()
       }
-      console.log(temp)
       musicQue.addMusic(
         temp.id,
         temp.artist,
@@ -53,16 +52,13 @@ export default defineStore('AudioControl ', {
         url: data.preview_url,
         picture: data.album.images[0].url,
         album: data.album
-        //timestamp: data.timestamp,
       }
-      // console.log(temp)
       this.nowChecking = temp
     },
     // 將選擇到的music放到第一首
     switchMusic(index) {
       // 按下 musicQueue 第一首歌時不響應(第一首歌應該正在播放)
       if (index === 0) {
-        console.log(`the first music is already playing NOW.`)
         return
       }
       // 取得目標音樂
@@ -74,7 +70,6 @@ export default defineStore('AudioControl ', {
       // 切歌，將變動存至 firebase
       musicQue.replaceMusic(firstMusic, targetMusic)
       this.snackbarMsg = `即將播放： ${this.musics[0].artist} - ${this.musics[0].songName}`
-      console.log('切歌成功')
     },
     async UseTrackIdStateUpdate(access_token, name, id) {
       let config = {
@@ -127,7 +122,6 @@ export default defineStore('AudioControl ', {
         picture: image,
         album: album
       }
-      // console.log(temp)
       this.nowChecking = temp
     },
     isPreviewStateChange(isPlaying) {

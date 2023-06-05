@@ -52,15 +52,12 @@ export default {
     })
 
     function PreviewControl() {
-      console.log(isPreview.value)
       if (isPreview.value) {
         // 正在播放 所以取消播放
-        console.log('正在播放 我想暫停')
         buttonName.value = 'Resume'
         PausePreview()
       } else {
         // 暫停中 所以繼續播放
-        console.log('暫停中 我想繼續')
         buttonName.value = 'Stop'
         PreviewResume()
       }

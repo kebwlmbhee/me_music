@@ -174,8 +174,6 @@ describe("Test ExploreView.vue", () => {
         // 等 wrapper.vm.searchPlayList() 內部完成呼叫 axios 的行為
         await wrapper.vm.searchPlayList()
         await wrapper.vm.$nextTick();
-        // console.log("wrapper.vm.playlists")
-        // console.log(wrapper.vm.playlists)
 
         // 預計假元件 wrapper 內的 playlists 資料會被修改
         expect(wrapper.vm.playlists).toEqual((mock_data["playlists"])["items"])
@@ -237,8 +235,6 @@ describe("Test ExploreView.vue", () => {
 
         await wrapper.vm.searchArtist()
         await wrapper.vm.$nextTick();
-        // console.log("wrapper.vm.artists")
-        // console.log(wrapper.vm.artists)
 
         expect(wrapper.vm.artists).toEqual((mock_data["artists"])["items"])
 

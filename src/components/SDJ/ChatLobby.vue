@@ -107,15 +107,6 @@
               {{ item.something }}
             </div>
           </div>
-
-          <div style="width: 100%; background-color: white; flex: 1">
-            <span style="color: black">
-              <!-- <v-btn @click="test">test</v-btn>
-                            <Test :name="X"></Test>
-                            <Test v-for="item in test1" :key="item.id" :name="`${item.name}`"></Test> -->
-              <Test></Test>
-            </span>
-          </div>
         </div>
       </div>
     </div>
@@ -168,7 +159,6 @@ export default {
       // like update
       async function test() {
         await announcementLikes.getAnnouncementLikes((announcementId, likeCount) => {
-          //console.log(likeCount)
           // 尋找遍歷到的 id
           const targetAnnouncement = announcements.find(
             (announcement) => announcement.id === announcementId
@@ -176,7 +166,6 @@ export default {
           if (targetAnnouncement) {
             // 更新指定公告的讚數
             targetAnnouncement.likeCount = likeCount
-            //console.log(targetAnnouncement.likeCount + 'test')
             // 檢查是否按過讚
             const userId = userid
             // 如果 "該 userId 存在"
@@ -194,11 +183,8 @@ export default {
 
         // import songList from firebase
         announcements.forEach((element) => {
-          console.log(element.id)
-          console.log(element.likeCount)
-          console.log(element.liked)
           songList.push({
-            id: reactive(element.id),
+            id: element.id,
             songImage: element.musicInfo.picture,
             songTitle: element.musicInfo.songName,
             songInfo: element.musicInfo.artist,
@@ -217,8 +203,6 @@ export default {
 
     const likesButton = async (announcement) => {
       try {
-        // alert(announcement.id)
-        console.log(songList)
         // userProfile.id 為空時會出錯，若獲取不到 userId 時，應該 alert 後 return
         if (!userid) {
           alert('請重新登入')

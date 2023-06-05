@@ -86,7 +86,6 @@ export default {
     // 取得時間使音樂同步
     this.musicQueue.getMusicPlayTime((startTime) => {
       this.playMusicTime = startTime
-      console.log(this.playMusicTime)
     })
   },
   watch: {
@@ -142,7 +141,6 @@ export default {
 
       // 按下 musicQueue 第一首歌時不響應(第一首歌應該正在播放)
       if (index === 0) {
-        console.log(`the first music is already playing NOW.`)
         return
       }
       // 取得目標音樂
@@ -156,7 +154,6 @@ export default {
 
       // 切歌完成，響應至 musicQueue 後才調用延遲訊息，同步本地和遠端
       this.showNextMusicMessage()
-      console.log('切歌成功')
     },
     // 從 musicQueue 中移除指定音樂
     deleteMusic(music) {
@@ -187,8 +184,6 @@ export default {
       setTimeout(() => {
         // 確定當前歌曲沒有被切掉，切掉要 return
         if (newMusic !== this.musics[0]) return
-        // TODO(前端): console.log() 應替換為播放歌曲的 code
-        console.log(this.musics[0])
         // 歌曲播放時記錄播放時戳
         this.musicQueue.setTransactionMusicPlayTime(Date.now())
       }, timeCutMusicSecond * 1000)
@@ -200,7 +195,6 @@ export default {
           .removeMusicTransaction(readyToRemoveMusic)
           .then(() => {
             this.showNextMusicMessage()
-            console.log('歌曲播放完畢')
           })
           .catch((error) => {
             console.error(error)

@@ -5,9 +5,7 @@
 <script lang="ts">
 export default {
   data() {},
-  setup() {
-    console.log('test')
-  },
+  setup() {},
   methods: {},
   props: {
     name: {

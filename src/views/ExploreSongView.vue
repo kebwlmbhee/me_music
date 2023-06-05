@@ -361,7 +361,6 @@ export default {
     },
     // 連接 Spotify WebPlayback
     startWebPlayback(track_id) {
-      console.log(this.my_device_id)
       let config = {
         method: 'PUT',
         url: 'https://api.spotify.com/v1/me/player/play',

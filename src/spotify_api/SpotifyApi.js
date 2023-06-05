@@ -79,7 +79,6 @@ class SpotifyApi {
       return track.artists
     })
     let unique_artists = [...new Set(playlist_artists)]
-    //console.log(unique_artists)
     let total_duration_ms = tracks.reduce((acc, track) => acc + track.duration_ms, 0)
     return {
       name: playlist.name,

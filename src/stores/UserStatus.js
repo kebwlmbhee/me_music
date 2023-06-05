@@ -52,8 +52,7 @@ export default defineStore('UserStatus', {
           this.userProfile.avatar = res.data.images[0].url
         })
         // 401 Bad or expired token
-        .catch((err) => {
-          console.log(err)
+        .catch(() => {
           self.logout()
         })
     },

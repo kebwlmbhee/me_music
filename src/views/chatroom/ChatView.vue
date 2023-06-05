@@ -165,7 +165,6 @@ export default {
       // 判斷是否要傳送音樂
       let currentMusic = null
       if (this.isSendMusic) {
-        console.log('要傳送音樂')
         currentMusic = this.nowChecking
         if (this.nowChecking.id == '') {
           alert('並不知你要傳送哪首歌曲')

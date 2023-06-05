@@ -62,10 +62,8 @@ export default {
       this.loading = true
 
       setTimeout(() => (this.loading = false), 2000)
-      console.log(this.$data)
     },
     required(v) {
-      console.log(v)
       return !!v || 'Field is required'
     }
   }
