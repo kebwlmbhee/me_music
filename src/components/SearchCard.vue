@@ -94,9 +94,7 @@ export default {
           Authorization: `Bearer ${this.authCode.access_token}`
         }
       }
-      axios(config).then((res) => {
-        console.log(res)
-      })
+      axios(config)
     },
     clickAdd() {
       if (this.preview_url == null) {

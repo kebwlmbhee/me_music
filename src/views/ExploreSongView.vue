@@ -375,9 +375,7 @@ export default {
           Authorization: `Bearer ${this.authCode.access_token}`
         }
       }
-      axios(config).then((res) => {
-        console.log(res)
-      })
+      axios(config)
     },
     ...mapActions(UserStatus, ['checkAuth']),
     ...mapActions(AudioControl, ['addQue', 'UseTrackIdStateUpdate'])
