@@ -89,12 +89,6 @@
           >
             <div style="display: flex; justify-content: center; height: 100%">
               <v-avatar :image="item.musicPlayer.avatar" size="80"></v-avatar>
-
-              <!-- <img
-                :src="item.musicPlayer.avatar"
-                alt="test"
-                style="width: auto; height: 100%; max-height: 100%"
-              /> -->
             </div>
 
             <div
@@ -248,9 +242,6 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-/* default => max-width: 1400px */
-/* wrong */
-
 .test {
   background-color: grey;
 }
@@ -315,10 +306,6 @@ html {
   html {
     font-size: 20px;
   }
-
-  // flexColumn {
-  //   /* background-color: yellowgreen; */
-  // }
 }
 
 /* width */
