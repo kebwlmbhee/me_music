@@ -49,18 +49,18 @@
               display: flex;
               justify-content: space-between;
               align-items: center;
-              height: 20%;
+              height: 30%;
               margin-bottom: 10px;
               font-size: 1em;
             "
           >
             <span style="display: flex; align-items: center; height: 100%">
-              <span style="font-size: 0.8em"
+              <span style="font-size: 1em"
                 ><b
                   >來自 <span class="text-blue">{{ item.musicPlayer.name }}</span> 的廣播</b
                 >
               </span>
-              <span class="gjButton" style="height: 100%; font-size: 1em">
+              <span class="gjButton" style="height: 75%; font-size: 1em">
                 <v-btn
                   @click="likesButton(item)"
                   :class="{ 'bg-green': !item.liked, test: item.liked }"
@@ -83,24 +83,26 @@
               justify-content: space-between;
               align-items: center;
               width: 100%;
-              height: 20%;
+              height: 60%;
               margin-bottom: 10px;
             "
           >
             <div style="display: flex; justify-content: center; height: 100%">
-              <img
+              <v-avatar :image="item.musicPlayer.avatar" size="80"></v-avatar>
+
+              <!-- <img
                 :src="item.musicPlayer.avatar"
                 alt="test"
                 style="width: auto; height: 100%; max-height: 100%"
-              />
+              /> -->
             </div>
 
             <div
               style="
                 width: 100%;
-                height: 100%;
+                height: 40%;
                 background-color: white;
-                font-size: 1em;
+                font-size: 1.2em;
                 margin-left: 10px;
               "
             >
@@ -131,6 +133,7 @@ export default {
     var userid = userStatus.userProfile.id
 
     chatroom.onAnnouncement((messages) => {
+      userid = userStatus.userProfile.id
       const announcements = messages.map((ParamAnnouncement) => {
         // 確認回傳的型態正確
         if (typeof ParamAnnouncement === 'object') {
@@ -183,6 +186,11 @@ export default {
 
         // import songList from firebase
         announcements.forEach((element) => {
+          let max_str = 18
+          if (element.text.length > max_str) {
+            element.text = element.text.substring(0, max_str) + ' ...'
+          }
+
           songList.push({
             id: element.id,
             songImage: element.musicInfo.picture,

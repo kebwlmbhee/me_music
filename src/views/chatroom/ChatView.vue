@@ -76,6 +76,7 @@
       <v-tooltip text="傳送音樂" location="top">
         <template v-slot:activator="{ props }">
           <input
+            id="sendMusic"
             v-bind="props"
             type="checkbox"
             v-model="isSendMusic"
@@ -194,7 +195,12 @@ export default {
     // 原本使用雙向締結v-model控制, 改成click去控制
     AnnounceCallback() {
       this.isAnnounce = !this.isAnnounce
-      if (this.isAnnounce) this.isSendMusic = true
+      if (this.isAnnounce) {
+        this.isSendMusic = true
+      } else {
+        this.isSendMusic = false
+      }
+      document.getElementById('sendMusic').disabled = this.isAnnounce
     },
     AddToQueueButtonCallback(data) {
       this.stateUpdateWithData(

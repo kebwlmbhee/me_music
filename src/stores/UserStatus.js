@@ -48,8 +48,17 @@ export default defineStore('UserStatus', {
         .get(url, config)
         .then((res) => {
           this.userProfile.id = res.data.id
-          this.userProfile.name = res.data.display_name
-          this.userProfile.avatar = res.data.images[0].url
+          if (res.data.display_name.length > 0) {
+            this.userProfile.name = res.data.display_name
+          } else {
+            this.userProfile.name = '訪客'
+          }
+
+          if (res.data.images.length > 0) {
+            this.userProfile.avatar = res.data.images[0].url
+          } else {
+            this.userProfile.avatar = '/src/assets/anonymous_user.jpg'
+          }
         })
         // 401 Bad or expired token
         .catch(() => {
