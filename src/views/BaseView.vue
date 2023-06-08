@@ -63,7 +63,7 @@
       <router-view></router-view>
     </v-main>
     <!-- 跳彈窗 -->
-    <v-dialog v-model="dialog" width="auto">
+    <v-dialog v-model="dialog" width="auto" persistent>
       <v-card>
         <v-card-text> Welcome to the clickLobby </v-card-text>
         <v-card-actions>
