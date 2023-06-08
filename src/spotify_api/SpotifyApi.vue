@@ -102,17 +102,16 @@ export default {
                 this.searchResponse = data.playlists.items.map((playlist, index) => {
                   return SpotifyApi.playlistFormat(playlist, results[index])
                 })
-                console.log(this.searchResponse)
               })
               break
             }
             default:
-              console.log('type error in searchItem API method')
+              console.error('type error in searchItem API method')
               break
           }
         })
         .catch((err) => {
-          console.log(err)
+          console.error(err)
         })
     },
 
@@ -140,11 +139,10 @@ export default {
             this.playlists = data.items.map((playlist, index) => {
               return SpotifyApi.playlistFormat(playlist, results[index])
             })
-            console.log(this.playlists)
           })
         })
         .catch((err) => {
-          console.log(err)
+          console.error(err)
         })
     },
 
@@ -176,7 +174,7 @@ export default {
           return tracks
         })
         .catch((err) => {
-          console.log(err)
+          console.err(err)
         })
     },
 
@@ -201,10 +199,9 @@ export default {
         .then((res) => {
           let data = res.data
           this.topTracks = data.items.map((track) => SpotifyApi.trackFormat(track))
-          console.log(this.topTracks)
         })
         .catch((err) => {
-          console.log(err)
+          console.error(err)
         })
     },
 
@@ -228,10 +225,9 @@ export default {
         .then((res) => {
           let data = res.data
           this.topArtists = data.items.map((artist) => SpotifyApi.artistFormat(artist))
-          console.log(this.topArtists)
         })
         .catch((err) => {
-          console.log(err)
+          console.error(err)
         })
     },
 
@@ -250,7 +246,6 @@ export default {
       axios(config).then((res) => {
         let data = res.data
         this.recentTracks = data.items.map((item) => SpotifyApi.trackFormat(item.track))
-        console.log(this.recentTracks)
       })
     },
 
@@ -264,9 +259,7 @@ export default {
           Authorization: `Bearer ${token}`
         }
       }
-      axios(config).then((res) => {
-        console.log(res)
-      })
+      axios(config)
     }
   },
   mounted() {

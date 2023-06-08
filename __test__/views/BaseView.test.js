@@ -324,8 +324,6 @@ describe('MusicQueueView.vue', () => {
 
                 // expect unmuteMainAudio not to have been called
                 expect(unmuteMainAudioSpy).not.toHaveBeenCalled();
-                // expect muteMainAudio to be called once
-                // expect(muteMainAudioSpy).toHaveBeenCalledTimes(1);
             })
         })
 
@@ -357,8 +355,6 @@ describe('MusicQueueView.vue', () => {
 
                 // isMuted is true after call MuteButtonControl
                 expect(wrapper.vm.volume_icon).toEqual('mdi-volume-off')
-                // expect muteMainAudio to be called once
-                // expect(muteMainAudioSpy).toHaveBeenCalledTimes(1);
             })
 
             it('當前未被靜音的情況', () => {
@@ -371,8 +367,6 @@ describe('MusicQueueView.vue', () => {
 
                 // isMuteduted is false after call MuteButtonControl
                 expect(wrapper.vm.volume_icon).toEqual('mdi-volume-high')
-                // expect unmuteMainAudio to be called once
-                // expect(unmuteMainAudioSpy).toHaveBeenCalledTimes(1);
             })
         })
 

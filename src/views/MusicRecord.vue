@@ -148,22 +148,18 @@ export default {
       const TrackPromise = axios(config_0).then((res) => {
         let data = res.data
         this.searchTracksResponse = data.items
-        // console.log(this.searchTracksResponse)
       })
       const ArtistPromise = axios(config_1).then((res) => {
         let data = res.data
         this.searchArtistsResponse = data.artists.items
-        // console.log(this.searchArtistsResponse)
       })
       const PlaylistPromise = axios(config_2).then((res) => {
         let data = res.data
         this.searchPlaylistsResponse = data.items
-        // console.log(this.searchPlaylistsResponse)
       })
       const AlbumPromise = axios(config_3).then((res) => {
         let data = res.data
         this.searchAlbumsResponse = data.items
-        // console.log(this.searchAlbumsResponse)
       })
       Promise.all([AlbumPromise, ArtistPromise, PlaylistPromise, TrackPromise]).then(() => {
         this.loaded = false

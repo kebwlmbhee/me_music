@@ -200,7 +200,6 @@ export default {
           .removeMusicTransaction(this.musics[0])
           .then(() => {
             // this.showNextMusicMessage()
-            console.log('歌曲播放完畢2')
           })
           .catch((error) => {
             alert(error)
@@ -239,7 +238,6 @@ export default {
       // 實時獲取 musicQueue 資料
       this.musicQueue.onMusic((musics) => {
         this.musics = musics
-        console.log('this is on music')
       })
 
       // 實時獲取訊息
@@ -279,12 +277,11 @@ export default {
       // Ready
       player.addListener('ready', ({ device_id }) => {
         this.update_device_id(device_id)
-        console.log('Ready with Device ID', device_id)
       })
 
       // Not Ready
       player.addListener('not_ready', ({ device_id }) => {
-        console.log('Device ID has gone offline', device_id)
+        console.error('Device ID has gone offline', device_id)
       })
 
       player.addListener('initialization_error', ({ message }) => {
@@ -299,9 +296,7 @@ export default {
         console.error(message)
       })
 
-      player.setVolume(1).then(() => {
-        console.log('Volume updated!')
-      })
+      player.setVolume(1)
 
       // player.addListener('player_state_changed', ({ track_window: { current_track } }) => {
       //   console.log('Currently Playing', current_track)

@@ -14,15 +14,11 @@
 <!-- 
 need to give it a root html -->
 <script>
-import { ref, reactive } from 'vue'
+import { reactive } from 'vue'
 export default {
   created() {},
   data() {},
-  methods: {
-    // test(){
-    //     console.log(list)
-    // }
-  },
+  methods: {},
 
   // !! setup 無法和vue2一起使用 會讀不到data
   setup() {
@@ -34,17 +30,9 @@ export default {
       }
     ])
 
-    var avd = ref()
-
-    console.log(avd)
-    console.log(test)
-
     for (let i = 0; i < 5; ++i) {
-      // var temp = new car(i,i,i);
       list.value.push({ make: 'a', model: 'b', year: 'c' })
     }
-
-    console.log(list.value[0].make)
 
     function test() {
       alert('test')

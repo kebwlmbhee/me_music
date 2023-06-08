@@ -75,7 +75,8 @@
       <!-- 是否要傳送當前音樂 -->
       <v-tooltip text="傳送音樂" location="top">
         <template v-slot:activator="{ props }">
-          <input id="sendMusic"
+          <input
+            id="sendMusic"
             v-bind="props"
             type="checkbox"
             v-model="isSendMusic"
@@ -165,7 +166,6 @@ export default {
       // 判斷是否要傳送音樂
       let currentMusic = null
       if (this.isSendMusic) {
-        console.log('要傳送音樂')
         currentMusic = this.nowChecking
         if (this.nowChecking.id == '') {
           alert('並不知你要傳送哪首歌曲')
@@ -197,11 +197,10 @@ export default {
       this.isAnnounce = !this.isAnnounce
       if (this.isAnnounce) {
         this.isSendMusic = true
-      }
-      else{
+      } else {
         this.isSendMusic = false
       }
-      document.getElementById("sendMusic").disabled = this.isAnnounce;
+      document.getElementById('sendMusic').disabled = this.isAnnounce
     },
     AddToQueueButtonCallback(data) {
       this.stateUpdateWithData(

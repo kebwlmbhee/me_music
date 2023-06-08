@@ -135,22 +135,18 @@ export default {
       const TrackPromise = axios(config_0).then((res) => {
         let data = res.data
         this.searchTracksResponse = data.tracks.items
-        // console.log(this.searchTracksResponse)
       })
       const ArtistPromise = axios(config_1).then((res) => {
         let data = res.data
         this.searchArtistsResponse = data.artists.items
-        // console.log(this.searchArtistsResponse)
       })
       const PlaylistPromise = axios(config_2).then((res) => {
         let data = res.data
         this.searchPlaylistsResponse = data.playlists.items
-        //   console.log(this.searchPlaylistsResponse)
       })
       const AlbumPromise = axios(config_3).then((res) => {
         let data = res.data
         this.searchAlbumsResponse = data.albums.items
-        //   console.log(this.searchAlbumsResponse)
       })
       Promise.all([AlbumPromise, ArtistPromise, PlaylistPromise, TrackPromise]).then(() => {
         this.loaded = false
@@ -159,8 +155,6 @@ export default {
     // 新增新的歌曲
     // TODO : 串點播API
     AddNewSong() {
-      console.log('Add New Song to Start')
-      console.log(this.checkSong)
       this.trigger_pop_up(false)
     },
     // 輸入的CallBack

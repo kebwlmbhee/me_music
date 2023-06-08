@@ -79,7 +79,6 @@ export default {
     // id : 就ID
     // type : playlist, artist, album
     clickPlaylist(list_id, type) {
-      console.log(type + ', id=' + list_id)
       this.$router.push({
         path: '/Home/ExploreSong',
         query: { id: list_id, type: type }

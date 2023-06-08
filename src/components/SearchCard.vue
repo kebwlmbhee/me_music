@@ -76,13 +76,10 @@ export default {
         })
       }
     },
-    AddToMusicQueue() {
-      console.log('test')
-    },
+    AddToMusicQueue() {},
 
     // 連接 Spotify WebPlayback
     startWebPlayback(track_id) {
-      console.log(this.my_device_id)
       let config = {
         method: 'PUT',
         url: 'https://api.spotify.com/v1/me/player/play',
@@ -97,9 +94,7 @@ export default {
           Authorization: `Bearer ${this.authCode.access_token}`
         }
       }
-      axios(config).then((res) => {
-        console.log(res)
-      })
+      axios(config)
     },
     clickAdd() {
       if (this.preview_url == null) {

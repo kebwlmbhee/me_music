@@ -61,8 +61,7 @@ export default defineStore('UserStatus', {
           }
         })
         // 401 Bad or expired token
-        .catch((err) => {
-          console.log(err)
+        .catch(() => {
           self.logout()
         })
     },

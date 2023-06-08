@@ -55,7 +55,7 @@
             "
           >
             <span style="display: flex; align-items: center; height: 100%">
-              <span style="font-size: 1.0em"
+              <span style="font-size: 1em"
                 ><b
                   >來自 <span class="text-blue">{{ item.musicPlayer.name }}</span> 的廣播</b
                 >
@@ -77,7 +77,7 @@
             <span style="font-size: 0.8em">{{ item.time }}</span>
           </span>
 
-          <div  
+          <div
             style="
               display: flex;
               justify-content: space-between;
@@ -88,14 +88,7 @@
             "
           >
             <div style="display: flex; justify-content: center; height: 100%">
-
               <v-avatar :image="item.musicPlayer.avatar" size="80"></v-avatar>
-
-              <!-- <img
-                :src="item.musicPlayer.avatar"
-                alt="test"
-                style="width: auto; height: 100%; max-height: 100%"
-              /> -->
             </div>
 
             <div
@@ -110,8 +103,6 @@
               {{ item.something }}
             </div>
           </div>
-
-          
         </div>
       </div>
     </div>
@@ -165,7 +156,6 @@ export default {
       // like update
       async function test() {
         await announcementLikes.getAnnouncementLikes((announcementId, likeCount) => {
-          //console.log(likeCount)
           // 尋找遍歷到的 id
           const targetAnnouncement = announcements.find(
             (announcement) => announcement.id === announcementId
@@ -173,7 +163,6 @@ export default {
           if (targetAnnouncement) {
             // 更新指定公告的讚數
             targetAnnouncement.likeCount = likeCount
-            //console.log(targetAnnouncement.likeCount + 'test')
             // 檢查是否按過讚
             const userId = userid
             // 如果 "該 userId 存在"
@@ -191,18 +180,13 @@ export default {
 
         // import songList from firebase
         announcements.forEach((element) => {
-          console.log(element.id)
-          console.log(element.likeCount)
-          console.log(element.liked)
-
           let max_str = 18
-          if(element.text.length > max_str){
+          if (element.text.length > max_str) {
             element.text = element.text.substring(0, max_str) + ' ...'
           }
 
-
           songList.push({
-            id: reactive(element.id),
+            id: element.id,
             songImage: element.musicInfo.picture,
             songTitle: element.musicInfo.songName,
             songInfo: element.musicInfo.artist,
@@ -221,8 +205,6 @@ export default {
 
     const likesButton = async (announcement) => {
       try {
-        // alert(announcement.id)
-        //console.log(songList)
         // userProfile.id 為空時會出錯，若獲取不到 userId 時，應該 alert 後 return
         if (!userid) {
           alert('請重新登入')
@@ -260,9 +242,6 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-/* default => max-width: 1400px */
-/* wrong */
-
 .test {
   background-color: grey;
 }
@@ -327,10 +306,6 @@ html {
   html {
     font-size: 20px;
   }
-
-  // flexColumn {
-  //   /* background-color: yellowgreen; */
-  // }
 }
 
 /* width */
