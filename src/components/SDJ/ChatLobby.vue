@@ -12,7 +12,7 @@
     <div class="firstPart" v-for="item in songList" :key="item.ID">
       <div class="inBox">
         <!-- left div -->
-        <div class="leftDiv" style="background-color: aqua">
+        <div class="leftDiv">
           <img :src="item.songImage" alt="songImgage" style="width: 100%; max-height: 100%" />
         </div>
 
@@ -91,26 +91,36 @@
               <v-avatar :image="item.musicPlayer.avatar" size="80"></v-avatar>
             </div>
 
-            <div
-              style="
-                width: 100%;
-                height: 40%;
-                background-color: white;
-                font-size: 1.2em;
-                margin-left: 10px;
-              "
-            >
+            <div style="width: 100%; height: 40%; font-size: 1.2em; margin-left: 10px">
               {{ item.something }}
             </div>
           </div>
+
+          <!-- Show All button -->
+          <v-btn class="show-all-button" @click="showAllText(item.fullText)">顯示完整內容</v-btn>
         </div>
       </div>
     </div>
+
+    <!-- Modal dialog -->
+    <v-dialog v-model="showModal" max-width="600">
+      <v-card>
+        <v-card-title>完整內容</v-card-title>
+        <v-card-text>
+          <!-- Full text content -->
+          {{ fullText }}
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="primary" text @click="closeModal">關閉</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </html>
 </template>
 
 <script>
-import { reactive } from 'vue'
+import { reactive, ref } from 'vue'
 import Chatroom from '/src/views/chatroom/chatroom.js'
 import AnnouncementLikes from '/src/views/announcement/announcementLikes.js'
 
@@ -123,6 +133,8 @@ export default {
     const audioControl = reactive(AudioControl())
     let songList = reactive([])
     var chatroom = new Chatroom()
+    const showModal = ref(false)
+    const fullText = ref('')
     var announcementLikes = new AnnouncementLikes()
     var userid = userStatus.userProfile.id
 
@@ -180,6 +192,7 @@ export default {
 
         // import songList from firebase
         announcements.forEach((element) => {
+          let fullText = element.text
           let max_str = 18
           if (element.text.length > max_str) {
             element.text = element.text.substring(0, max_str) + ' ...'
@@ -192,6 +205,7 @@ export default {
             songInfo: element.musicInfo.artist,
             musicPlayer: element.author,
             time: chatroom.getTimeString(element.time),
+            fullText: fullText,
             something: element.text,
             others: '訪客留言',
             liked: element.liked,
@@ -232,10 +246,23 @@ export default {
         })
     }
 
+    function showAllText(text) {
+      fullText.value = text
+      showModal.value = true
+    }
+
+    function closeModal() {
+      showModal.value = false
+    }
+
     return {
       songList,
       likesButton,
-      PlayButtonCallback
+      PlayButtonCallback,
+      showAllText,
+      closeModal,
+      fullText,
+      showModal
     }
   }
 }
@@ -299,7 +326,6 @@ html {
 .flexColumn {
   display: flex;
   flex-direction: column;
-  /* background-color: black; */
 }
 
 @media (min-width: 1600px) {
@@ -328,5 +354,10 @@ html {
 /* Handle on hover */
 ::-webkit-scrollbar-thumb:hover {
   background: #555;
+}
+
+.show-all-button {
+  margin: 10px;
+  background-color: rgb(194, 169, 128);
 }
 </style>
