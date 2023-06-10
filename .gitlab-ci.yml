@@ -1,14 +1,29 @@
 image: node:latest
 
-before_script:
-  - npm i -g firebase-tools
+cache:
+  paths:
+    - node_modules/
 
-pipeline:
+before_script:
   variables:
     SECURE_FILES_DOWNLOAD_PATH: '/.firebase/'
   script:
     - curl --silent "https://gitlab.com/gitlab-org/incubation-engineering/mobile-devops/download-secure-files/-/raw/main/installer" | bash
     - npm install
-    - npm run test:coverage
+
+lint:
+  script:
+    # add script
+
+build:
+  script:
     - npm run build
+
+test:
+  script:
+    - npm run test:coverage
+
+deploy:
+  - script:
+    - npm i -g firebase-tools
     - firebase deploy --token $FIREBASE_TOKEN
