@@ -10,7 +10,7 @@
     "preview": "vite preview",
     "test:unit": "vitest",
     "test:coverage": "vitest --environment jsdom --coverage",
-    "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs --fix --ignore-path .gitignore",
+    "lint": "eslint ./src --ext .vue,.js,.jsx,.cjs,.mjs --fix --ignore-path .gitignore",
     "format": "prettier --write src/",
     "deploy": "firebase deploy",
     "prepare": "husky install",
