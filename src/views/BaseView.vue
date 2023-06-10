@@ -71,6 +71,17 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+    <v-snackbar
+      v-model="isShowSwitchMessage"
+      :timeout="-1"
+      class="centered-snackbar"
+      bottom="false"
+    >
+      {{ switchMessage }}
+      <template v-slot:actions>
+        <v-btn color="blue" variant="text" @click="state.snackbar = false"> Close </v-btn>
+      </template>
+    </v-snackbar>
   </v-app>
 </template>
 <script>
@@ -108,8 +119,10 @@ export default {
       delayedMessage: '',
       playMusicTime: '',
       currentMusic: {},
-      // 測試參數
-      currentIndex: 0
+      currentIndex: 0,
+      switchMessage: '',
+      isShowSwitchMessage: false,
+      switchMessageTimeout: ''
     }
   },
   computed: {
@@ -146,22 +159,33 @@ export default {
     },
     // 繼續播放Preview
     PreviewResume() {
+      this.switchMessage = '切換至 Preview'
+      this.isShowSwitchMessage = true
+
       this.MuteMainAudio()
       this.isPreviewStateChange(true)
       var secondAudio = document.getElementById('secondAudio')
       if (secondAudio.ended) secondAudio.load()
       else secondAudio.play()
+
+      clearTimeout(this.switchMessageTimeout)
+      this.setSwitchMessageTimeout()
     },
     // 暫停Second Audio 預覽音樂
     // MainAudio 靜音會根據當前是否處於靜音去調整
     PausePreviewAudio() {
       // 當暫停時 使MainAudio靜音取消
       // 暫停播放 Second Audio
+      this.switchMessage = '切換至 Music Queue'
+      this.isShowSwitchMessage = true
       this.isPreviewStateChange(false)
       var secondAudio = document.getElementById('secondAudio')
       if (secondAudio) secondAudio.pause()
 
       if (!this.isMuted) this.UnmuteMainAudio()
+
+      clearTimeout(this.switchMessageTimeout)
+      this.setSwitchMessageTimeout()
     },
     // 靜音按鈕的控制
     // 控制Preview 跟 MainAudio 的 靜音狀態
@@ -246,6 +270,11 @@ export default {
       })
       mainAudio.volume = 0.5
       this.dialog = false
+    },
+    setSwitchMessageTimeout() {
+      this.switchMessageTimeout = setTimeout(() => {
+        this.isShowSwitchMessage = false
+      }, 1000)
     },
     ...mapActions(UserStatus, ['checkAuth', 'update_device_id']),
     ...mapActions(AudioControl, ['isPreviewStateChange'])
@@ -357,3 +386,9 @@ export default {
   }
 }
 </script>
+
+<style>
+.custom-snackbar .v-snack__content {
+  text-align: center;
+}
+</style>
