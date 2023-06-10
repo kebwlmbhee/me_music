@@ -1,5 +1,8 @@
 image: node:latest
 
+before_script:
+  - npm i -g firebase-tools
+
 test_unit:
   variables:
     SECURE_FILES_DOWNLOAD_PATH: '/.firebase/'
@@ -9,3 +12,7 @@ test_unit:
     - npm run test:coverage
 
 
+deploy:
+  script:
+    - npm run build
+    - npm run deploy --token $FIREBASE_TOKEN
