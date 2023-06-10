@@ -119,8 +119,6 @@ describe('MusicQueueView.vue', () => {
         playReplacedMusicSpy = vi.spyOn(wrapper.vm, 'playReplacedMusic');
         // spyOn isPreviewStateChange
         isPreviewStateChangeSpy = vi.spyOn(wrapper.vm, 'isPreviewStateChange');
-        // spyOn clearTimeout
-        clearTimeoutSpy = vi.spyOn(window, 'clearTimeout');
         // spyOn setSwitchMessageTimeout
         setSwitchMessageTimeoutSpy = vi.spyOn(wrapper.vm, 'setSwitchMessageTimeout');
     })
@@ -233,6 +231,9 @@ describe('MusicQueueView.vue', () => {
 
             it('Preview 歌曲 (secondAudio) 已結束', () => {
 
+                // spyOn clearTimeout
+                clearTimeoutSpy = vi.spyOn(window, 'clearTimeout');
+
                 // set secondAudio ended to true
                 mockSecondAudio.ended = true;
                 // mock getElementById return value
@@ -256,6 +257,9 @@ describe('MusicQueueView.vue', () => {
                 expect(clearTimeoutSpy).toHaveBeenCalledWith(switchMessageTimeoutValue);
                 // expect setSwitchMessageTimeoutSpy to be called once
                 expect(setSwitchMessageTimeoutSpy).toHaveBeenCalledOnce;
+
+                // restore the original implementation
+                clearTimeoutSpy.mockRestore()
             })
 
             it('Preview 歌曲 (secondAudio) 未結束', () => {
@@ -736,17 +740,6 @@ describe('MusicQueueView.vue', () => {
 
                 // expect isShowSwitchMessage to be false
                 expect(wrapper.vm.isShowSwitchMessage).toBe(false);
-            })
-        })
-
-        describe('whenPreviewEnded', () => {
-            it('Preview 播完時，將狀態設置為 false', () => {
-                
-                // Call the method being tested
-                wrapper.vm.whenPreviewEnded();
-
-                // expect isPreviewStateChange to be called with false
-                expect(isPreviewStateChangeSpy).toHaveBeenCalledWith(false);
             })
         })
     })

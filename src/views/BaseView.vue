@@ -44,7 +44,7 @@
       <v-app-bar-title class="font-weight-bold">#{{ SelectedPage }}</v-app-bar-title>
       <v-spacer></v-spacer>
       <audio :src="MainMusic_url" autoplay id="mainAudio" @ended="whenMusicEnded"></audio>
-      <audio :src="SecondMusic_url" id="secondAudio" @ended="whenPreviewEnded" autoplay></audio>
+      <audio :src="SecondMusic_url" id="secondAudio" @ended="PausePreviewAudio" autoplay></audio>
       <v-slider class="mt-5 mx-3" v-model="volume" min="0" max="1"> </v-slider>
       <v-btn :icon="volume_icon" @click="MuteButtonControl"></v-btn>
       <user-profile-button
@@ -272,9 +272,6 @@ export default {
       this.switchMessageTimeout = setTimeout(() => {
         this.isShowSwitchMessage = false
       }, 1000)
-    },
-    whenPreviewEnded() {
-      this.isPreviewStateChange(false)
     },
     ...mapActions(UserStatus, ['checkAuth', 'update_device_id']),
     ...mapActions(AudioControl, ['isPreviewStateChange'])
