@@ -71,13 +71,10 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
-    <v-snackbar
-      v-model="isShowSwitchMessage"
-      :timeout="-1"
-      class="centered-snackbar"
-      bottom="false"
-    >
-      {{ switchMessage }}
+    <v-snackbar v-model="isShowSwitchMessage" :timeout="-1">
+      <div class="centered-text">
+        {{ switchMessage }}
+      </div>
       <template v-slot:actions>
         <v-btn color="blue" variant="text" @click="state.snackbar = false"> Close </v-btn>
       </template>
@@ -391,7 +388,7 @@ export default {
 </script>
 
 <style>
-.custom-snackbar .v-snack__content {
+.centered-text {
   text-align: center;
 }
 </style>
