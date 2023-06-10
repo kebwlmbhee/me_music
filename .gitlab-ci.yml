@@ -11,4 +11,4 @@ pipeline:
     - npm install
     - npm run test:coverage
     - npm run build
-    - npm run deploy --token $FIREBASE_TOKEN
+    - firebase deploy --token $FIREBASE_TOKEN
