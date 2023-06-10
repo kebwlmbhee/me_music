@@ -26,4 +26,6 @@ build:
 deploy:
   script:
     - npm i -g firebase-tools
-    - firebase deploy --token $FIREBASE_TOKEN
+    - "npm run build && firebase deploy --token $FIREBASE_TOKEN"
+  needs:
+    - build
