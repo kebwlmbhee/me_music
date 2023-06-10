@@ -738,6 +738,17 @@ describe('MusicQueueView.vue', () => {
                 expect(wrapper.vm.isShowSwitchMessage).toBe(false);
             })
         })
+
+        describe('whenPreviewEnded', () => {
+            it('Preview 播完時，將狀態設置為 false', () => {
+                
+                // Call the method being tested
+                wrapper.vm.whenPreviewEnded();
+
+                // expect isPreviewStateChange to be called with false
+                expect(isPreviewStateChangeSpy).toHaveBeenCalledWith(false);
+            })
+        })
     })
 
     describe('BaseView watch', () => {
