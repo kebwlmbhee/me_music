@@ -3,16 +3,12 @@ image: node:latest
 before_script:
   - npm i -g firebase-tools
 
-test_unit:
+pipeline:
   variables:
     SECURE_FILES_DOWNLOAD_PATH: '/.firebase/'
   script:
     - curl --silent "https://gitlab.com/gitlab-org/incubation-engineering/mobile-devops/download-secure-files/-/raw/main/installer" | bash
     - npm install
     - npm run test:coverage
-
-
-deploy:
-  script:
     - npm run build
     - npm run deploy --token $FIREBASE_TOKEN
