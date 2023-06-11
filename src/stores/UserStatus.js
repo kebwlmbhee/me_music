@@ -57,7 +57,7 @@ export default defineStore('UserStatus', {
           if (res.data.images.length > 0) {
             this.userProfile.avatar = res.data.images[0].url
           } else {
-            this.userProfile.avatar = '/src/assets/anonymous_user.jpg'
+            this.userProfile.avatar = '/anonymous_user.jpg'
           }
         })
         // 401 Bad or expired token
