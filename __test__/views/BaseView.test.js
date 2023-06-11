@@ -16,6 +16,7 @@ describe('MusicQueueView.vue', () => {
     let mockMainAudio, mockSecondAudio;
     let getElementByIdSpy, muteMainAudioSpy, unmuteMainAudioSpy, isPreviewStateChangeSpy;
     let playReplacedMusicSpy, removeMusicTransactionMock, setTransactionMusicPlayTimeMock, getMusicPlayTimeMock;
+    let clearTimeoutSpy, setSwitchMessageTimeoutSpy;
 
     // using vi.fn() to create a mock push method in router
     const mockRouter = {
@@ -88,6 +89,10 @@ describe('MusicQueueView.vue', () => {
         wrapper.vm.playMusicTime = '';
         wrapper.vm.currentMusic = {};
         wrapper.vm.currentIndex = 0;
+        // Switch Message
+        wrapper.vm.switchMessage = '';
+        wrapper.vm.isShowSwitchMessage = false;
+        wrapper.vm.switchMessageTimeout = '';
 
         // mock musicQueue function
         removeMusicTransactionMock = vi.fn().mockResolvedValue();
@@ -104,8 +109,6 @@ describe('MusicQueueView.vue', () => {
             setTransactionMusicPlayTime: setTransactionMusicPlayTimeMock
         }
 
-        
-
         // spyOn getElementById
         getElementByIdSpy = vi.spyOn(document, 'getElementById');
         // spyOn MuteMainAudio 
@@ -116,6 +119,8 @@ describe('MusicQueueView.vue', () => {
         playReplacedMusicSpy = vi.spyOn(wrapper.vm, 'playReplacedMusic');
         // spyOn isPreviewStateChange
         isPreviewStateChangeSpy = vi.spyOn(wrapper.vm, 'isPreviewStateChange');
+        // spyOn setSwitchMessageTimeout
+        setSwitchMessageTimeoutSpy = vi.spyOn(wrapper.vm, 'setSwitchMessageTimeout');
     })
 
     // executed after each individual test
@@ -226,10 +231,16 @@ describe('MusicQueueView.vue', () => {
 
             it('Preview 歌曲 (secondAudio) 已結束', () => {
 
+                // spyOn clearTimeout
+                clearTimeoutSpy = vi.spyOn(window, 'clearTimeout');
+
                 // set secondAudio ended to true
                 mockSecondAudio.ended = true;
                 // mock getElementById return value
                 getElementByIdSpy.mockReturnValue(mockSecondAudio);
+                // mock switchMessageTimeout to be switchMessageTimeoutValue
+                const switchMessageTimeoutValue = 456;
+                wrapper.vm.switchMessageTimeout = switchMessageTimeoutValue;
 
                 // Call the method being tested
                 wrapper.vm.PreviewResume();
@@ -242,6 +253,13 @@ describe('MusicQueueView.vue', () => {
                 expect(getElementByIdSpy).toHaveBeenCalledWith('secondAudio');
                 // expect secondAudio load to be called once
                 expect(mockSecondAudio.load).toHaveBeenCalledTimes(1);
+                // expect clearTimeout to be called with switchMessageTimeout
+                expect(clearTimeoutSpy).toHaveBeenCalledWith(switchMessageTimeoutValue);
+                // expect setSwitchMessageTimeoutSpy to be called once
+                expect(setSwitchMessageTimeoutSpy).toHaveBeenCalledOnce;
+
+                // restore the original implementation
+                clearTimeoutSpy.mockRestore()
             })
 
             it('Preview 歌曲 (secondAudio) 未結束', () => {
@@ -271,17 +289,27 @@ describe('MusicQueueView.vue', () => {
 
                 // mock getElementById return value
                 getElementByIdSpy.mockReturnValue(mockSecondAudio);
+                // mock switchMessageTimeout to be switchMessageTimeoutValue
+                const switchMessageTimeoutValue = 123;
+                wrapper.vm.switchMessageTimeout = switchMessageTimeoutValue;
 
                 // Call the method being tested
                 wrapper.vm.PausePreviewAudio();
 
+                // expect switchMessage to be right value
+                expect(wrapper.vm.switchMessage).toEqual('切換至 Music Queue');
+                // expect isShowSwitchMessage to be true
+                expect(wrapper.vm.isShowSwitchMessage).toBe(true);
                 // expect isPreviewStateChange to be called with false
                 expect(isPreviewStateChangeSpy).toHaveBeenCalledWith(false);
                 // expect getElementById to be called with secondAudio
                 expect(getElementByIdSpy).toHaveBeenCalledWith('secondAudio');
                 // expect secondAudio pause to be called once
                 expect(mockSecondAudio.pause).toHaveBeenCalledTimes(1);
-
+                // expect clearTimeout to be called with switchMessageTimeout
+                expect(clearTimeoutSpy).toHaveBeenCalledWith(switchMessageTimeoutValue);
+                // expect setSwitchMessageTimeoutSpy to be called once
+                expect(setSwitchMessageTimeoutSpy).toHaveBeenCalledOnce;
             })
 
             it('Preview 歌曲 (secondAudio) 不存在', () => {
@@ -382,9 +410,9 @@ describe('MusicQueueView.vue', () => {
                 // mock isPreview return value is true
                 store.isPreview = true;
 
-                 // mock getElementById return value
+                // mock getElementById return value
                 getElementByIdSpy.mockReturnValue(mockMainAudio);
- 
+
                 // Call the method being tested
                 wrapper.vm.MuteMainAudio();
 
@@ -696,6 +724,22 @@ describe('MusicQueueView.vue', () => {
                 expect(wrapper.vm.playMusicTime).toEqual(10 + 3);
                 // expect playMusicTime to be assigned to mainAudio currentTime
                 expect(mockMainAudio.currentTime).toBe(wrapper.vm.playMusicTime);
+            })
+        })
+
+        describe('setSwitchMessageTimeout', () => {
+            it('1 秒鐘後隱藏訊息', () => {
+                // set isShowSwitchMessage to true
+                wrapper.vm.isShowSwitchMessage = true;
+
+                // Call the method being tested
+                wrapper.vm.setSwitchMessageTimeout();
+
+                // speed up the setTimeout by 1 seconds
+                vi.advanceTimersByTime(1000);
+
+                // expect isShowSwitchMessage to be false
+                expect(wrapper.vm.isShowSwitchMessage).toBe(false);
             })
         })
     })
