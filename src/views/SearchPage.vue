@@ -3,8 +3,7 @@
     <!-- 最上方搜尋處 -->
     <v-app-bar scroll-behavior="hide" scroll-threshold="0" flat height="100">
       <v-text-field
-        prepend-icon="mdi-magnify"
-        append-inner-icon="mdi-send"
+        append-inner-icon="mdi-magnify"
         v-model="searchText"
         label="Search"
         variant="outlined"
