@@ -60,11 +60,11 @@
                   >來自 <span class="text-blue">{{ item.musicPlayer.name }}</span> 的廣播</b
                 >
               </span>
-              <span class="gjButton" style="height: 75%; font-size: 1em">
+              <span class="gjButton" style="height: 100%; font-size: 1em">
                 <v-btn
                   @click="likesButton(item)"
                   :class="{ 'bg-green': !item.liked, test: item.liked }"
-                  style="width: auto; height: 80%; font-size: 0.8em; margin-left: 10px"
+                  style="width: auto; height: 100%; font-size: 0.8em; margin-left: 10px"
                 >
                   <span class="material-symbols-outlined" style="font-size: 1em"> thumb_up </span>
                   <span style="font-size: 1em; margin-left: 10%">

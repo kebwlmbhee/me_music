@@ -52,9 +52,7 @@
           <v-spacer></v-spacer>
           <!-- 應該要放頭像  但沒有ˊˇˋ -->
           <div style="margin-right: 20px">
-            <v-avatar v-for="n in checkSong.artists.length" :key="n">
-              <v-img :src="imgSrc"></v-img>
-            </v-avatar>
+            <v-avatar></v-avatar>
             <!-- 點播按鈕 -->
             <v-card-actions>
               <v-spacer></v-spacer>
@@ -208,7 +206,6 @@ export default {
   },
   created() {
     this.checkAuth()
-    this.PausePreview()
     this.searchUserItem()
   }
 }
