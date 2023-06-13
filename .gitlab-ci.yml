@@ -4,6 +4,11 @@ cache:
   paths:
     - node_modules/
 
+stages:
+  - test
+  - build
+  - deploy
+
 variables:
   SECURE_FILES_DOWNLOAD_PATH: '/.firebase/'
 
@@ -11,19 +16,26 @@ before_script:
   - curl --silent "https://gitlab.com/gitlab-org/incubation-engineering/mobile-devops/download-secure-files/-/raw/main/installer" | bash
   - npm install
 
-test:
-  script:
-    - npm run test:coverage
-
 lint:
+  stage: test
   script:
     - npm run lint
 
+test:
+  stage: test
+  script:
+    - npm run test:coverage
+
 build:
+  stage: build
   script:
     - npm run build
+  artifacts:
+    paths:
+      - dist/
 
 deploy:
+  stage: deploy
   script:
     - npm i -g firebase-tools
     - firebase deploy --token $FIREBASE_TOKEN
