@@ -206,7 +206,6 @@ export default {
   },
   created() {
     this.checkAuth()
-    this.PausePreview()
     this.searchUserItem()
   }
 }

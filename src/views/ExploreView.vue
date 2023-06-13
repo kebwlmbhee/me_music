@@ -1,8 +1,7 @@
 <template>
   <div v-if="!loaded" class="ExploreContainer ma-3">
     <v-text-field
-      prepend-icon="mdi-magnify"
-      append-inner-icon="mdi-send"
+      append-inner-icon="mdi-magnify"
       v-model="search"
       label="Search"
       variant="underlined"
