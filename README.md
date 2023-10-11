@@ -1,5 +1,8 @@
 # me_music
 
+## GitLab
+#### https://gitlab.com/nccu_se/ac/me_music
+
 ## Link: 
 #### https://memusic-97d9b.firebaseapp.com/Home
 
